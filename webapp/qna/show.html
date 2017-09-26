@@ -170,7 +170,7 @@
                                           <a class="link-modify-article" href="/questions/413/answers/1405/form">수정</a>
                                       </li>
                                       <li>
-                                          <form class="form-delete" action="/questions/413/answers/1405" method="POST">
+                                          <form class="delete-answer-form" action="/questions/413/answers/1405" method="POST">
                                               <input type="hidden" name="_method" value="DELETE">
                                               <button type="submit" class="delete-answer-button">삭제</button>
                                           </form>
@@ -178,7 +178,7 @@
                                   </ul>
                               </div>
                           </article>
-                          <form class="submit-write">
+                          <form class="answer-form">
                               <div class="form-group" style="padding:14px;">
                                   <textarea class="form-control" placeholder="Update your status"></textarea>
                               </div>
@@ -210,7 +210,7 @@
 		<div class="article-util">
 		<ul class="article-util-list">
 			<li>
-				<a class="link-modify-article" href="/api/qna/updateAnswer/{3}">수정</a>
+				<a class="link-modify-article" href="/api/questions/{3}/answers/{4}/form">수정</a>				
 			</li>
 			<li>
 				<form class="delete-answer-form" action="/api/questions/{3}/answers/{4}" method="POST">
