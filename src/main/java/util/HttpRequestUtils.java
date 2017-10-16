@@ -7,12 +7,23 @@ import java.util.stream.Collectors;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
+import db.DataBase;
+import model.User;
+
 public class HttpRequestUtils {
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
+	
+	public static User loginRequest(String userId, String password) {
+		User user = DataBase.findUserById(userId);
+		if(user.getPassword().equals(password)) {
+			return user;
+		}
+		throw new NullPointerException();
+	}
 	public static String getRequestType(String queryString) {
 		String query[] = queryString.split(" ");
 		return query[0];
