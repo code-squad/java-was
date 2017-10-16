@@ -9,9 +9,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import model.User;
+import util.HttpRequestUtils;
+import util.IOUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -31,18 +36,30 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
             String line = br.readLine();
-            //first header line(url include)
-            String headers[] = line.split(" ");
-            log.debug(line);
+            String requestType = HttpRequestUtils.getRequestType(line);
+            String requestUrl = HttpRequestUtils.getRequestUrl(line);
+
+            int length = 0;
+            
             while(!line.equals("")) {
             		line = br.readLine();
-            		log.debug(line);
+            		if(line.contains("Content-Length")) {
+            			length = Integer.parseInt(line.split(" ")[1]);
+            		}
             }
-            String url = headers[1];
+            
             try {
-            		byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-            		response200Header(dos, body.length);
-                responseBody(dos, body);
+	        		if(requestType.equals("GET")) {
+	        			byte[] body = Files.readAllBytes(new File("./webapp" + requestUrl).toPath());
+	        			response200Header(dos, body.length);
+	        			responseBody(dos, body);
+	        		}else {
+	        			Map<String, String> map = HttpRequestUtils.parseQueryString(IOUtils.readData(br, (length)));
+	        			User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
+	        			log.debug(user.toString());
+	        			
+	        			response302Header(dos);
+	        		}
             }catch(IOException e) {
             		response404Header(dos);
             }
@@ -69,6 +86,16 @@ public class RequestHandler extends Thread {
     		}catch(IOException e) {
     			log.error(e.getMessage());
     		}
+    }
+    
+    private void response302Header(DataOutputStream dos) {
+    		try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: /index.html");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 
     private void responseBody(DataOutputStream dos, byte[] body) {

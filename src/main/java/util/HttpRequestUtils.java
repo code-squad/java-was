@@ -13,6 +13,16 @@ public class HttpRequestUtils {
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
+	public static String getRequestType(String queryString) {
+		String query[] = queryString.split(" ");
+		return query[0];
+	}
+	
+	public static String getRequestUrl(String queryString) {
+		String query[] = queryString.split(" ");
+		return query[1];
+	}
+	
     public static Map<String, String> parseQueryString(String queryString) {
         return parseValues(queryString, "&");
     }
