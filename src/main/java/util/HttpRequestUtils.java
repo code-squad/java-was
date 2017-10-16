@@ -1,5 +1,7 @@
 package util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +37,15 @@ public class HttpRequestUtils {
     }
     public static Map<String, String> parseCookies(String cookies) {
         return parseValues(cookies, ";");
+    }
+    
+    public static int parseContentLength(BufferedReader br) throws IOException{
+    		while(br.readLine() != null) {
+    			if (br.readLine().contains("length")) {
+    				return Integer.parseInt(br.readLine().split(":")[1]);
+    			}
+    		}
+    		return -1;
     }
 
     private static Map<String, String> parseValues(String values, String separator) {

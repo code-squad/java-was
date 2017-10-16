@@ -45,6 +45,7 @@ public class RequestHandler extends Thread {
 			String requestFile = StringUtils.directoryFromRequestHeader(requestFirstLine);
 			
 			if(HttpRequestUtils.parseRequestType(requestFirstLine) == HttpRequestUtils.RequestTypes.POST) {
+				
 			}
 			
 			else if(requestFile.indexOf('?') >= 0) {
