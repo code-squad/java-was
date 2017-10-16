@@ -8,6 +8,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
+	
+	public enum RequestTypes{
+		GET, POST
+	}
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
@@ -22,6 +26,13 @@ public class HttpRequestUtils {
      *            값은 name1=value1; name2=value2 형식임
      * @return
      */
+    
+    public static RequestTypes parseRequestType(String header) {
+    		if (header.contains("POST")) {
+    			return RequestTypes.POST;
+    		}
+    		return RequestTypes.GET;
+    }
     public static Map<String, String> parseCookies(String cookies) {
         return parseValues(cookies, ";");
     }
@@ -34,6 +45,11 @@ public class HttpRequestUtils {
         String[] tokens = values.split(separator);
         return Arrays.stream(tokens).map(t -> getKeyValue(t, "=")).filter(p -> p != null)
                 .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+    }
+    
+    public static Map<String, String> parsePostBody(String requestBody){
+    		String [] inputString = requestBody.split(System.getProperty("line.separator"));
+    		return parseValues(inputString[inputString.length - 1], "=");
     }
 
     static Pair getKeyValue(String keyValue, String regex) {

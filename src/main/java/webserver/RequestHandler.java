@@ -21,6 +21,7 @@ import model.User;
 import java.nio.file.*;
 
 import util.HttpRequestUtils;
+import util.IOUtils;
 import util.StringUtils;
 
 public class RequestHandler extends Thread {
@@ -40,8 +41,13 @@ public class RequestHandler extends Thread {
 			// TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 			DataOutputStream dos = new DataOutputStream(out);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-			String requestFile = StringUtils.directoryFromRequestHeader(br.readLine());
-			if(requestFile.contains("\\?")) {
+			String requestFirstLine = br.readLine();
+			String requestFile = StringUtils.directoryFromRequestHeader(requestFirstLine);
+			
+			if(HttpRequestUtils.parseRequestType(requestFirstLine) == HttpRequestUtils.RequestTypes.POST) {
+			}
+			
+			else if(requestFile.indexOf('?') >= 0) {
 				log.debug("user info received.");
 				String query = StringUtils.parseQueryString(requestFile);
 				Map<String, String> UserInfo = HttpRequestUtils.parseQueryString(query);
