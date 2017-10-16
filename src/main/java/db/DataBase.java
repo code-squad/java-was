@@ -22,7 +22,4 @@ public class DataBase {
 		return users.values();
 	}
 
-	public static String HelloPobi() {
-		return "hello pobi";
-	}
 }
