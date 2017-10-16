@@ -1,5 +1,7 @@
 package util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,6 +10,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
+	
+	public enum RequestTypes{
+		GET, POST
+	}
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
@@ -22,8 +28,25 @@ public class HttpRequestUtils {
      *            값은 name1=value1; name2=value2 형식임
      * @return
      */
+    
+    public static RequestTypes parseRequestType(String header) {
+    		if (header.contains("POST")) {
+    			return RequestTypes.POST;
+    		}
+    		return RequestTypes.GET;
+    }
+    
     public static Map<String, String> parseCookies(String cookies) {
         return parseValues(cookies, ";");
+    }
+    
+    public static int parseContentLength(BufferedReader br) throws IOException{
+    		while(br.readLine() != null) {
+    			if (br.readLine().contains("length")) {
+    				return Integer.parseInt(br.readLine().split(":")[1]);
+    			}
+    		}
+    		return -1;
     }
 
     private static Map<String, String> parseValues(String values, String separator) {
@@ -35,6 +58,7 @@ public class HttpRequestUtils {
         return Arrays.stream(tokens).map(t -> getKeyValue(t, "=")).filter(p -> p != null)
                 .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
     }
+    
 
     static Pair getKeyValue(String keyValue, String regex) {
         if (Strings.isNullOrEmpty(keyValue)) {
