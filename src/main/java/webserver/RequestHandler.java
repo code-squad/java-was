@@ -10,12 +10,17 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import db.DataBase;
+import model.User;
+
 import java.nio.file.*;
 
+import util.HttpRequestUtils;
 import util.StringUtils;
 
 public class RequestHandler extends Thread {
@@ -28,8 +33,6 @@ public class RequestHandler extends Thread {
 	}
 
 	public void run() {
-		StringBuilder sb = new StringBuilder();
-		
 		log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
 				connection.getPort());
 
@@ -38,18 +41,26 @@ public class RequestHandler extends Thread {
 			DataOutputStream dos = new DataOutputStream(out);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			String requestFile = StringUtils.directoryFromRequestHeader(br.readLine());
+			if(requestFile.contains("\\?")) {
+				log.debug("user info received.");
+				String query = StringUtils.parseQueryString(requestFile);
+				Map<String, String> UserInfo = HttpRequestUtils.parseQueryString(query);
+				DataBase.addUser(new User(UserInfo.get("userId"), UserInfo.get("password"), UserInfo.get("name"), UserInfo.get("email")));
+				log.debug(DataBase.findUserById(UserInfo.get("userId")).toString());
+			}
+			else {
 			log.debug(requestFile);
 			byte[] body = Files.readAllBytes(new File("./webapp" + requestFile).toPath());
 			if (requestFile.contains("css")) {
 				response200HeaderStaticCss(dos, body.length);
-			}
-			else {
-			response200Header(dos, body.length);
+			} else {
+				response200Header(dos, body.length);
 			}
 			responseBody(dos, body);
-		} catch (IOException e) {
+		}} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+		
 	}
 
 	private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
@@ -62,7 +73,7 @@ public class RequestHandler extends Thread {
 			log.error(e.getMessage());
 		}
 	}
-	
+
 	private void response200HeaderStaticCss(DataOutputStream dos, int lengthOfBodyContent) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");

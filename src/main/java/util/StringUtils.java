@@ -6,5 +6,10 @@ public class StringUtils {
 		String [] inputArray = header.split(" ");
 		return inputArray[1];
 	}
+	
+	public static String parseQueryString(String query) {
+		String [] inputArray = query.split("\\?");
+		return inputArray[1];
+	}
 
 }
