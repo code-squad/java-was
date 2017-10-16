@@ -56,3 +56,28 @@ ex) git push origin javajigi
 ## 앞의 코드 리뷰 과정은 [영상 보기](https://youtu.be/ZSZoaG0PqLg) 를 통해 참고 가능
 
 ## 실습 중 모든 질문은 [웹백엔드 java 레벨4 채널](https://codesquad-members.slack.com/messages/C74DD7R7S/)에서...
+
+## 2017 / 10 / 16 정리
+
+### Java BuffredReader
+
+```java
+BufferedReader br = new BufferedReader(new InputStreamReader(new InputStream()));
+```
+
+BufferdReader위와 같은 구조를 가지고 있다.
+
+readLine() 메소드를 통해 br에 들어있는 값을 한줄씩 받아올 수 있다.
+
+### File을 byte 형태로 읽을 
+
+```java
+Files.readAllBytes(new File("./webapp" + url).toPath());
+```
+Reads all the bytes from a file
+
+Parameters: 파일의 경로
+
+Returns: 해당 파일이 포함하고 있는 바이트 어레이 반환
+
+Throws : IOException / OutOfMemoryError / SecurityException
