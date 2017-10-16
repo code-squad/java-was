@@ -35,6 +35,7 @@ public class HttpRequestUtils {
     		}
     		return RequestTypes.GET;
     }
+    
     public static Map<String, String> parseCookies(String cookies) {
         return parseValues(cookies, ";");
     }
@@ -58,10 +59,6 @@ public class HttpRequestUtils {
                 .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
     }
     
-    public static Map<String, String> parsePostBody(String requestBody){
-    		String [] inputString = requestBody.split(System.getProperty("line.separator"));
-    		return parseValues(inputString[inputString.length - 1], "=");
-    }
 
     static Pair getKeyValue(String keyValue, String regex) {
         if (Strings.isNullOrEmpty(keyValue)) {

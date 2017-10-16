@@ -21,6 +21,7 @@ import model.User;
 import java.nio.file.*;
 
 import util.HttpRequestUtils;
+import util.HttpRequestUtils.RequestTypes;
 import util.IOUtils;
 import util.StringUtils;
 
@@ -28,7 +29,9 @@ public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket connection;
-
+	
+	
+	
 	public RequestHandler(Socket connectionSocket) {
 		this.connection = connectionSocket;
 	}
@@ -42,9 +45,25 @@ public class RequestHandler extends Thread {
 			DataOutputStream dos = new DataOutputStream(out);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			String requestFirstLine = br.readLine();
+			RequestTypes type = HttpRequestUtils.parseRequestType(requestFirstLine);
 			String requestFile = StringUtils.directoryFromRequestHeader(requestFirstLine);
+			int length = 0;
 			
-			if(HttpRequestUtils.parseRequestType(requestFirstLine) == HttpRequestUtils.RequestTypes.POST) {
+			if (type == RequestTypes.POST) {
+				while(!requestFirstLine.equals("")) {
+					requestFirstLine = br.readLine();
+					if(requestFirstLine.contains("Content-Length")) {
+						length = Integer.parseInt(requestFirstLine.split(" ")[1]);
+					}
+					
+				}
+				
+				String postBody = IOUtils.readData(br, length);
+				log.debug(postBody);
+				Map<String, String> userInfo = HttpRequestUtils.parseQueryString(postBody);
+				DataBase.addUser(User.createNewUser(userInfo));
+				log.debug(DataBase.findUserById(userInfo.get("userId")).getName());
+				response302Redirect(dos, "/index.html");
 				
 			}
 			
@@ -88,6 +107,16 @@ public class RequestHandler extends Thread {
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+	
+	private void response302Redirect(DataOutputStream dos, String target) {
+		try {
+			dos.writeBytes("HTTP/1.1 302 Found \r\n");
+			dos.writeBytes("Location: " + target);
+		}
+		catch (IOException e) {
 			log.error(e.getMessage());
 		}
 	}
