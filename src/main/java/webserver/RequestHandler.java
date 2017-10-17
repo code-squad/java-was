@@ -97,7 +97,8 @@ public class RequestHandler extends Thread {
 				log.debug(DataBase.findUserById(UserInfo.get("userId")).toString());
 			}
 			
-			else if (requestFile.contains("list")) {
+			else if (type == RequestTypes.GET && requestFile.contains("/users/list")) {
+				
 				
 				log.debug("user list info requested.");
 				while(!requestFirstLine.equals("")) {
@@ -107,9 +108,11 @@ public class RequestHandler extends Thread {
 						response200Header(dos, body.length);
 						responseBody(dos, body);
 					}
-					else {
+					else if(requestFirstLine.contains("logined=false")){
+						log.debug("no authentication cookie. redirect to index page.");
 						response302Redirect(dos, "/index.html");
 					}
+					
 				}
 			}
 			else {
@@ -137,13 +140,6 @@ public class RequestHandler extends Thread {
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
-	}
-	
-	private String response200HeaderWithLoginCookie(boolean login) {
-		if(login) {
-			return "Set-Cookie: logined=true; Path=/";
-		}
-		return "Set-Cookie: logined=false; Path=/";
 	}
 
 	private void response200HeaderStaticCss(DataOutputStream dos, int lengthOfBodyContent) {
