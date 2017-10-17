@@ -6,10 +6,14 @@ import static org.junit.Assert.*;
 import java.util.Map;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import util.HttpRequestUtils.Pair;
+import webserver.RequestHandler;
 
 public class HttpRequestUtilsTest {
+	private static final Logger log = LoggerFactory.getLogger(HttpRequestUtilsTest.class);
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
@@ -69,5 +73,29 @@ public class HttpRequestUtilsTest {
         String header = "Content-Length: 59";
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
+    }
+    
+    @Test
+    public void parseJoinHeader() throws Exception {
+    		StringBuilder header = new StringBuilder();
+    		header.append("GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1");
+    		header.append("Host: localhost:8080");
+    		header.append("Connection: keep-alive");
+    		header.append("Accept: */*");
+    		
+    }
+    
+    @Test
+    public void parseJoinUrlHeader() throws Exception {
+    		String header="GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
+    		String val[] = header.split(" ");
+    		String url[] = val[1].split("\\?");
+    		log.debug("logg : " + url[0]);
+    		log.debug("logg2 : " + url[1]);
+    		
+    		String params[] = url[1].split("\\&");
+    		for(String str : params) {
+    			log.debug("logg3 : " + str);
+    		}
     }
 }
