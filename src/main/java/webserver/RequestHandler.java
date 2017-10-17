@@ -29,6 +29,7 @@ public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket connection;
+	private boolean login;
 	
 	
 	
@@ -49,7 +50,7 @@ public class RequestHandler extends Thread {
 			String requestFile = StringUtils.directoryFromRequestHeader(requestFirstLine);
 			int length = 0;
 			
-			if (type == RequestTypes.POST) {
+			if (type == RequestTypes.POST && requestFile.contains("/user/create")) {
 				while(!requestFirstLine.equals("")) {
 					requestFirstLine = br.readLine();
 					if(requestFirstLine.contains("Content-Length")) {
@@ -65,6 +66,22 @@ public class RequestHandler extends Thread {
 				log.debug(DataBase.findUserById(userInfo.get("userId")).getName());
 				response302Redirect(dos, "/index.html");
 				
+			}
+			
+			else if(type == RequestTypes.POST && requestFile.contains("/user/login")) {
+				while(!requestFirstLine.equals("")) {
+					requestFirstLine = br.readLine();
+					if(requestFirstLine.contains("Content-Length")) {
+						length = Integer.parseInt(requestFirstLine.split(" ")[1]);
+					}
+					
+				}
+				String postBody = IOUtils.readData(br, length);
+				Map<String, String> loginInfo = HttpRequestUtils.parseQueryString(postBody);
+				User user = DataBase.findUserById(loginInfo.get("userId"));
+				if (user.isLoginInfoCorrect(loginInfo.get("password"))) {
+					
+				}
 			}
 			
 			else if(requestFile.indexOf('?') >= 0) {
@@ -94,10 +111,18 @@ public class RequestHandler extends Thread {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
 			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+			dos.writeBytes(response200HeaderWithLoginCookie(this.login) + "\r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+	}
+	
+	private String response200HeaderWithLoginCookie(boolean login) {
+		if(login) {
+			return "Set-Cookie: logined=true; Path=/";
+		}
+		return "Set-Cookie: logined=false; Path=/";
 	}
 
 	private void response200HeaderStaticCss(DataOutputStream dos, int lengthOfBodyContent) {
