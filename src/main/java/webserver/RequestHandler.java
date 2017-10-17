@@ -91,6 +91,22 @@ public class RequestHandler extends Thread {
 				DataBase.addUser(new User(UserInfo.get("userId"), UserInfo.get("password"), UserInfo.get("name"), UserInfo.get("email")));
 				log.debug(DataBase.findUserById(UserInfo.get("userId")).toString());
 			}
+			
+			else if (requestFile.contains("list")) {
+				
+				log.debug("user list info requested.");
+				while(!requestFirstLine.equals("")) {
+					requestFirstLine = br.readLine();
+					if (requestFirstLine.contains("logined=true")) {
+						byte[] body = DataBase.findAll().toString().getBytes();
+						response200Header(dos, body.length);
+						responseBody(dos, body);
+					}
+					else {
+						response302Redirect(dos, "/index.html");
+					}
+				}
+			}
 			else {
 			log.debug(requestFile);
 			byte[] body = Files.readAllBytes(new File("./webapp" + requestFile).toPath());
