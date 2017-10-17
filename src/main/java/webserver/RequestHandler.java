@@ -89,14 +89,6 @@ public class RequestHandler extends Thread {
 				}
 			}
 			
-			else if(requestFile.indexOf('?') >= 0) {
-				log.debug("user info received.");
-				String query = StringUtils.parseQueryString(requestFile);
-				Map<String, String> UserInfo = HttpRequestUtils.parseQueryString(query);
-				DataBase.addUser(new User(UserInfo.get("userId"), UserInfo.get("password"), UserInfo.get("name"), UserInfo.get("email")));
-				log.debug(DataBase.findUserById(UserInfo.get("userId")).toString());
-			}
-			
 			else if (type == RequestTypes.GET && requestFile.contains("/users/list")) {
 				
 				
