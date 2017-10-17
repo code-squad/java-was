@@ -80,7 +80,12 @@ public class RequestHandler extends Thread {
 				Map<String, String> loginInfo = HttpRequestUtils.parseQueryString(postBody);
 				User user = DataBase.findUserById(loginInfo.get("userId"));
 				if (user.isLoginInfoCorrect(loginInfo.get("password"))) {
-					
+					this.login = true;
+					response302RedirectLoginCookie(dos, "/index.html");
+				}
+				else {
+					this.login = false;
+					response302Redirect(dos, "/user/login_failed.html");
 				}
 			}
 			
@@ -111,7 +116,7 @@ public class RequestHandler extends Thread {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
 			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-			dos.writeBytes(response200HeaderWithLoginCookie(this.login) + "\r\n");
+			//dos.writeBytes(response200HeaderWithLoginCookie(this.login) + "\r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -145,6 +150,20 @@ public class RequestHandler extends Thread {
 			log.error(e.getMessage());
 		}
 	}
+	
+	private void response302RedirectLoginCookie(DataOutputStream dos, String target) {
+		try {
+			dos.writeBytes("HTTP/1.1 302 Found \r\n");
+			dos.writeBytes("Location: " + target + "\r\n");
+			dos.writeBytes("Set-Cookie: logined=true; Path=/");
+			dos.writeBytes("\r\n");
+		}
+		catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+	
+	
 
 	private void responseBody(DataOutputStream dos, byte[] body) {
 		try {
