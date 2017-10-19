@@ -5,22 +5,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import request.GetMapper;
+import request.PostMapper;
+import request.RequestMapper;
 import util.HttpRequestParser;
 
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
-	private GetHandler getHandler;
-	private PostHandler postHandler;
 	private Socket connection;
+	private Map<String, RequestMapper> requsetStrategy;
 
 	public RequestHandler(Socket connectionSocket) {
 		this.connection = connectionSocket;
-		getHandler = new GetHandler();
-		postHandler = new PostHandler();
+		this.requsetStrategy = new HashMap<String, RequestMapper>();
+		initRequestMethod();
+	}
+	
+	public void initRequestMethod() {
+		this.requsetStrategy.put("GET",new GetMapper());
+		this.requsetStrategy.put("POST",new PostMapper());
 	}
 
 	public void run() {
@@ -44,17 +53,9 @@ public class RequestHandler extends Thread {
 	}
 
 	private void requestHandlling(HttpRequestParser parser, DataOutputStream dos) throws IOException {
-		runRequestLogic(parser, dos);
-	}
-
-	private void runRequestLogic(HttpRequestParser parser, DataOutputStream dos) throws IOException {
 		String requestType = parser.getRequestType();
-		if(requestType.equals("GET")) {
-			this.getHandler.getHandling(parser, dos);
-		}else {
-			this.postHandler.postHandling(parser, dos);
-		}
-		
+		log.debug(requestType);
+		requsetStrategy.get(requestType).run(parser, dos);
 	}
 	
 }

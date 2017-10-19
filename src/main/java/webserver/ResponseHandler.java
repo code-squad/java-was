@@ -30,7 +30,6 @@ public class ResponseHandler {
 			log.error(e.getMessage());
 		}
 	}
-	
 	public static void response200HeaderHtmlRequrest(DataOutputStream dos, int lengthOfBodyContent, String requestUrl) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
