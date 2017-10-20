@@ -19,6 +19,14 @@ public class ResponseHandler {
 			log.error(e.getMessage());
 		}
 	}
+	
+	public static void sendRedirect(String path) {
+		
+	}
+	
+	public static void ok(String file) {
+		
+	}
 
 	public static void responseLoginFailed302Header(DataOutputStream dos, String redirectUrl) {
 		try {

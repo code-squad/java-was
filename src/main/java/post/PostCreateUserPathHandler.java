@@ -18,6 +18,7 @@ public class PostCreateUserPathHandler implements PathHandler {
 	private static final Logger log = LoggerFactory.getLogger(PostCreateUserPathHandler.class);
 	@Override
 	public void run(HttpRequestParser parser, DataOutputStream dos) throws IOException {
+		log.debug("회원가입 세션 진행 ");
 		Map<String, String> bodyMap = HttpRequestUtils.parseQueryString(parser.getBody());
 		// TODO Auto-generated method stub
 		User user = new User(bodyMap.get("userId"), bodyMap.get("password"), bodyMap.get("name"), bodyMap.get("email"));

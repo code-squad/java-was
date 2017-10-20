@@ -15,19 +15,18 @@ public class GetMapper implements RequestMapper{
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
-		pathStrategy.put("/user/list", new GetUserListPathHandler());
-		pathStrategy.put("default", new GetDefaultPathHandler());
+		pathMethodStrategy.put("/user/list", new GetUserListPathHandler());
+		pathMethodStrategy.put("default", new GetDefaultPathHandler());
 	}
 
 	@Override
-	public void run(HttpRequestParser parser, DataOutputStream dos) throws IOException {
+	public PathHandler getReqestMapper(String requestType) {
 		// TODO Auto-generated method stub
-		String url = parser.getUrl();
-		if(pathStrategy.containsKey(url)) {
-			pathStrategy.get(url).run(parser, dos);
-		}else {
-			pathStrategy.get("default").run(parser, dos);
+		if(pathMethodStrategy.containsKey(requestType)) {
+			return pathMethodStrategy.get(requestType);
 		}
+		
+		return pathMethodStrategy.get("default");
 	}
 
 }

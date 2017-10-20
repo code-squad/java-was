@@ -1,14 +1,13 @@
 package request;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import post.PostCreateUserPathHandler;
 import post.PostLoginPathHandler;
-import util.HttpRequestParser;
 
 public class PostMapper implements RequestMapper {
-
+	private static final Logger log = LoggerFactory.getLogger(PostMapper.class);
 	public PostMapper() {
 		init();
 	}
@@ -16,15 +15,14 @@ public class PostMapper implements RequestMapper {
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
-		pathStrategy.put("/user/login", new PostLoginPathHandler());
-		pathStrategy.put("/user/create", new PostCreateUserPathHandler());
+		log.debug("POST : help");
+		pathMethodStrategy.put("/user/login", new PostLoginPathHandler());
+		pathMethodStrategy.put("/user/create", new PostCreateUserPathHandler());
 	}
 
 	@Override
-	public void run(HttpRequestParser parser, DataOutputStream dos) throws IOException {
-		// TODO Auto-generated method stub
-		String url = parser.getUrl();
-		pathStrategy.get(url).run(parser, dos);
+	public PathHandler getReqestMapper(String url) {
+		return pathMethodStrategy.get(url);
 	}
 
 }
