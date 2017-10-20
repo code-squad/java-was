@@ -12,6 +12,7 @@ import request.GetMapper;
 import request.PathHandler;
 import request.PostMapper;
 import request.RequestMapper;
+import request.RequestStrategies;
 
 public class WebServer {
     private static final Logger log = LoggerFactory.getLogger(WebServer.class);

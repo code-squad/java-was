@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import request.PathHandler;
-import request.RequestMapper;
+import request.RequestStrategies;
 import util.HttpRequestParser;
 
 public class RequestHandler extends Thread {

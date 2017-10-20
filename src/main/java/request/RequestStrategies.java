@@ -1,12 +1,8 @@
-package webserver;
+package request;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import request.GetMapper;
-import request.PathHandler;
-import request.PostMapper;
-import request.RequestMapper;
 import util.HttpRequestParser;
 
 public class RequestStrategies {

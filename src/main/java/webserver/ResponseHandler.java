@@ -67,6 +67,8 @@ public class ResponseHandler {
 			response200HeaderHtmlRequrest(dos, lengthOfBodyContent, url);
 		}else if(url.contains("css")) {
 			response200HeaderCssRequrest(dos, lengthOfBodyContent, url);
+		}else {
+			response200HeaderCssRequrest(dos, lengthOfBodyContent, url);
 		}
 	}
 
