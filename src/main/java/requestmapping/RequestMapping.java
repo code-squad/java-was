@@ -1,32 +1,32 @@
 package requestmapping;
 
+import java.util.Map;
+
 import controller.Controller;
 import util.HttpRequestUtils.RequestTypes;
 
 public class RequestMapping {
-    
-    
-    private Controller controller;
-    private RequestTypes requestType;
-    
-    public RequestMapping(RequestTypes type, Controller controller) {
-        this.requestType = type;
-        this.controller = controller;
+
+    private static RequestMapping requestMapping;
+
+    private RequestMapping() {
+
     }
-    
-    public void setController(Controller controller) {
-        this.controller = controller;
+
+    public static RequestMapping getInstance() {
+        if (requestMapping == null) {
+            requestMapping = new RequestMapping();
+        }
+        return requestMapping;
     }
-    public void setRequestTypes(RequestTypes type) {
-        this.requestType = type;
+
+    private Map<RequestLine, Controller> controllerList;
+
+    public Controller getController(RequestLine rq) {
+        return controllerList.get(rq);
     }
-    public RequestTypes getRequestTypes() {
-        return this.requestType;
+
+    public void addController(RequestLine rq, Controller controller) {
+        this.controllerList.put(rq, controller);
     }
-    public Controller getController() {
-        return this.controller;
-    }
-    
-    
-   
 }
