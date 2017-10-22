@@ -17,9 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import controller.Controller;
+import controller.IndexController;
+import controller.ResourceController;
 import db.DataBase;
 import model.User;
 import requestmapping.RequestLine;
+import requestmapping.RequestLineFactory;
 import requestmapping.RequestMapping;
 
 import java.nio.file.*;
@@ -31,9 +34,12 @@ import util.StringUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+    private static final RequestLine notFoundRequestLine = RequestLineFactory.generateRequestLine(RequestTypes.GET,
+            "/resource");
 
     private Socket connection;
     private RequestMapping rm;
+
     private boolean login;
 
     public RequestHandler(Socket connectionSocket, RequestMapping rm) {
@@ -51,10 +57,15 @@ public class RequestHandler extends Thread {
             HttpRequest req = new HttpRequest(in);
             HttpResponse res = new HttpResponse(new DataOutputStream(out));
             RequestLine rl = req.getLine();
-            Controller controller = rm.getController(rl);
-            if (controller == null) {
+            log.debug(rl.getPath());
 
+            Controller controller = rm.getController(rl);
+            
+            if (controller == null) {
+                controller = new ResourceController();
+                controller.run(req, res);
             } else {
+
                 controller.run(req, res);
             }
 

@@ -23,7 +23,10 @@ public class HttpResponse {
     public void responseBody(byte[] bytes) {
         try {
             this.dos.writeBytes(header);
-            this.dos.write(bytes, 0, bytes.length);
+            log.debug(header);
+            this.dos.writeBytes("\r\n");
+            this.dos.write(bytes);
+            log.debug(dos.toString());
             dos.flush();
         } catch (IOException e) {
             log.error(e.getMessage());

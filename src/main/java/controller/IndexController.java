@@ -20,13 +20,14 @@ public class IndexController extends GetController {
     
     @Override
     public void run(HttpRequest req, HttpResponse res) {
+        log.debug("index controller initiated!");
         try {
         byte[] filebytes = Files.readAllBytes(new File("./webapp/index.html").toPath());
-        this.header = new HttpOkHeader();
+        this.header = new HttpOkHeader(filebytes.length, false);
         
+       
         res.setHeader(this.header.generateHttpHeaderString());
         res.responseBody(filebytes);
-        
         }
         catch(Exception e) {
             log.error(e.getMessage());
