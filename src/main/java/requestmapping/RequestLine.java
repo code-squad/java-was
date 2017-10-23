@@ -62,6 +62,13 @@ public class RequestLine {
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "RequestLine [path=" + path + ", method=" + method + ", params=" + params.values() + "]";
+    }
+    
+    
     
     
 

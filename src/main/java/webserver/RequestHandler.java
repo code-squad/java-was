@@ -58,6 +58,7 @@ public class RequestHandler extends Thread {
             HttpResponse res = new HttpResponse(new DataOutputStream(out));
             RequestLine rl = req.getLine();
             log.debug(rl.getPath());
+            log.debug(rl.getMethod().toString());
 
             Controller controller = rm.getController(rl);
             

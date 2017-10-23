@@ -19,6 +19,17 @@ public class HttpResponse {
     public void setHeader(String header) {
         this.header = header;
     }
+    
+    public void responseHeaderWithoutBody() {
+        try {
+            this.dos.writeBytes(header);
+            this.dos.writeBytes("\r\n");
+        }
+        catch(Exception e) {
+            log.error(e.getMessage());
+        }
+       
+    }
 
     public void responseBody(byte[] bytes) {
         try {
