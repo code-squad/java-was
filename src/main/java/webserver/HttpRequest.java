@@ -1,23 +1,18 @@
 package webserver;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.*;
 
 import com.google.common.collect.Maps;
 
-import controller.RequestMethod;
 import requestmapping.RequestLine;
-import util.HttpRequestUtils;
-import util.HttpRequestUtils.RequestTypes;
+
 import util.IOUtils;
-import util.StringUtils;
 
 public class HttpRequest {
 
@@ -37,7 +32,7 @@ public class HttpRequest {
             this.line = new RequestLine(br.readLine());
             log.debug(this.line.toString());
             String header = br.readLine();
-            while (!header.equals("")) {
+            while (!"".equals(header)) {
                 log.debug("header : {}", header);
                 String[] splitedHeader = header.split(": ");
                 headers.put(splitedHeader[0], splitedHeader[1]);

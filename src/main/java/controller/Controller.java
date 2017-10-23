@@ -1,6 +1,5 @@
 package controller;
 
-import util.HttpRequestUtils.RequestTypes;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 

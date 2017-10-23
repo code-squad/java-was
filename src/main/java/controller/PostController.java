@@ -7,12 +7,10 @@ import webserver.HttpResponse;
 
 public class PostController implements Controller {
 
-    private HttpHeader header;
-    private RequestTypes type = RequestTypes.POST;
 
     @Override
     public void run(HttpRequest req, HttpResponse res) {
-        
+        //TODO Override this method by extending PostController on implemented POST Method controllers.
     }
 
 }

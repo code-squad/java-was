@@ -1,13 +1,7 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import org.slf4j.Logger;
-
 public class ResponseHeaderOk extends ResponseHeader {
 
-    private ResponseCodes code = ResponseCodes.OK_200;
 
     public String generateHttpResponseHeader(int lengthOfBodyContent) {
 

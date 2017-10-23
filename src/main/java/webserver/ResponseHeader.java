@@ -1,9 +1,5 @@
 package webserver;
 
-import java.io.DataOutputStream;
-
-import org.slf4j.Logger;
-
 public class ResponseHeader {
     
     public enum ResponseCodes{
