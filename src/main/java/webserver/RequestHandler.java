@@ -49,6 +49,8 @@ public class RequestHandler extends Thread {
     }
 
     public void run() {
+        Controller resourceController = new ResourceController();
+        
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
@@ -57,8 +59,7 @@ public class RequestHandler extends Thread {
             HttpRequest req = new HttpRequest(in);
             HttpResponse res = new HttpResponse(new DataOutputStream(out));
             RequestLine rl = req.getLine();
-            log.debug(rl.getPath());
-            log.debug(rl.getMethod().toString());
+            
 
             Controller controller = rm.getController(rl);
             
