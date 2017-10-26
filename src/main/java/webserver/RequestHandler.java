@@ -23,22 +23,17 @@ public class RequestHandler extends Thread {
 		this.requsetStrategy = requsetStrategies;
 	}
 	
-	public void initRequestMethod() {
-		
-	}
-
 	public void run() {
 		log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
 				connection.getPort());
-
 		DataOutputStream dos = null;
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 			dos = new DataOutputStream(out);
 			HttpRequestParser parser = new HttpRequestParser(in);
 			log.debug("요청이 들어왔습니다");
 			requestHandlling(parser, dos);
-			log.debug("404 Error");
 		} catch (IOException e) {
+			log.debug("404 Error");
 			log.error(e.getMessage());
 			ResponseHandler.response404Header(dos);
 		}

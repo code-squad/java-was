@@ -21,13 +21,9 @@ public class GetUserListPathHandler implements PathHandler {
 		LoginCheckModule.checkLogin(dos, parser.getLogin());
 		log.debug("User List를 탐색합니다. 로그인 체크 성공");
 		String url = parser.getUrl();
-		log.debug("1");
 		// TODO Auto-generated method stub
 		byte[] body = DataBase.findAll().toString().getBytes();
-		log.debug("2");
 		ResponseHandler.response200Header(dos, body.length, url);
-		log.debug("3");
 		ResponseHandler.responseBody(dos, body);
-		log.debug("4");
 	}
 }
