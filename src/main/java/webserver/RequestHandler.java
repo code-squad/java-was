@@ -36,42 +36,52 @@ public class RequestHandler extends Thread {
 			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			DataOutputStream dos = new DataOutputStream(out);
 			String line = br.readLine();
-			String url = HttpRequestUtils.parseUrl(line);
-			Map<String, String> headers = HttpRequestUtils.pasrseHeaders(line, br);
-
-			if("/user/login".equals(url)) {
-				String query = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-				Map<String, String> parameters = HttpRequestUtils.parseQueryString(query);
-				User user = DataBase.findUserById(parameters.get("userId"));
-				if(user != null && user.matchPassword(parameters.get("password"))) {
-					response302CookieHeader(dos, "/index.html", "true");
-				} else {
-					response302CookieHeader(dos, "/user/login_failed.html", "false");
-				}
+			String method = HttpRequestUtils.parseMethod(line);
+			if("POST".equals(method)) {
+				handlePost(br, dos, line);
 			}
-			
-			if("/user/create".equals(url)) {
-				String query = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-				Map<String, String> parameters = HttpRequestUtils.parseQueryString(query);
-				DataBase.addUser(new User(parameters.get("userId"),parameters.get("password"),parameters.get("name"),parameters.get("email")));
-				response302Header(dos, "/index.html");
-			}
-			
-			if("/user/list".equals(url)) {
-				Map<String, String> cookies = HttpRequestUtils.parseCookies( headers.get("Cookie"));
-				String isLogined = cookies.get("logined");
-				if ( isLogined == null || isLogined.equals("false") ) {
-					response302Header(dos, "/user/login.html");	
-				} else {
-					byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
-					response200(dos, IOUtils.addUserList(body), headers);
-				}
-			} else {
-				byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-				response200(dos, body, headers);
+			if("GET".equals(method)) {
+				handleGet(br, dos, line);
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
+		}
+	}
+	
+	private void handleGet(BufferedReader br, DataOutputStream dos, String line) throws IOException {
+		String url = HttpRequestUtils.parseUrl(line);
+		Map<String, String> headers = HttpRequestUtils.pasrseHeaders(line, br);
+		if("/user/list".equals(url)) {
+			Map<String, String> cookies = HttpRequestUtils.parseCookies( headers.get("Cookie"));
+			String isLogined = cookies.get("logined");
+			if ( isLogined == null || isLogined.equals("false") ) {
+				response302Header(dos, "/user/login.html");	
+			} else {
+				byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
+				response200(dos, IOUtils.addUserList(body), headers);
+			}
+		} else {
+			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+			response200(dos, body, headers);
+		}
+	}
+
+	private void handlePost(BufferedReader br, DataOutputStream dos, String line) throws IOException {
+		String url = HttpRequestUtils.parseUrl(line);
+		Map<String, String> headers = HttpRequestUtils.pasrseHeaders(line, br);
+		String query = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+		Map<String, String> parameters = HttpRequestUtils.parseQueryString(query);
+		if("/user/login".equals(url)) {
+			User user = DataBase.findUserById(parameters.get("userId"));
+			if(user != null && user.matchPassword(parameters.get("password"))) {
+				response302CookieHeader(dos, "/index.html", "true");
+			} else {
+				response302CookieHeader(dos, "/user/login_failed.html", "false");
+			}
+		}
+		if("/user/create".equals(url)) {
+			DataBase.addUser(new User(parameters.get("userId"),parameters.get("password"),parameters.get("name"),parameters.get("email")));
+			response302Header(dos, "/index.html");
 		}
 	}
 	

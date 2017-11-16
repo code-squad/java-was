@@ -19,6 +19,10 @@ public class HttpRequestUtils {
 	public static String parseUrl(String firstLine) {
 		return firstLine.split(" ")[1];
 	}
+	
+	public static String parseMethod(String firstLine) {
+		return firstLine.split(" ")[0].toUpperCase();
+	}
 	/**
 	 * @param queryString은
 	 *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
@@ -33,11 +37,14 @@ public class HttpRequestUtils {
 		while( !"".equals(line) && line != null ) {
 			log.info(line);
 			line = br.readLine();
+			System.out.println("여긴가??");
 			Pair pair = HttpRequestUtils.parseHeader(line);
 			if(pair != null) {
 				headers.put(pair.getKey(), pair.getValue());
 			}
+			System.out.println("loof");
 		}
+		System.out.println("end");
 		return headers;
 	}
 
