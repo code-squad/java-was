@@ -24,15 +24,15 @@ public class HttpRequestUtils {
 		}
 		throw new NullPointerException();
 	}
-	public static String getRequestType(String queryString) {
-		String query[] = queryString.split(" ");
-		return query[0];
-	}
 	
-	public static String getRequestUrl(String queryString) {
+	public static String getFirstHeader(String queryString, int type) {
 		String query[] = queryString.split(" ");
+		if(type==0) {
+			return query[0];
+		}
 		return query[1];
 	}
+	
 	
     public static Map<String, String> parseQueryString(String queryString) {
         return parseValues(queryString, "&");
