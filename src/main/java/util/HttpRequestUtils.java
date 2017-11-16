@@ -32,12 +32,12 @@ public class HttpRequestUtils {
 		return parseValues(queryString, "&");
 	}
 
-	public static Map<String, String> pasrseHeaders(String headerLine, BufferedReader br) throws IOException {
+	public static Map<String, String> pasrseHeaders(String requestHeaderLine, BufferedReader br) throws IOException {
 		Map<String, String> headers = new HashMap<>();
-		while( !"".equals(headerLine) && headerLine != null ) {
-			log.info(headerLine);
-			headerLine = br.readLine();
-			Pair pair = HttpRequestUtils.parseHeader(headerLine);
+		while( !"".equals(requestHeaderLine) && requestHeaderLine != null ) {
+			log.info(requestHeaderLine);
+			requestHeaderLine = br.readLine();
+			Pair pair = HttpRequestUtils.parseHeader(requestHeaderLine);
 			if(pair != null) {
 				headers.put(pair.getKey(), pair.getValue());
 			}
