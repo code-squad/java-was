@@ -1,7 +1,9 @@
 package util;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.Map;
 
@@ -69,5 +71,21 @@ public class HttpRequestUtilsTest {
         String header = "Content-Length: 59";
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
+    }
+    
+    @Test
+    public void parseHttpHeader() throws Exception{
+        String header = 
+                "Host: localhost:8080\r\n" + 
+                "Connection: keep-alive\r\n" + 
+                "Content-Length: 46\r\n" + 
+                "Content-Type: application/x-www-form-urlencoded\r\n" + 
+                "Accept: */*";
+        
+        String[] list = header.split("\r\n");
+        
+        Map<String, String> testPair = HttpRequestUtils.parseHttpHeader(header);
+        
+        assertEquals("localhost:8080", testPair.get("Host"));
     }
 }

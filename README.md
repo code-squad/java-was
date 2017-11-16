@@ -56,3 +56,8 @@ ex) git push origin javajigi
 ## 앞의 코드 리뷰 과정은 [영상 보기](https://youtu.be/ZSZoaG0PqLg) 를 통해 참고 가능
 
 ## 실습 중 모든 질문은 [웹백엔드 java 레벨4 채널](https://codesquad-members.slack.com/messages/C74DD7R7S/)에서...
+
+### 20171016 실습 내용
+
+* HTTP Header 정보
+	* 모든 HTTP 데이터에는 헤더 정보가 있다. .html => "text/html" 등등

@@ -6,9 +6,20 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import controller.IndexController;
+import controller.ResourceController;
+import controller.UserJoinController;
+import controller.UserLoginController;
+import db.DataBase;
+import requestmapping.RequestLineFactory;
+import requestmapping.RequestMapping;
+import util.HttpRequestUtils.RequestTypes;
+
 public class WebServer {
     private static final Logger log = LoggerFactory.getLogger(WebServer.class);
-    private static final int DEFAULT_PORT = 8080;
+    private static final int DEFAULT_PORT = 4567;
+    public static final DataBase db = new DataBase();
+    private static final RequestMapping rm = RequestMapping.getInstance();
 
     public static void main(String args[]) throws Exception {
         int port = 0;
@@ -17,7 +28,10 @@ public class WebServer {
         } else {
             port = Integer.parseInt(args[0]);
         }
-
+        rm.addController(RequestLineFactory.generateRequestLine(RequestTypes.GET, "/index"), new IndexController());
+        rm.addController(RequestLineFactory.generateRequestLine(RequestTypes.GET, "/resource"), new ResourceController());
+        rm.addController(RequestLineFactory.generateRequestLine(RequestTypes.POST, "/user/create"), new UserJoinController());
+        rm.addController(RequestLineFactory.generateRequestLine(RequestTypes.POST, "/user/login"), new UserLoginController());
         // 서버소켓을 생성한다. 웹서버는 기본적으로 8080번 포트를 사용한다.
 
         try (ServerSocket listenSocket = new ServerSocket(port)) {
@@ -26,7 +40,7 @@ public class WebServer {
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                RequestHandler requestHandler = new RequestHandler(connection);
+                RequestHandler requestHandler = new RequestHandler(connection, rm);
                 requestHandler.start();
             }
         }
