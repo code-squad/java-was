@@ -1,5 +1,7 @@
 package util;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -32,5 +34,6 @@ public class IOUtilsTest {
 		body = IOUtils.addUserList(body);
 		
 		logger.debug(new String(body));
+		assertNotNull(body);
 	}
 }

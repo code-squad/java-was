@@ -32,19 +32,16 @@ public class HttpRequestUtils {
 		return parseValues(queryString, "&");
 	}
 
-	public static Map<String, String> pasrseHeaders(String line, BufferedReader br) throws IOException {
+	public static Map<String, String> pasrseHeaders(String header, BufferedReader br) throws IOException {
 		Map<String, String> headers = new HashMap<>();
-		while( !"".equals(line) && line != null ) {
-			log.info(line);
-			line = br.readLine();
-			System.out.println("여긴가??");
-			Pair pair = HttpRequestUtils.parseHeader(line);
+		while( !"".equals(header) && header != null ) {
+			log.info(header);
+			header = br.readLine();
+			Pair pair = HttpRequestUtils.parseHeader(header);
 			if(pair != null) {
 				headers.put(pair.getKey(), pair.getValue());
 			}
-			System.out.println("loof");
 		}
-		System.out.println("end");
 		return headers;
 	}
 
