@@ -7,19 +7,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import db.DataBase;
+import model.HttpRequest;
+import model.Method;
 import model.User;
-import util.HttpRequestUtils;
-import util.IOUtils;
 
 public class RequestHandler extends Thread {
-	private static final String POST = "POST";
-	private static final String GET = "GET";
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket connection;
@@ -36,10 +33,10 @@ public class RequestHandler extends Thread {
 			DataOutputStream dos = new DataOutputStream(out);
 			HttpRequest request = new HttpRequest(in);
 			
-			if(POST.equals(request.getHeader("method"))) {
+			if(Method.Post.equals(request.getHeader("method"))) {
 				handlePost(request, dos);
 			}
-			if(GET.equals(request.getHeader("method"))) {
+			if(Method.Get.equals(request.getHeader("method"))) {
 				handleGet(request, dos);
 			}
 		} catch (IOException e) {
@@ -50,15 +47,13 @@ public class RequestHandler extends Thread {
 	private void handleGet(HttpRequest request, DataOutputStream dos) throws IOException {
 		String url = request.getHeader("url");
 		if("/user/list".equals(url)) {
-//			Map<String, String> cookies = HttpRequestUtils.parseCookies( request.getHeader("Cookie"));
-//			String isLogined = cookies.get("logined");
 			String isLogined = request.getCookie("logined");
 			
 			if ( isLogined == null || isLogined.equals("false") ) {
 				response302Header(dos, "/user/login.html");	
 			} else {
 				byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
-				response200(dos, IOUtils.addUserList(body), request);
+				response200(dos, DataBase.addUserList(body), request);
 			}
 		} else {
 			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
@@ -67,7 +62,7 @@ public class RequestHandler extends Thread {
 	}
 
 	private void handlePost(HttpRequest request, DataOutputStream dos) {
-		String url = request.getHeader("url");
+		String url = request.getUrl();
 		if("/user/login".equals(url)) {
 			User user = DataBase.findUserById(request.getParameter("userId"));
 			if(user != null && user.matchPassword(request.getParameter("password"))) {

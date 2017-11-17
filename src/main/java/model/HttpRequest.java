@@ -1,4 +1,4 @@
-package webserver;
+package model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,6 +52,10 @@ public class HttpRequest {
 			return cookie.get(key);
 		}
 		return null;
+	}
+
+	public String getUrl() {
+		return headers.get("url");
 	}
 
 }
