@@ -15,6 +15,14 @@ import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
 	private static final Logger log = LoggerFactory.getLogger(HttpRequestUtils.class);
+	
+	public static String parseQueryByUrl(String url) {
+		String[] urlArr = url.split("\\?");
+		if( urlArr.length > 1 ) {
+			return urlArr[1];
+		}
+		return null;
+	}
 
 	public static String parseUrl(String firstLine) {
 		return firstLine.split(" ")[1];
@@ -32,12 +40,15 @@ public class HttpRequestUtils {
 		return parseValues(queryString, "&");
 	}
 
-	public static Map<String, String> pasrseHeaders(String header, BufferedReader br) throws IOException {
+	public static Map<String, String> pasrseHeaders( BufferedReader br) throws IOException {
 		Map<String, String> headers = new HashMap<>();
-		while( !"".equals(header) && header != null ) {
-			log.info(header);
-			header = br.readLine();
-			Pair pair = HttpRequestUtils.parseHeader(header);
+		String line = br.readLine();
+		headers.put("method", HttpRequestUtils.parseMethod(line));
+		headers.put("url", HttpRequestUtils.parseUrl(line));
+		while( !"".equals(line) && line != null ) {
+			log.info(line);
+			line = br.readLine();
+			Pair pair = HttpRequestUtils.parseHeader(line);
 			if(pair != null) {
 				headers.put(pair.getKey(), pair.getValue());
 			}
