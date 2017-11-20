@@ -15,6 +15,9 @@ import db.DataBase;
 import model.HttpRequest;
 import model.Method;
 import model.User;
+import model.response.Http200Response;
+import model.response.Http302Response;
+import model.response.HttpResponse;
 
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -32,89 +35,53 @@ public class RequestHandler extends Thread {
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 			DataOutputStream dos = new DataOutputStream(out);
 			HttpRequest request = new HttpRequest(in);
-			
-			if(Method.Post.equals(request.getHeader("method"))) {
-				handlePost(request, dos);
+			HttpResponse response = null;
+
+			if (Method.Post.equals(request.getHeader("method"))) {
+				response = Http302Response.create();
+				handlePost(request, response);
 			}
-			if(Method.Get.equals(request.getHeader("method"))) {
-				handleGet(request, dos);
+			if (Method.Get.equals(request.getHeader("method"))) {
+				response = Http200Response.create();
+				handleGet(request, response);
 			}
+			response.writeResponse(dos);
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
 	}
-	
-	private void handleGet(HttpRequest request, DataOutputStream dos) throws IOException {
+
+	private void handleGet(HttpRequest request, HttpResponse response) throws IOException {
 		String url = request.getHeader("url");
-		if("/user/list".equals(url)) {
-			if ( request.isLogined() ) {
-				byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
-				response200(dos, DataBase.addUserList(body), request);
+		if ("/user/list".equals(url)) {
+			if (request.isLogined()) {
+				response.setUrl("/user/list.html");
+				response.putBody(DataBase.addUserList(Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath())));
 			} else {
-				response302Header(dos, "/user/login.html");	
+				response.setUrl("/user/login.html");
 			}
 		} else {
-			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-			response200(dos, body, request);
+			response.setUrl(url);
+			response.setContentType(request.getHeader("Accept"));
 		}
 	}
 
-	private void handlePost(HttpRequest request, DataOutputStream dos) {
+	private void handlePost(HttpRequest request, HttpResponse response) {
 		String url = request.getUrl();
-		if("/user/login".equals(url)) {
+		if ("/user/login".equals(url)) {
 			User user = DataBase.findUserById(request.getParameter("userId"));
-			if(user != null && user.matchPassword(request.getParameter("password"))) {
-				response302CookieHeader(dos, "/index.html", true);
+			if (user != null && user.matchPassword(request.getParameter("password"))) {
+				response.setCookieLogined(true);
+				response.setUrl("/index.html");
 			} else {
-				response302CookieHeader(dos, "/user/login_failed.html", false);
+				response.setCookieLogined(false);
+				response.setUrl("/user/login_failed.html");
 			}
 		}
-		if("/user/create".equals(url)) {
-			DataBase.addUser(new User(request.getParameter("userId"),request.getParameter("password"),request.getParameter("name"),request.getParameter("email")));
-			response302Header(dos, "/index.html");
-		}
-	}
-
-	private void response200(DataOutputStream dos, byte[] body, HttpRequest request) {
-		response200Header(dos, body.length, request);
-		responseBody(dos, body);
-	}
-	
-	private void response200Header(DataOutputStream dos, int lengthOfBodyContent, HttpRequest request) {
-		try {
-			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			dos.writeBytes("Content-Type: " + request.getHeader("Accept") + "\r\n");
-			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-			dos.writeBytes("\r\n");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-	}
-	
-	private void response302CookieHeader(DataOutputStream dos, String url, boolean isLogined) {
-		try {
-			dos.writeBytes("HTTP/1.1 302 Found \r\n");
-			dos.writeBytes("Set-Cookie: logined=" + isLogined + "; Path=/ \r\n");
-			dos.writeBytes("Location: " + url);
-		} catch(IOException e) {
-			log.error(e.getMessage());
-		}
-	}
-
-	private void response302Header(DataOutputStream dos, String url) {
-		try {
-			dos.writeBytes("HTTP/1.1 302 Found \r\n");
-			dos.writeBytes("Location: " + url);
-		} catch(IOException e) {
-			log.error(e.getMessage());
-		}
-	}
-
-	private void responseBody(DataOutputStream dos, byte[] body) {
-		try {
-			dos.write(body, 0, body.length);
-		} catch (IOException e) {
-			log.error(e.getMessage());
+		if ("/user/create".equals(url)) {
+			DataBase.addUser(new User(request.getParameter("userId"), request.getParameter("password"),
+					request.getParameter("name"), request.getParameter("email")));
+			response.setUrl("/index.html");
 		}
 	}
 }

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
+import model.response.HttpException;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
@@ -51,7 +52,7 @@ public class HttpRequest {
 		if( cookie != null ) {
 			return cookie.get(key);
 		}
-		return null;
+		throw new HttpException("쿠키가 없어서 문제가 발생하였다!");
 	}
 
 	public String getUrl() {

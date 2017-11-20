@@ -1,49 +1,61 @@
 package model.response;
 
-import java.io.File;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class HttpResponse {
+	private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
 	private Map<String, String> headers;
 	private boolean hasBody;
 	private byte[] body;
 
-	public HttpResponse() {
+	protected HttpResponse(String status) {
 		headers = new HashMap<>();
+		headers.put("status", status);
 		hasBody = false;
 	}
 
-	public abstract String createHeader();
-
-	public void responseUrl(String url) throws IOException {
-		this.body = Files.readAllBytes(new File("./webapp" + url).toPath());
-		this.hasBody = true;
-		setHeader("Content-Length", Integer.toString(body.length));
-	}
+	public abstract void setUrl(String url);
 	
-	public void responseType(String type) {
-		setHeader("Content-Type",type);
-	}
-
-	public byte[] getBody() {
-		if (hasBody) {
-			return body;
-		}
-		throw new HttpResponseException("no body no body");
-	}
-
 	public boolean hasBody() {
 		return hasBody;
 	}
-
-	protected void setHeader(String key, String value) {
-		headers.put(key, value);
+	
+	public void putBody(byte[] body) {
+		this.body = body;
+		this.hasBody = true;
+		headers.put("Content-Length", Integer.toString(body.length));
+	}
+	
+	public void setContentType(String type) {
+		headers.put("Content-Type", type);
 	}
 
-	protected String getHeader(String key) {
-		return headers.get(key);
+	public void writeResponse(DataOutputStream dos) {
+		try {
+			dos.writeBytes(headers.remove("status"));
+			for (String key : headers.keySet()) {
+				dos.writeBytes(key + ": " + headers.get(key) + "\r\n");
+			}
+			dos.writeBytes("\r\n");
+			if( hasBody() ) {
+				dos.write(body);
+			}
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	protected void setHeaders(String key, String value) {
+		headers.put(key, value);
+	}
+	
+	public void setCookieLogined(boolean isLogined) {
+		headers.put("Set-Cookie", "logined=" + isLogined + "; Path=/");
 	}
 }

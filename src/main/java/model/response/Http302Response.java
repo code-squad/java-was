@@ -2,17 +2,18 @@ package model.response;
 
 public class Http302Response extends HttpResponse {
 
-	@Override
-	public String createHeader() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("HTTP/1.1 302 Found \r\n");
-		sb.append("Location: ").append(getHeader("url"));
-		return sb.toString();
+	private static final String status = "HTTP/1.1 302 Found \r\n";
+	private Http302Response(String status) {
+		super(status);
 	}
-
+	
+	public static HttpResponse create() {
+		return new Http302Response(status);
+	}
+	
 	@Override
-	public void responseUrl(String url) {
-		setHeader("url", url);
+	public void setUrl(String url) {
+		setHeaders("Location", url);
 	}
 
 }
