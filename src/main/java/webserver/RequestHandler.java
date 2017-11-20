@@ -47,13 +47,11 @@ public class RequestHandler extends Thread {
 	private void handleGet(HttpRequest request, DataOutputStream dos) throws IOException {
 		String url = request.getHeader("url");
 		if("/user/list".equals(url)) {
-			String isLogined = request.getCookie("logined");
-			
-			if ( isLogined == null || isLogined.equals("false") ) {
-				response302Header(dos, "/user/login.html");	
-			} else {
+			if ( request.isLogined() ) {
 				byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
 				response200(dos, DataBase.addUserList(body), request);
+			} else {
+				response302Header(dos, "/user/login.html");	
 			}
 		} else {
 			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
@@ -66,9 +64,9 @@ public class RequestHandler extends Thread {
 		if("/user/login".equals(url)) {
 			User user = DataBase.findUserById(request.getParameter("userId"));
 			if(user != null && user.matchPassword(request.getParameter("password"))) {
-				response302CookieHeader(dos, "/index.html", "true");
+				response302CookieHeader(dos, "/index.html", true);
 			} else {
-				response302CookieHeader(dos, "/user/login_failed.html", "false");
+				response302CookieHeader(dos, "/user/login_failed.html", false);
 			}
 		}
 		if("/user/create".equals(url)) {
@@ -93,7 +91,7 @@ public class RequestHandler extends Thread {
 		}
 	}
 	
-	private void response302CookieHeader(DataOutputStream dos, String url, String isLogined) {
+	private void response302CookieHeader(DataOutputStream dos, String url, boolean isLogined) {
 		try {
 			dos.writeBytes("HTTP/1.1 302 Found \r\n");
 			dos.writeBytes("Set-Cookie: logined=" + isLogined + "; Path=/ \r\n");

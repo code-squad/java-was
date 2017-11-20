@@ -23,12 +23,12 @@ public class HttpRequest {
 		headers = HttpRequestUtils.pasrseHeaders(br);
 		String method = headers.get("method");
 
-		if ("POST".equals(method)) {
+		if (Method.Post.equals(method)) {
 			String query = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
 			parameters = HttpRequestUtils.parseQueryString(query);
 		}
 
-		if ("GET".equals(method)) {
+		if (Method.Get.equals(method)) {
 			String query = HttpRequestUtils.parseQueryByUrl(headers.get("url"));
 			if (query != null) {
 				parameters = HttpRequestUtils.parseQueryString(query);
@@ -56,6 +56,13 @@ public class HttpRequest {
 
 	public String getUrl() {
 		return headers.get("url");
+	}
+
+	public boolean isLogined() {
+		if( cookie == null ) {
+			return false;
+		}
+		return "true".equals(cookie.get("logined"));
 	}
 
 }
