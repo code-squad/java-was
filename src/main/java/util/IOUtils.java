@@ -2,11 +2,6 @@ package util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import db.DataBase;
-import model.User;
 
 public class IOUtils {
 	/**
