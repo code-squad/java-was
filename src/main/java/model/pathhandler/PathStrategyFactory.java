@@ -4,12 +4,12 @@ import java.util.HashMap;
 
 public class PathStrategyFactory {
 	
-	public static HashMap<String, PathStrategy> createpathStrategies(){
-		HashMap<String, PathStrategy> pathStrategies = new HashMap<>();
-		pathStrategies.put("/user/create", new CreateUserStrategy());
-		pathStrategies.put("/user/login", new LoginStrategy());
-		pathStrategies.put("/user/list", new UserListStrategy());
-		pathStrategies.put("normal", new StaticGetStrategy());
-		return pathStrategies;
+	public static HashMap<String, PathController> createpathControllers(){
+		HashMap<String, PathController> pathController = new HashMap<>();
+		pathController.put("/user/create", new CreateUserController());
+		pathController.put("/user/login", new LoginStrateg());
+		pathController.put("/user/list", new UserListController());
+		pathController.put("normal", new StaticGetController());
+		return pathController;
 	}
 }

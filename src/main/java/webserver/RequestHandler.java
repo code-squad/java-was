@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import model.HttpRequest;
 import model.Method;
-import model.pathhandler.PathStrategy;
+import model.pathhandler.PathController;
 import model.pathhandler.PathStrategyFactory;
 import model.response.Http200Response;
 import model.response.Http302Response;
@@ -35,17 +35,17 @@ public class RequestHandler extends Thread {
 			DataOutputStream dos = new DataOutputStream(out);
 			HttpRequest request = new HttpRequest(in);
 			HttpResponse response = Http200Response.create();
-			Map<String, PathStrategy> pathHandlers = PathStrategyFactory.createpathStrategies();
+			Map<String, PathController> pathControllers = PathStrategyFactory.createpathControllers();
 
 			if (Method.Post.equals(request.getHeader("method"))) {
-				PathStrategy handler = pathHandlers.get(request.getHeader("url"));
+				PathController Controller = pathControllers.get(request.getHeader("url"));
 				response = Http302Response.create();
-				handler.handling(request, response);
+				Controller.handling(request, response);
 			}
 			if (Method.Get.equals(request.getHeader("method"))) {
-				PathStrategy handler = pathHandlers.get(request.getHeader("url"));
+				PathController handler = pathControllers.get(request.getHeader("url"));
 				if (handler == null) {
-					handler = pathHandlers.get("normal");
+					handler = pathControllers.get("normal");
 				}
 				handler.handling(request, response);
 			}

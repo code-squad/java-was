@@ -5,7 +5,7 @@ import model.HttpRequest;
 import model.User;
 import model.response.HttpResponse;
 
-public class LoginStrategy implements PathStrategy {
+public class LoginStrateg implements PathController {
 
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {

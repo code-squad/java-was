@@ -42,9 +42,20 @@ public class HttpRequestUtils {
 
 	public static Map<String, String> pasrseHeaders( BufferedReader br) throws IOException {
 		Map<String, String> headers = new HashMap<>();
+		parseFirstLine(headers, br);
+		parseHeaders(headers, br);
+		return headers;
+	}
+	
+	private static void parseFirstLine(Map<String, String> headers, BufferedReader br) throws IOException {
 		String line = br.readLine();
+		log.info(line);
 		headers.put("method", HttpRequestUtils.parseMethod(line));
 		headers.put("url", HttpRequestUtils.parseUrl(line));
+	}
+	
+	private static void parseHeaders(Map<String, String> headers, BufferedReader br) throws IOException{
+		String line = br.readLine();
 		while( !"".equals(line) && line != null ) {
 			log.info(line);
 			line = br.readLine();
@@ -53,7 +64,6 @@ public class HttpRequestUtils {
 				headers.put(pair.getKey(), pair.getValue());
 			}
 		}
-		return headers;
 	}
 
 	/**

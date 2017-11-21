@@ -14,8 +14,8 @@ import model.HttpRequest;
 import model.User;
 import model.response.HttpResponse;
 
-public class UserListStrategy implements PathStrategy {
-	private static final Logger log = LoggerFactory.getLogger(UserListStrategy.class);
+public class UserListController implements PathController {
+	private static final Logger log = LoggerFactory.getLogger(UserListController.class);
 
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {

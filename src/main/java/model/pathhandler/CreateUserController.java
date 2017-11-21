@@ -5,7 +5,7 @@ import model.HttpRequest;
 import model.User;
 import model.response.HttpResponse;
 
-public class CreateUserStrategy implements PathStrategy {
+public class CreateUserController implements PathController {
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {
 		DataBase.addUser(new User(request.getParameter("userId"), 

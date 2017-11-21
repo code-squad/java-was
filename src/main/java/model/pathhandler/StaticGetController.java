@@ -3,7 +3,7 @@ package model.pathhandler;
 import model.HttpRequest;
 import model.response.HttpResponse;
 
-public class StaticGetStrategy implements PathStrategy {
+public class StaticGetController implements PathController {
 
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {
