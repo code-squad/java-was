@@ -1,9 +1,9 @@
-package model.pathhandler;
+package model.pathcontroller;
 
 import model.HttpRequest;
 import model.response.HttpResponse;
 
-public class StaticGetController implements PathController {
+public class StaticGetController extends GetController {
 
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {

@@ -24,12 +24,12 @@ public class HttpRequest {
 		headers = HttpRequestUtils.pasrseHeaders(br);
 		String method = headers.get("method");
 
-		if (Method.Post.equals(method)) {
+		if (Method.POST.equals(method)) {
 			String query = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
 			parameters = HttpRequestUtils.parseQueryString(query);
 		}
 
-		if (Method.Get.equals(method)) {
+		if (Method.GET.equals(method)) {
 			String query = HttpRequestUtils.parseQueryByUrl(headers.get("url"));
 			if (query != null) {
 				parameters = HttpRequestUtils.parseQueryString(query);

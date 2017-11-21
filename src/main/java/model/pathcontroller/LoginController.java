@@ -1,11 +1,11 @@
-package model.pathhandler;
+package model.pathcontroller;
 
 import db.DataBase;
 import model.HttpRequest;
 import model.User;
 import model.response.HttpResponse;
 
-public class LoginStrateg implements PathController {
+public class LoginController extends PostController {
 
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {

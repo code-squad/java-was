@@ -1,4 +1,4 @@
-package model.pathhandler;
+package model.pathcontroller;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import model.HttpRequest;
 import model.User;
 import model.response.HttpResponse;
 
-public class UserListController implements PathController {
+public class UserListController extends GetController {
 	private static final Logger log = LoggerFactory.getLogger(UserListController.class);
 
 	@Override

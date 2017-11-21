@@ -1,7 +1,7 @@
 package model;
 
 public enum Method {
-	Post("POST"), Get("GET"), Put("PUT"), Head("HEAD"), Patch("PATCH"), Trace("TRACE"), Options("OPTIONS"), Delete("DELETE");
+	POST("POST"), GET("GET"), PUT("PUT"), HEAD("HEAD"), PATCH("PATCH"), TRACE("TRACE"), OPTIONS("OPTIONS"), DELETE("DELETE");
 	private String method;
 
 	Method(String method) {

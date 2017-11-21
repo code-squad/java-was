@@ -1,11 +1,11 @@
-package model.pathhandler;
+package model.pathcontroller;
 
 import db.DataBase;
 import model.HttpRequest;
 import model.User;
 import model.response.HttpResponse;
 
-public class CreateUserController implements PathController {
+public class CreateUserController extends PostController {
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {
 		DataBase.addUser(new User(request.getParameter("userId"), 
