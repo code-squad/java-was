@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import model.HttpRequest;
 import model.Method;
-import model.pathHandler.PathStrategy;
-import model.pathHandler.PathStrategyFactory;
+import model.pathhandler.PathStrategy;
+import model.pathhandler.PathStrategyFactory;
 import model.response.Http200Response;
 import model.response.Http302Response;
 import model.response.HttpResponse;

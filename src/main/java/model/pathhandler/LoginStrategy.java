@@ -1,4 +1,4 @@
-package model.pathHandler;
+package model.pathhandler;
 
 import db.DataBase;
 import model.HttpRequest;

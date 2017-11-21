@@ -12,7 +12,7 @@ public class Cookie {
 		if( query != null ) {
 			cookie = HttpRequestUtils.parseCookies(query);
 		} else {
-			cookie = new HashMap<>();;
+			cookie = new HashMap<>();
 		}
 	}
 	

@@ -1,4 +1,4 @@
-package model.pathHandler;
+package model.pathhandler;
 
 import java.io.File;
 import java.io.IOException;

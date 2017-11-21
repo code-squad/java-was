@@ -1,4 +1,4 @@
-package model.pathHandler;
+package model.pathhandler;
 
 import model.HttpRequest;
 import model.response.HttpResponse;
