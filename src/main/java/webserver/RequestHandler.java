@@ -1,21 +1,17 @@
 package webserver;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import db.DataBase;
 import model.HttpRequest;
 import model.Method;
-import model.User;
 import model.pathHandler.PathStrategy;
 import model.pathHandler.PathStrategyFactory;
 import model.response.Http200Response;
