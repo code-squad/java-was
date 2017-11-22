@@ -8,7 +8,6 @@ import java.util.Map;
 
 import model.response.HttpException;
 import util.HttpRequestUtils;
-import util.IOUtils;
 
 public class HttpRequest {
 	private Map<String, String> headers;
@@ -24,19 +23,19 @@ public class HttpRequest {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 		requestLine = new RequestLine(br);
 		headers = HttpRequestUtils.pasrseHeaders(br);
-
-		if (requestLine.matchMethod(Method.POST)) {
-			String query = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+		settingParameters(HttpRequestUtils.getParameterQuery(requestLine, headers, br));
+		settingCookie(headers.get("Cookie"));
+	}
+	
+	private void settingParameters(String query) {
+		if (query != null) {
 			parameters = HttpRequestUtils.parseQueryString(query);
 		}
-		if (requestLine.matchMethod(Method.GET)) {
-			String query = HttpRequestUtils.parseQueryByPath(requestLine.getUrl());
-			if (query != null) {
-				parameters = HttpRequestUtils.parseQueryString(query);
-			}
-		}
-		if (headers.get("Cookie") != null) {
-			cookie = new Cookie(headers.get("Cookie"));
+	}
+	
+	private void settingCookie(String cookieQuery) {
+		if (cookieQuery != null) {
+			cookie = new Cookie(cookieQuery);
 		}
 	}
 	
@@ -57,7 +56,6 @@ public class HttpRequest {
 
 	public String getUrl() {
 		return requestLine.getUrl();
-//		return headers.get("url");
 	}
 
 	public boolean isLogined() {

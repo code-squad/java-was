@@ -13,24 +13,35 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
+import model.Method;
+import model.RequestLine;
+
 public class HttpRequestUtils {
 	private static final Logger log = LoggerFactory.getLogger(HttpRequestUtils.class);
-	
+
 	public static String parseQueryByPath(String url) {
 		String[] urlArr = url.split("\\?");
-		if( urlArr.length > 1 ) {
+		if (urlArr.length > 1) {
 			return urlArr[1];
 		}
 		return null;
 	}
 
+	public static String getParameterQuery(RequestLine requestLine, Map<String, String> headers, BufferedReader br) throws NumberFormatException, IOException {
+		if (requestLine.matchMethod(Method.POST)) {
+			return IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+		}
+		return HttpRequestUtils.parseQueryByPath(requestLine.getUrl());
+	}
+	
 	public static String parseUrl(String firstLine) {
 		return firstLine.split(" ")[1];
 	}
-	
+
 	public static String parseMethod(String firstLine) {
 		return firstLine.split(" ")[0].toUpperCase();
 	}
+
 	/**
 	 * @param queryString은
 	 *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
@@ -40,22 +51,22 @@ public class HttpRequestUtils {
 		return parseValues(queryString, "&");
 	}
 
-	public static Map<String, String> pasrseHeaders( BufferedReader br) throws IOException {
+	public static Map<String, String> pasrseHeaders(BufferedReader br) throws IOException {
 		Map<String, String> headers = new HashMap<>();
-		parseHeaders(headers, br);
-		return headers;
-	}
-	
-	private static void parseHeaders(Map<String, String> headers, BufferedReader br) throws IOException{
 		String line = br.readLine();
-		while( !"".equals(line) && line != null ) {
+		while (hasNext(line)) {
 			log.info(line);
 			line = br.readLine();
 			Pair pair = HttpRequestUtils.parseHeader(line);
-			if(pair != null) {
+			if (pair != null) {
 				headers.put(pair.getKey(), pair.getValue());
 			}
 		}
+		return headers;
+	}
+
+	private static boolean hasNext(String line) {
+		return !"".equals(line) && line != null;
 	}
 
 	/**

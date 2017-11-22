@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import model.HttpRequest;
 import model.pathcontroller.Controllers;
 import model.pathcontroller.PathController;
-import model.response.Http200Response;
 import model.response.HttpResponse;
 
 public class RequestHandler extends Thread {
