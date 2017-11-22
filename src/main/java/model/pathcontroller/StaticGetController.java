@@ -7,7 +7,7 @@ public class StaticGetController extends GetController {
 
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {
-		String url = request.getHeader("url");
+		String url = request.getUrl();
 		response.setUrl(url);
 		response.setContentType(request.getHeader("Accept"));
 	}

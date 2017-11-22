@@ -16,7 +16,7 @@ import com.google.common.collect.Maps;
 public class HttpRequestUtils {
 	private static final Logger log = LoggerFactory.getLogger(HttpRequestUtils.class);
 	
-	public static String parseQueryByUrl(String url) {
+	public static String parseQueryByPath(String url) {
 		String[] urlArr = url.split("\\?");
 		if( urlArr.length > 1 ) {
 			return urlArr[1];
@@ -42,16 +42,8 @@ public class HttpRequestUtils {
 
 	public static Map<String, String> pasrseHeaders( BufferedReader br) throws IOException {
 		Map<String, String> headers = new HashMap<>();
-		parseFirstLine(headers, br);
 		parseHeaders(headers, br);
 		return headers;
-	}
-	
-	private static void parseFirstLine(Map<String, String> headers, BufferedReader br) throws IOException {
-		String line = br.readLine();
-		log.info(line);
-		headers.put("method", HttpRequestUtils.parseMethod(line));
-		headers.put("url", HttpRequestUtils.parseUrl(line));
 	}
 	
 	private static void parseHeaders(Map<String, String> headers, BufferedReader br) throws IOException{
