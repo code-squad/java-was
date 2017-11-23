@@ -1,4 +1,4 @@
-package model.response;
+package http.response;
 
 public class Http302Response extends HttpResponse {
 

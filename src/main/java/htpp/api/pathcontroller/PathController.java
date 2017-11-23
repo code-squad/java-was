@@ -1,7 +1,7 @@
-package model.pathcontroller;
+package htpp.api.pathcontroller;
 
-import model.HttpRequest;
-import model.response.HttpResponse;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 
 public interface PathController {
 	public void handling(HttpRequest request, HttpResponse response);

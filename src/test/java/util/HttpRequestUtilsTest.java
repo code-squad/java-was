@@ -10,11 +10,6 @@ import org.junit.Test;
 import util.HttpRequestUtils.Pair;
 
 public class HttpRequestUtilsTest {
-	@Test
-	public void url에서_parameter부분만_받아오기() {
-		String url = "/user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
-		assertThat(HttpRequestUtils.parseQueryByPath(url), is("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"));
-	}
 	
 	@Test
 	public void parseUrl() {

@@ -1,4 +1,4 @@
-package model.pathcontroller;
+package htpp.api.pathcontroller;
 
 import java.util.HashMap;
 import java.util.Map;

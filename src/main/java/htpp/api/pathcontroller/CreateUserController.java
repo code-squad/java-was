@@ -1,9 +1,9 @@
-package model.pathcontroller;
+package htpp.api.pathcontroller;
 
 import db.DataBase;
-import model.HttpRequest;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 import model.User;
-import model.response.HttpResponse;
 
 public class CreateUserController extends PostController {
 	@Override

@@ -1,4 +1,4 @@
-package model.pathcontroller;
+package htpp.api.pathcontroller;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import db.DataBase;
-import model.HttpRequest;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 import model.User;
-import model.response.HttpResponse;
 
 public class UserListController extends GetController {
 	private static final Logger log = LoggerFactory.getLogger(UserListController.class);

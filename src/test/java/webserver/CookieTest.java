@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import model.Cookie;
+import http.Cookie;
 
 public class CookieTest {
 

@@ -1,7 +1,7 @@
-package model.pathcontroller;
+package htpp.api.pathcontroller;
 
-import model.response.Http200Response;
-import model.response.HttpResponse;
+import http.response.Http200Response;
+import http.response.HttpResponse;
 
 public abstract class GetController implements PathController {
 	public HttpResponse getResponse() {

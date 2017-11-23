@@ -1,4 +1,4 @@
-package model;
+package http.request;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,8 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-import model.response.HttpException;
+import http.Cookie;
+import http.Method;
+import http.response.HttpException;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 public class HttpRequest {
 	private Map<String, String> headers;
@@ -23,7 +26,10 @@ public class HttpRequest {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 		requestLine = new RequestLine(br.readLine());
 		headers = HttpRequestUtils.parseHeaders(br);
-		settingParameters(HttpRequestUtils.getParameterQuery(requestLine, headers, br));
+		if(requestLine.matchMethod(Method.POST)) {
+			requestLine.setQuery(IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length"))));;
+		}
+		settingParameters(requestLine.getQuery());
 		settingCookie(headers.get("Cookie"));
 	}
 	
@@ -42,6 +48,10 @@ public class HttpRequest {
 	public String getHeader(String key) {
 		return headers.get(key);
 	}
+	
+	public Method getMethod() {
+		return requestLine.getMethod();
+	}
 
 	public String getParameter(String key) {
 		return parameters.get(key);
@@ -54,8 +64,8 @@ public class HttpRequest {
 		throw new HttpException("쿠키가 없어서 문제가 발생하였다!");
 	}
 
-	public String getUrl() {
-		return requestLine.getUrl();
+	public String getPath() {
+		return requestLine.getPath();
 	}
 
 	public boolean isLogined() {
