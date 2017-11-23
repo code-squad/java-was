@@ -21,8 +21,8 @@ public class HttpRequest {
 
 	public void analysisRequest(InputStream in) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-		requestLine = new RequestLine(br);
-		headers = HttpRequestUtils.pasrseHeaders(br);
+		requestLine = new RequestLine(br.readLine());
+		headers = HttpRequestUtils.parseHeaders(br);
 		settingParameters(HttpRequestUtils.getParameterQuery(requestLine, headers, br));
 		settingCookie(headers.get("Cookie"));
 	}

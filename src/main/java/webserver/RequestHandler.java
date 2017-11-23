@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import model.HttpRequest;
-import model.pathcontroller.Controllers;
 import model.pathcontroller.PathController;
+import model.pathcontroller.PathControllerFactory;
 import model.response.HttpResponse;
 
 public class RequestHandler extends Thread {
@@ -30,7 +30,7 @@ public class RequestHandler extends Thread {
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 			DataOutputStream dos = new DataOutputStream(out);
 			HttpRequest request = new HttpRequest(in);
-			PathController controller = Controllers.find(request.getUrl());
+			PathController controller = PathControllerFactory.find(request.getUrl());
 			HttpResponse response = controller.getResponse();
 			controller.handling(request, response);
 			response.writeResponse(dos);

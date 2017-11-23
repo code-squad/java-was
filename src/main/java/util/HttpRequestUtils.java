@@ -27,13 +27,14 @@ public class HttpRequestUtils {
 		return null;
 	}
 
-	public static String getParameterQuery(RequestLine requestLine, Map<String, String> headers, BufferedReader br) throws NumberFormatException, IOException {
+	public static String getParameterQuery(RequestLine requestLine, Map<String, String> headers, BufferedReader br)
+			throws NumberFormatException, IOException {
 		if (requestLine.matchMethod(Method.POST)) {
 			return IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
 		}
 		return HttpRequestUtils.parseQueryByPath(requestLine.getUrl());
 	}
-	
+
 	public static String parseUrl(String firstLine) {
 		return firstLine.split(" ")[1];
 	}
@@ -51,18 +52,20 @@ public class HttpRequestUtils {
 		return parseValues(queryString, "&");
 	}
 
-	public static Map<String, String> pasrseHeaders(BufferedReader br) throws IOException {
+	public static Map<String, String> parseHeaders(BufferedReader br) throws IOException {
 		Map<String, String> headers = new HashMap<>();
 		String line = br.readLine();
 		while (hasNext(line)) {
 			log.info(line);
+			putHeaders(headers, line);
 			line = br.readLine();
-			Pair pair = HttpRequestUtils.parseHeader(line);
-			if (pair != null) {
-				headers.put(pair.getKey(), pair.getValue());
-			}
 		}
 		return headers;
+	}
+
+	private static void putHeaders(Map<String, String> headers, String line) {
+		Pair pair = HttpRequestUtils.parseHeader(line);
+		headers.put(pair.getKey(), pair.getValue());
 	}
 
 	private static boolean hasNext(String line) {

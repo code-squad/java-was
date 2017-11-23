@@ -42,7 +42,7 @@ public class HttpRequestUtilsTest {
 	}
 
 	@Test
-	public void parseQueryString_null() {
+	public void parseQueryStringnull() {
 		Map<String, String> parameters = HttpRequestUtils.parseQueryString(null);
 		assertThat(parameters.isEmpty(), is(true));
 
@@ -54,7 +54,7 @@ public class HttpRequestUtilsTest {
 	}
 
 	@Test
-	public void parseQueryString_invalid() {
+	public void parseQueryStringinvalid() {
 		String queryString = "userId=javajigi&password";
 		Map<String, String> parameters = HttpRequestUtils.parseQueryString(queryString);
 		assertThat(parameters.get("userId"), is("javajigi"));
@@ -77,7 +77,7 @@ public class HttpRequestUtilsTest {
 	}
 
 	@Test
-	public void getKeyValue_invalid() throws Exception {
+	public void getKeyValueInvalid() throws Exception {
 		Pair pair = HttpRequestUtils.getKeyValue("userId", "=");
 		assertThat(pair, is(nullValue()));
 	}
