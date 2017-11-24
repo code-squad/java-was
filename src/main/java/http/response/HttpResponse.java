@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class HttpResponse {
 	private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
+	private static final String NEWLINE = "\r\n";
 	private Map<String, String> headers;
 	private boolean hasBody;
 	private byte[] body;
@@ -40,9 +41,9 @@ public abstract class HttpResponse {
 		try {
 			dos.writeBytes(headers.remove("status"));
 			for (String key : headers.keySet()) {
-				dos.writeBytes(key + ": " + headers.get(key) + "\r\n");
+				dos.writeBytes(key + ": " + headers.get(key) + NEWLINE);
 			}
-			dos.writeBytes("\r\n");
+			dos.writeBytes(NEWLINE);
 			if( hasBody() ) {
 				dos.write(body);
 			}

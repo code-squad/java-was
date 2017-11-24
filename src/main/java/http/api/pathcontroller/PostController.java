@@ -1,4 +1,4 @@
-package htpp.api.pathcontroller;
+package http.api.pathcontroller;
 
 import http.response.Http302Response;
 import http.response.HttpResponse;

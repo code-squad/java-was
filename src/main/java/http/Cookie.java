@@ -9,14 +9,18 @@ public class Cookie {
 	private Map<String, String> cookie;
 
 	public Cookie(String query) {
-		if( query != null ) {
+		if (query != null) {
 			cookie = HttpRequestUtils.parseCookies(query);
 		} else {
 			cookie = new HashMap<>();
 		}
 	}
-	
+
 	public String get(String key) {
 		return cookie.get(key);
+	}
+
+	public void put(String key, String value) {
+		cookie.put(key, value);
 	}
 }

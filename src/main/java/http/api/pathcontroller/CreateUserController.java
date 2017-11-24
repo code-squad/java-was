@@ -1,4 +1,4 @@
-package htpp.api.pathcontroller;
+package http.api.pathcontroller;
 
 import db.DataBase;
 import http.request.HttpRequest;

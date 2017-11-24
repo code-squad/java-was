@@ -9,8 +9,8 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import htpp.api.pathcontroller.PathController;
-import htpp.api.pathcontroller.PathControllerFactory;
+import http.api.pathcontroller.PathController;
+import http.api.pathcontroller.PathControllerFactory;
 import http.request.HttpRequest;
 import http.response.HttpResponse;
 
