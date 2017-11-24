@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.Optional;
 
 import http.Cookie;
 import http.Method;
@@ -26,34 +27,32 @@ public class HttpRequest {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 		requestLine = new RequestLine(br.readLine());
 		headers = HttpRequestUtils.parseHeaders(br);
-		if(requestLine.matchMethod(Method.POST)) {
-			requestLine.setQuery(IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length"))));;
+		if (headers.get("Content-Length") != null) {
+			String query = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+			Optional<Map<String, String>> optional = Optional.ofNullable(query).map(HttpRequestUtils::parseQueryString);
+			parameters = optional.get();
 		}
-		settingParameters(requestLine.getQuery());
 		settingCookie(headers.get("Cookie"));
 	}
-	
-	private void settingParameters(String query) {
-		if (query != null) {
-			parameters = HttpRequestUtils.parseQueryString(query);
-		}
-	}
-	
+
 	private void settingCookie(String cookieQuery) {
 		if (cookieQuery != null) {
 			cookie = new Cookie(cookieQuery);
 		}
 	}
-	
+
 	public String getHeader(String key) {
 		return headers.get(key);
 	}
-	
+
 	public Method getMethod() {
 		return requestLine.getMethod();
 	}
 
 	public String getParameter(String key) {
+		if (requestLine.hasParameter()) {
+			return requestLine.getParameter(key);
+		}
 		return parameters.get(key);
 	}
 

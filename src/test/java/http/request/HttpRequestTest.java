@@ -1,4 +1,4 @@
-package model;
+package http.request;
 
 import static org.junit.Assert.*;
 
@@ -22,6 +22,7 @@ public class HttpRequestTest {
 		assertEquals(Method.GET, request.getMethod());
 		assertEquals("/user/create", request.getPath());
 		assertEquals("keep-alive", request.getHeader("Connection"));
+		assertEquals("JaeSung", request.getParameter("name"));
 		assertEquals("javajigi", request.getParameter("userId"));
 	}
 
