@@ -31,8 +31,7 @@ public class RequestHandler extends Thread {
 			DataOutputStream dos = new DataOutputStream(out);
 			HttpRequest request = new HttpRequest(in);
 			PathController controller = PathControllerFactory.find(request.getPath());
-			HttpResponse response = new HttpResponse(dos);
-			controller.handling(request, response);
+			controller.handling(request, new HttpResponse(dos));
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}

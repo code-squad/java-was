@@ -12,10 +12,8 @@ public class LoginController implements PathController {
 		User user = DataBase.findUserById(request.getParameter("userId"));
 		if (user != null && user.matchPassword(request.getParameter("password"))) {
 			response.setCookie("logined", "true");
-//			response.setCookieLogined(true);
 			response.sendRedirect("/index.html");
 		} else {
-//			response.setCookieLogined(false);
 			response.setCookie("logined", "false");
 			response.sendRedirect("/user/login_failed.html");
 		}
