@@ -14,7 +14,7 @@ import http.request.HttpRequest;
 import http.response.HttpResponse;
 import model.User;
 
-public class UserListController extends GetController {
+public class UserListController implements PathController {
 	private static final Logger log = LoggerFactory.getLogger(UserListController.class);
 
 	@Override
@@ -24,7 +24,7 @@ public class UserListController extends GetController {
 			response.setUrl(url);
 			try {
 				byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-				response.putBody(addUserList(body));
+//				response.putBody(addUserList(body));
 			} catch (IOException e) {
 				log.error(e.getMessage());
 			}

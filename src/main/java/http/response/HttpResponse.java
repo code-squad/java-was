@@ -1,43 +1,56 @@
 package http.response;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class HttpResponse {
+public class HttpResponse {
 	private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
 	private static final String NEWLINE = "\r\n";
 	private Map<String, String> headers;
 	private boolean hasBody;
 	private byte[] body;
+	private DataOutputStream dos;
 
-	protected HttpResponse(String requestFirstLine) {
+	public HttpResponse(OutputStream out) {
 		headers = new HashMap<>();
-		headers.put("requestFirstLine", requestFirstLine);
-		hasBody = false;
+		this.dos = new DataOutputStream(out);
 	}
-
-	public abstract void setUrl(String url);
+	
+	public void sendRedirect(String path) {
+		headers.put("requestFirstLine", "HTTP/1.1 302 Found \r\n");
+		addHeader("Location", path);
+		writeResponse();
+	}
+	
+	public void forward(String path) {
+		headers.put("requestFirstLine", "HTTP/1.1 200 OK \r\n");
+		try {
+			this.body = Files.readAllBytes(new File("./webapp" + path).toPath());
+			this.hasBody = true;
+			headers.put("Content-Length", Integer.toString(body.length));
+		} catch (IOException e) {
+			log.error("body를 읽어오면서 에러가 났다!!");
+		}
+		writeResponse();
+	}
 	
 	public boolean hasBody() {
 		return hasBody;
 	}
 	
-	public void putBody(byte[] body) {
-		this.body = body;
-		this.hasBody = true;
-		headers.put("Content-Length", Integer.toString(body.length));
-	}
-	
 	public void setContentType(String type) {
 		headers.put("Content-Type", type);
 	}
-
-	public void writeResponse(DataOutputStream dos) {
+	
+	private void writeResponse() {
 		try {
 			dos.writeBytes(headers.remove("requestFirstLine"));
 			for (String key : headers.keySet()) {
@@ -52,7 +65,7 @@ public abstract class HttpResponse {
 		}
 	}
 
-	protected void setHeaders(String key, String value) {
+	protected void addHeader(String key, String value) {
 		headers.put(key, value);
 	}
 	

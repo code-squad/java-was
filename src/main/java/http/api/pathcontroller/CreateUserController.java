@@ -5,7 +5,7 @@ import http.request.HttpRequest;
 import http.response.HttpResponse;
 import model.User;
 
-public class CreateUserController extends PostController {
+public class CreateUserController implements PathController {
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {
 		DataBase.addUser(
@@ -14,6 +14,6 @@ public class CreateUserController extends PostController {
 						request.getParameter("password"),
 						request.getParameter("name"), 
 						request.getParameter("email")));
-		response.setUrl("/index.html");
+		response.sendRedirect("/index.html");
 	}
 }
