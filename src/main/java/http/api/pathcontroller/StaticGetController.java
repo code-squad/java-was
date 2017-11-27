@@ -8,7 +8,7 @@ public class StaticGetController implements PathController {
 	@Override
 	public void handling(HttpRequest request, HttpResponse response) {
 		String url = request.getPath();
-		response.forward(url);
 		response.setContentType(request.getHeader("Accept"));
+		response.forward(url);
 	}
 }

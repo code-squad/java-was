@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import db.DataBase;
+import http.Cookie;
 import model.User;
 
 public class HttpResponse {
@@ -22,10 +23,12 @@ public class HttpResponse {
 	private Map<String, String> headers;
 	private byte[] body;
 	private DataOutputStream dos;
+	private Cookie cookie;
 
 	public HttpResponse(OutputStream out) {
 		this.headers = new HashMap<>();
 		this.dos = new DataOutputStream(out);
+		this.cookie = new Cookie();
 	}
 	
 	public void sendRedirect(String path) {
@@ -78,6 +81,9 @@ public class HttpResponse {
 			for (String key : headers.keySet()) {
 				dos.writeBytes(key + ": " + headers.get(key) + NEWLINE);
 			}
+			if( !cookie.isEmpty() ) {
+				cookie.writeResponse(dos);
+			}
 			dos.writeBytes(NEWLINE);
 			if( hasBody() ) {
 				dos.write(body);
@@ -91,7 +97,11 @@ public class HttpResponse {
 		headers.put(key, value);
 	}
 	
-	public void setCookieLogined(boolean isLogined) {
-		headers.put("Set-Cookie", "logined=" + isLogined + "; Path=/");
+//	public void setCookieLogined(boolean isLogined) {
+//		headers.put("Set-Cookie", "logined=" + isLogined + "; Path=/");
+//	}
+	
+	public void setCookie(String key, String value) {
+		cookie.put(key, value);
 	}
 }
