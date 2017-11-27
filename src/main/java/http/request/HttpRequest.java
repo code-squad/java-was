@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import http.Cookie;
 import http.Method;
-import http.response.HttpException;
+import http.response.HttpResponseException;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
@@ -60,7 +60,7 @@ public class HttpRequest {
 		if (cookie != null) {
 			return cookie.get(key);
 		}
-		throw new HttpException("쿠키가 없어서 문제가 발생하였다!");
+		throw new HttpResponseException("쿠키가 없어서 문제가 발생하였다!");
 	}
 
 	public String getPath() {
