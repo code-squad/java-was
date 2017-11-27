@@ -6,10 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class CookieTest {
-	Cookie cookie;
+	private Cookie cookie;
 
 	@Before
-	public void setup() {
+	public void setUp() {
 		cookie = new Cookie("logined=true");
 	}
 

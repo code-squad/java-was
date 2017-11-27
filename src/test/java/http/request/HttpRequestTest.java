@@ -15,7 +15,7 @@ public class HttpRequestTest {
 	private String testDirectory = "./src/test/java/resources/";
 
 	@Test
-	public void request_GET() throws Exception {
+	public void GETrequestTEST() throws Exception {
 		InputStream in = new FileInputStream(new File(testDirectory + "Http_GET.txt"));
 		HttpRequest request = new HttpRequest(in);
 
@@ -27,7 +27,7 @@ public class HttpRequestTest {
 	}
 
 	@Test
-	public void request_POST() throws Exception {
+	public void POSTrequestTEST() throws Exception {
 		InputStream in = new FileInputStream(new File(testDirectory + "Http_POST.txt"));
 		HttpRequest request = new HttpRequest(in);
 

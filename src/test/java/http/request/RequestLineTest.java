@@ -10,10 +10,10 @@ import http.Method;
 import http.request.RequestLine;
 
 public class RequestLineTest {
-	RequestLine requestLine;
+	private RequestLine requestLine;
 	
 	@Before
-	public void setup() {
+	public void setUp() {
 		requestLine = new RequestLine("GET /user/create?userId=javajigi&password=password&name=JaeSung HTTP/1.1 ");
 	}
 	
@@ -34,7 +34,7 @@ public class RequestLineTest {
 	
 	
 	@Test
-	public void MachMethodTest() {
+	public void machMethodTest() {
 		assertTrue(requestLine.matchMethod(Method.GET));
 	}
 	
