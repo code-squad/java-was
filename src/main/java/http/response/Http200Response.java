@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 
 public class Http200Response extends HttpResponse {
 	private static final Logger log = LoggerFactory.getLogger(Http200Response.class);
-	private static final String status = "HTTP/1.1 200 OK \r\n";
+	private static final String REQUESTFIRSTLINE = "HTTP/1.1 200 OK \r\n";
 
-	private Http200Response(String status) {
-		super(status);
+	private Http200Response(String requestFirstLine) {
+		super(requestFirstLine);
 	}
 
 	public static HttpResponse create() {
-		return new Http200Response(status);
+		return new Http200Response(REQUESTFIRSTLINE);
 	}
 
 	@Override

@@ -15,9 +15,9 @@ public abstract class HttpResponse {
 	private boolean hasBody;
 	private byte[] body;
 
-	protected HttpResponse(String status) {
+	protected HttpResponse(String requestFirstLine) {
 		headers = new HashMap<>();
-		headers.put("status", status);
+		headers.put("requestFirstLine", requestFirstLine);
 		hasBody = false;
 	}
 
@@ -39,7 +39,7 @@ public abstract class HttpResponse {
 
 	public void writeResponse(DataOutputStream dos) {
 		try {
-			dos.writeBytes(headers.remove("status"));
+			dos.writeBytes(headers.remove("requestFirstLine"));
 			for (String key : headers.keySet()) {
 				dos.writeBytes(key + ": " + headers.get(key) + NEWLINE);
 			}
