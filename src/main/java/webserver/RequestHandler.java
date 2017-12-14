@@ -12,13 +12,18 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import controller.PathController;
+import model.HeaderRequest;
+
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket connection;
+	PathController pathController = new PathController();
 
 	public RequestHandler(Socket connectionSocket) {
 		this.connection = connectionSocket;
+		pathController.setRootDir("./webapp");
 	}
 
 	public void run() {
@@ -35,13 +40,17 @@ public class RequestHandler extends Thread {
 				request.addLine(line);
 				log.debug("Header : " + line);
 			}
-			String url = request.getPath();
-			log.debug("Path : " + request.getPath());
+			log.debug("Path : " + request.getPathValue());
 			// TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 			DataOutputStream dos = new DataOutputStream(out);
 			
+			//이 부분에 html파일이 아닌경우에 다르게 처리하거나 특정 명령어 일때 어떻게 처리할지 확인
+			//지금 대부분이 html파일이므로 html 먼저 정상 처리 하도록 하는게 좋을듯..
+			
+			String finalUrl = pathController.changeFinalUrl(request.getRequestPath());			
+			
 			PathFileReader pathFileReader = new PathFileReader("./webapp");
-			byte[] body = pathFileReader.getReadAllBytes(url);
+			byte[] body = pathFileReader.getReadAllBytes(finalUrl);
 			
 			response200Header(dos, body.length);
 			responseBody(dos, body);
