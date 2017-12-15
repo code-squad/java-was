@@ -27,6 +27,9 @@ public class PathController {
 	}
 
 	private String runController(RequestPath path) {
+		if(path.getOnlyUrl().equals("/")) {
+			return "/";
+		}
 		String firstTurningPoint = SplitUtils.getSplitedValue(path.getOnlyUrl(), "/", 1);
 		if ("user".equals(firstTurningPoint)) {
 			log.debug("user turning point 진입");
