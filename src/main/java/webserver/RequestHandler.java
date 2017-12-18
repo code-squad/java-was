@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import request.RequestHeader;
-import request.ResponseHeader;
 import util.IOUtils;
 
 public class RequestHandler extends Thread {
@@ -51,8 +50,9 @@ public class RequestHandler extends Thread {
 			
 			PathFileReader pathFileReader = new PathFileReader("./webapp");
 			String responseValue = requestHeaderHandler.getResponseValue(request);
-			ResponseHeader responseHeader = new ResponseHeader(responseValue, pathFileReader);
-			responseHeader.response(dos);
+			ResponseHeaderHandler responseHeaderHandler = new ResponseHeaderHandler(responseValue, pathFileReader);
+			responseHeaderHandler.setResponseHeaderList(requestHeaderHandler.getResponseHeaderList());
+			responseHeaderHandler.response(dos);
 			
 		} catch (IOException e) {
 			log.error(e.getMessage());
