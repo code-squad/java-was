@@ -12,18 +12,17 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import controller.PathController;
-import model.HeaderRequest;
+import RequestHeader.RequestHeader;
+import util.IOUtils;
 
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket connection;
-	PathController pathController = new PathController();
+	private RequestHeaderHandler requestHeaderHandler = new RequestHeaderHandler();
 
 	public RequestHandler(Socket connectionSocket) {
 		this.connection = connectionSocket;
-		pathController.setRootDir("./webapp");
 	}
 
 	public void run() {
@@ -33,28 +32,34 @@ public class RequestHandler extends Thread {
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 			BufferedReader bufferedReader = convertToBufferedReader(in);
 			String line = bufferedReader.readLine();
-			log.debug("Request line : " + line);
-			HeaderRequest request = new HeaderRequest(line);
+			log.debug("Request line : {}", line);
+			RequestHeader request = new RequestHeader(line);
 			while (!"".equals(line) && line != null) {
 				line = bufferedReader.readLine();
 				request.addLine(line);
-				log.debug("Header : " + line);
+				log.debug("Header : {}", line);
 			}
-			log.debug("Path : " + request.getPathValue());
+			log.debug("Path : {}", request.getPathValue());
+			int contentLength = request.getContentLength();
+			if (contentLength > 0) {
+				request.setRequestBody(String.valueOf(IOUtils.readData(bufferedReader, contentLength)));
+				log.debug("Body : {}", request.getRequestBody());
+			}
 			// TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 			DataOutputStream dos = new DataOutputStream(out);
-			
-			//이 부분에 html파일이 아닌경우에 다르게 처리하거나 특정 명령어 일때 어떻게 처리할지 확인
-			//지금 대부분이 html파일이므로 html 먼저 정상 처리 하도록 하는게 좋을듯..
-			
-			String finalUrl = pathController.changeFinalUrl(request.getRequestPath());			
-			
+
+			// pathController가 먼저 시작되는게 아니라 requestHeader가 모두 들어가는 컨트롤러를 만들고
+			// 그 안에서 메소드로 먼저 분기 그리고 url에 맞춰서 분기
+			// url에서 먼저 처리될건 파일이름들.. 이미 구현해놓은걸로 사용
+
+			String finalUrl = requestHeaderHandler.changeFinalUrl(request);
+
 			PathFileReader pathFileReader = new PathFileReader("./webapp");
 			byte[] body = pathFileReader.getReadAllBytes(finalUrl);
-			
+
 			response200Header(dos, body.length);
 			responseBody(dos, body);
-			
+
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}

@@ -1,4 +1,4 @@
-package model;
+package RequestHeader;
 
 import java.util.Map;
 
@@ -33,5 +33,29 @@ public class RequestPath {
 	public String toString() {
 		return path;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		return result;
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RequestPath other = (RequestPath) obj;
+		if (path == null) {
+			if (other.path != null)
+				return false;
+		} else if (!path.equals(other.path))
+			return false;
+		return true;
+	}
 }

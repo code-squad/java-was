@@ -1,4 +1,4 @@
-package model;
+package RequestHeader;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import RequestHeader.RequestPath;
 
 public class RequestPathTest {
 	RequestPath requestPath;

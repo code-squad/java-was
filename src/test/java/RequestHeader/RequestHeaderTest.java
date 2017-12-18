@@ -1,15 +1,15 @@
-package model;
+package RequestHeader;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import model.HeaderRequest;
+import RequestHeader.RequestHeader;
 
-public class HeaderRequestTest {
+public class RequestHeaderTest {
 	@Test
 	public void requestLineTest() {
-		HeaderRequest request = new HeaderRequest("GET /index.html HTTP/1.1");
+		RequestHeader request = new RequestHeader("GET /index.html HTTP/1.1");
 		assertEquals("/index.html", request.getPathValue());
 	}
 }
