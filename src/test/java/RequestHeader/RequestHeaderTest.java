@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import RequestHeader.RequestHeader;
+import request.RequestHeader;
 
 public class RequestHeaderTest {
 	@Test

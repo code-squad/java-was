@@ -1,4 +1,4 @@
-package RequestHeader;
+package request;
 
 import util.HttpRequestUtils.RequestMethodType;
 import util.SplitUtils;

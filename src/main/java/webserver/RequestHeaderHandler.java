@@ -2,11 +2,11 @@ package webserver;
 
 import java.util.Map;
 
-import RequestHeader.RequestHeader;
-import RequestHeader.RequestLine;
 import db.DataBase;
 import exception.InvalidMethodTypeException;
 import model.User;
+import request.RequestHeader;
+import request.RequestLine;
 import util.HttpRequestUtils;
 import util.HttpRequestUtils.RequestMethodType;
 import util.SplitUtils;
@@ -14,10 +14,10 @@ import util.SplitUtils;
 public class RequestHeaderHandler {
 	String homePath = "/index.html";
 
-	public String changeFinalUrl(RequestHeader request) {
+	public String getResponseValue(RequestHeader request) {
 		return methodTurningPoint(request);
 	}
-	
+
 	private String methodTurningPoint(RequestHeader request) {
 		RequestLine requestLine = request.getRequestLine();
 		RequestMethodType requestMethodType = requestLine.getMethodType();
@@ -29,22 +29,25 @@ public class RequestHeaderHandler {
 		}
 		throw new InvalidMethodTypeException("지원하지 않는 메서드 요청입니다.");
 	}
-	
+
 	private String whenPost(RequestHeader requestHeader) {
 		String[] splitedPath = requestHeader.getPathValue().split("/");
-		if("user".equals(splitedPath[1])) {
-			if("create".equals(splitedPath[2])) {
+		if ("user".equals(splitedPath[1])) {
+			if ("create".equals(splitedPath[2])) {
 				userSignUp(requestHeader.getRequestBody());
-				return "";
+				return "redirect: " + homePath;
+			}
+			if("login".equals(splitedPath[2])) {
+				
 			}
 		}
 		return "";
 	}
-	
+
 	private void userSignUp(String requestBody) {
 		DataBase.addUser(getUser(HttpRequestUtils.parseQueryString(requestBody)));
 	}
-	
+
 	private User getUser(Map<String, String> inputValue) {
 		User user = new User(inputValue.get("userId"), inputValue.get("password"), inputValue.get("name"),
 				inputValue.get("email"));
@@ -53,7 +56,7 @@ public class RequestHeaderHandler {
 
 	private String whenGet(RequestLine requestLine) {
 		String requestPath = requestLine.getRequestPath().toString();
-		if("/".equals(requestPath))
+		if ("/".equals(requestPath))
 			return homePath;
 		if (isWebFile(requestPath)) {
 			return requestPath;

@@ -12,7 +12,8 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import RequestHeader.RequestHeader;
+import request.RequestHeader;
+import request.ResponseHeader;
 import util.IOUtils;
 
 public class RequestHandler extends Thread {
@@ -47,30 +48,12 @@ public class RequestHandler extends Thread {
 			}
 			// TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 			DataOutputStream dos = new DataOutputStream(out);
-
-			// pathController가 먼저 시작되는게 아니라 requestHeader가 모두 들어가는 컨트롤러를 만들고
-			// 그 안에서 메소드로 먼저 분기 그리고 url에 맞춰서 분기
-			// url에서 먼저 처리될건 파일이름들.. 이미 구현해놓은걸로 사용
-
-			String finalUrl = requestHeaderHandler.changeFinalUrl(request);
-
+			
 			PathFileReader pathFileReader = new PathFileReader("./webapp");
-			byte[] body = pathFileReader.getReadAllBytes(finalUrl);
-
-			response200Header(dos, body.length);
-			responseBody(dos, body);
-
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-	}
-
-	private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-		try {
-			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-			dos.writeBytes("\r\n");
+			String responseValue = requestHeaderHandler.getResponseValue(request);
+			ResponseHeader responseHeader = new ResponseHeader(responseValue, pathFileReader);
+			responseHeader.response(dos);
+			
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
@@ -78,14 +61,5 @@ public class RequestHandler extends Thread {
 
 	private BufferedReader convertToBufferedReader(InputStream inputStream) throws UnsupportedEncodingException {
 		return new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-	}
-
-	private void responseBody(DataOutputStream dos, byte[] body) {
-		try {
-			dos.write(body, 0, body.length);
-			dos.flush();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
 	}
 }

@@ -1,4 +1,4 @@
-package RequestHeader;
+package request;
 
 import java.util.Map;
 

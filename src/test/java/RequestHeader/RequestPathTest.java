@@ -7,7 +7,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import RequestHeader.RequestPath;
+import request.RequestPath;
 
 public class RequestPathTest {
 	RequestPath requestPath;
