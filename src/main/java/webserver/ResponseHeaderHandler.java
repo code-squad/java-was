@@ -13,8 +13,8 @@ import util.SplitUtils;
 public class ResponseHeaderHandler {
 	private static final Logger log = LoggerFactory.getLogger(ResponseHeaderHandler.class);
 	private StatusCode statusCode;
-//	private ArrayList<String> responseHeaders = new ArrayList<String>();
-	ArrayList<ResponseHeader> responseHeaders = new ArrayList<ResponseHeader>();
+	// private ArrayList<String> responseHeaders = new ArrayList<String>();
+	private ArrayList<ResponseHeader> responseHeaders = new ArrayList<ResponseHeader>();
 
 	private String responseUrl;
 
@@ -22,14 +22,20 @@ public class ResponseHeaderHandler {
 
 	public ResponseHeaderHandler(String responseValue, PathFileReader pathFileReader) throws IOException {
 		statusCode = setStatusCode(responseValue);
-		body = pathFileReader.getReadAllBytes(responseUrl);
+		if (responseValue.startsWith("dataValue: ")) {
+			body = SplitUtils.getSplitedValue(responseValue, ": ", 1).getBytes();
+		} else {
+			body = pathFileReader.getReadAllBytes(responseUrl);
+		}
+		setAccept(responseValue);
+		setDefaultHeader();
 	}
 
 	public void response(DataOutputStream dos) {
 		responseHeader(dos, body.length);
 		responseBody(dos, body);
 	}
-	
+
 	public void setResponseHeaderList(ArrayList<ResponseHeader> responseHeaderList) {
 		responseHeaders.addAll(responseHeaderList);
 	}
@@ -55,8 +61,22 @@ public class ResponseHeaderHandler {
 	}
 
 	public void setDefaultHeader() {
-		setHeader(new ResponseHeader("Content-Type", "text/html;charset=utf-8"));
 		setHeader(new ResponseHeader("Content-Length", Integer.toString(body.length)));
+	}
+	
+	public void setAccept(String responseValue) {
+		setHeader(new ResponseHeader("Accept", getAcceptContentType(responseValue)));
+	}
+
+	private String getAcceptContentType(String responseValue) {
+		String extension = SplitUtils.getSplitedExtension(responseValue).toUpperCase();
+		if("HTML".equals(extension))
+			return "text/html";
+		if ("CSS".equals(extension))
+			return "text/css";
+		if ("JS".equals(extension))
+			return "text/javascript";
+		return "*/*";
 	}
 
 	private void debugResponseHeaders() {

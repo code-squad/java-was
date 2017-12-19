@@ -10,6 +10,7 @@ import db.DataBase;
 import exception.InvalidMethodTypeException;
 import model.User;
 import request.RequestHeader;
+import request.RequestHeaderValue;
 import request.RequestLine;
 import request.ResponseHeader;
 import util.HttpRequestUtils;
@@ -22,13 +23,22 @@ public class RequestHeaderHandler {
 
 	private String homePath = "/index.html";
 	private ArrayList<ResponseHeader> responseHeaders = new ArrayList<ResponseHeader>();
+	private RequestHeaderValue requestHeaderValue;
 
 	public String getResponseValue(RequestHeader request) {
+		requestHeaderValue = request.getRequestHeaderValues();
 		return methodTurningPoint(request);
 	}
 
 	public ArrayList<ResponseHeader> getResponseHeaderList() {
 		return responseHeaders;
+	}
+
+	private boolean isLogin() {
+		String cookiesValue = requestHeaderValue.getTextFindByField("Cookie");
+		Map<String, String> cookies = HttpRequestUtils.parseCookies(cookiesValue);
+		return Boolean.valueOf(SplitUtils.valueToStringOrEmpty(cookies, "logined"));
+
 	}
 
 	private String methodTurningPoint(RequestHeader request) {
@@ -57,6 +67,22 @@ public class RequestHeaderHandler {
 		return "";
 	}
 
+	private String userList() {
+		StringBuilder stringBuilder = new StringBuilder();
+		ArrayList<User> users = new ArrayList<User>();
+		users.addAll(DataBase.findAll());
+
+		stringBuilder.append("<!doctype html>");
+		stringBuilder.append("<html>");
+		stringBuilder.append("<body>");
+		for (User user : users) {
+			stringBuilder.append(user.toString() + "<br>");
+		}
+		stringBuilder.append("</body>");
+		stringBuilder.append("</html>");
+		return stringBuilder.toString();
+	}
+
 	private void userSignUp(String requestBody) {
 		DataBase.addUser(getUser(HttpRequestUtils.parseQueryString(requestBody)));
 	}
@@ -70,7 +96,7 @@ public class RequestHeaderHandler {
 		// 로그인 성공
 		if (password.equals(user.getPassword())) {
 			log.debug(user.getName() + " 로그인 성공");
-			responseHeaders.add(new ResponseHeader("Cookie", "logined=true; Path=/"));
+			responseHeaders.add(new ResponseHeader("Set-Cookie", "logined=true; Path=/"));
 			return "redirect: " + homePath;
 		}
 		log.debug("로그인 실패");
@@ -85,10 +111,21 @@ public class RequestHeaderHandler {
 
 	private String whenGet(RequestLine requestLine) {
 		String requestPath = requestLine.getRequestPath().toString();
+		String[] splitedPath = requestPath.split("/");
 		if ("/".equals(requestPath))
 			return homePath;
 		if (isWebFile(requestPath)) {
 			return requestPath;
+		}
+		if ("user".equals(splitedPath[1])) {
+			if ("list".equals(splitedPath[2])) {
+				log.debug("list 페이지");
+				if (isLogin()) {
+					return "dataValue: " + userList();
+				}
+				log.debug("로그인이 되어 있지 않습니다.");
+				return "redirect: /user/login.html";
+			}
 		}
 		return "";
 	}

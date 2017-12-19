@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Map;
+
 public class SplitUtils {
 	public static String getSplitedValue(String inputValue, String pivot, int num) {
 		String[] tokens = inputValue.split(pivot);
@@ -20,5 +22,10 @@ public class SplitUtils {
 
 	public static String getSplitedExtension(String inputValue) {
 		return inputValue.substring(inputValue.lastIndexOf('.') + 1, inputValue.length());
+	}
+	
+	public static String valueToStringOrEmpty(Map<String, ?> map, String key) {
+		Object value = map.get(key);
+		return value == null ? "" : value.toString();
 	}
 }

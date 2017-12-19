@@ -1,14 +1,12 @@
 package request;
 
-import java.util.ArrayList;
-
 import util.HttpRequestUtils.RequestMethodType;
 
 public class RequestHeader {
-	ArrayList<String> headerLines = new ArrayList<String>();
-	RequestLine requestLine;
-	String requestBody = "no body content";
-	int contentLength = 0;
+	private RequestLine requestLine;	
+	private RequestHeaderValue requestHeaderValues = new RequestHeaderValue();	
+	private String requestBody = "no body content";
+	private int contentLength = 0;
 
 	// GET /index.html HTTP/1.1
 	public RequestHeader(String inputLine) {
@@ -18,13 +16,17 @@ public class RequestHeader {
 	public void setRequestBody(String requestBody) {
 		this.requestBody = requestBody;
 	}
+	
+	public RequestHeaderValue getRequestHeaderValues(){
+		return requestHeaderValues;
+	}
 
 	public String getRequestBody() {
 		return requestBody;
 	}
 
 	public void addLine(String headerLine) {
-		headerLines.add(headerLine);
+		requestHeaderValues.addRequestHeaderValue(headerLine);
 		// 콘텐츠 확인
 		if (headerLine.startsWith("Content-Length:")) {
 			contentLength = Integer.parseInt(headerLine.substring("Content-Length:".length()).trim());
