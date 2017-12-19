@@ -10,7 +10,7 @@ import org.junit.Test;
 import request.RequestPath;
 
 public class RequestPathTest {
-	RequestPath requestPath;
+	private RequestPath requestPath;
 	
 	@Before
 	public void setPath() {

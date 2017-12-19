@@ -13,7 +13,6 @@ import util.SplitUtils;
 public class ResponseHeaderHandler {
 	private static final Logger log = LoggerFactory.getLogger(ResponseHeaderHandler.class);
 	private StatusCode statusCode;
-	// private ArrayList<String> responseHeaders = new ArrayList<String>();
 	private ArrayList<ResponseHeader> responseHeaders = new ArrayList<ResponseHeader>();
 
 	private String responseUrl;
@@ -32,7 +31,7 @@ public class ResponseHeaderHandler {
 	}
 
 	public void response(DataOutputStream dos) {
-		responseHeader(dos, body.length);
+		responseHeader(dos);
 		responseBody(dos, body);
 	}
 
@@ -100,7 +99,7 @@ public class ResponseHeaderHandler {
 		setHeader(new ResponseHeader("Cookie", "logined=true; Path=/"));
 	}
 
-	private void responseHeader(DataOutputStream dos, int lengthOfBodyContent) {
+	private void responseHeader(DataOutputStream dos) {
 		try {
 			log.debug("HTTP/1.1 " + statusCode.getStatusCodeValue()); // statusLine
 			debugResponseHeaders();

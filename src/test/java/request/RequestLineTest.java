@@ -11,7 +11,7 @@ import request.RequestPath;
 import util.HttpRequestUtils.RequestMethodType;
 
 public class RequestLineTest {
-	RequestLine requestLine;
+	private RequestLine requestLine;
 	
 	@Before
 	public void init() {

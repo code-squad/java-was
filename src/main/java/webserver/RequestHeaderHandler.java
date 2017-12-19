@@ -44,10 +44,10 @@ public class RequestHeaderHandler {
 	private String methodTurningPoint(RequestHeader request) {
 		RequestLine requestLine = request.getRequestLine();
 		RequestMethodType requestMethodType = requestLine.getMethodType();
-		if (RequestMethodType.GET.equals(requestMethodType)) {
+		if (RequestMethodType.GET == requestMethodType) {
 			return whenGet(requestLine);
 		}
-		if (RequestMethodType.POST.equals(requestMethodType)) {
+		if (RequestMethodType.POST == requestMethodType) {
 			return whenPost(request);
 		}
 		throw new InvalidMethodTypeException("지원하지 않는 메서드 요청입니다.");
@@ -117,15 +117,13 @@ public class RequestHeaderHandler {
 		if (isWebFile(requestPath)) {
 			return requestPath;
 		}
-		if ("user".equals(splitedPath[1])) {
-			if ("list".equals(splitedPath[2])) {
-				log.debug("list 페이지");
-				if (isLogin()) {
-					return "dataValue: " + userList();
-				}
-				log.debug("로그인이 되어 있지 않습니다.");
-				return "redirect: /user/login.html";
+		if ("user".equals(splitedPath[1]) && "list".equals(splitedPath[2])) {
+			log.debug("list 페이지");
+			if (isLogin()) {
+				return "dataValue: " + userList();
 			}
+			log.debug("로그인이 되어 있지 않습니다.");
+			return "redirect: /user/login.html";
 		}
 		return "";
 	}

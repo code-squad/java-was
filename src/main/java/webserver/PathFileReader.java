@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class PathFileReader {
-	String rootPath;
-	String indexUrl = "/index.html";
+	private String rootPath;
+	private String indexUrl = "/index.html";
 	
 	public PathFileReader(String rootPath) {
 		this.rootPath = rootPath;

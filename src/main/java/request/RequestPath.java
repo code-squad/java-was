@@ -5,9 +5,9 @@ import java.util.Map;
 import util.HttpRequestUtils;
 
 public class RequestPath {
-	String path;
-	String url;
-	Map<String, String> inputValues;
+	private String path;
+	private String url;
+	private Map<String, String> inputValues;
 
 	public RequestPath(String path) {
 		this.path = path;
