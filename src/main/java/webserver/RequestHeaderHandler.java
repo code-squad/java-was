@@ -1,5 +1,10 @@
 package webserver;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -17,6 +22,7 @@ import request.RequestLine;
 import request.ResponseHeaderValues;
 import util.HttpRequestUtils;
 import util.HttpRequestUtils.RequestMethodType;
+import util.IOUtils;
 import util.SplitUtils;
 
 public class RequestHeaderHandler {
@@ -28,7 +34,22 @@ public class RequestHeaderHandler {
 	private RequestHeaderValue requestHeaderValue;
 	private UrlController urlController = new UrlController();
 
-	public String getResponseValue(RequestHeader request) {
+	public String getResponseValue(InputStream in) throws IOException {
+		BufferedReader bufferedReader = convertToBufferedReader(in);
+		String line = bufferedReader.readLine();
+		log.debug("Request line : {}", line);
+		RequestHeader request = new RequestHeader(line);
+		while (!"".equals(line) && line != null) {
+			line = bufferedReader.readLine();
+			request.addLine(line);
+			log.debug("Header : {}", line);
+		}
+		log.debug("Path : {}", request.getPathValue());
+		int contentLength = request.getContentLength();
+		if (contentLength > 0) {
+			request.setRequestBody(String.valueOf(IOUtils.readData(bufferedReader, contentLength)));
+			log.debug("Body : {}", request.getRequestBody());
+		}
 		requestHeaderValue = request.getRequestHeaderValues();
 		return methodTurningPoint(request);
 	}
@@ -101,5 +122,9 @@ public class RequestHeaderHandler {
 	private boolean isWebFile(String url) {
 		String extension = SplitUtils.getSplitedExtension(url).toUpperCase();
 		return "HTML".equals(extension) || "JS".equals(extension) || "CSS".equals(extension);
+	}
+	
+	private BufferedReader convertToBufferedReader(InputStream inputStream) throws UnsupportedEncodingException {
+		return new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 	}
 }

@@ -30,26 +30,11 @@ public class RequestHandler extends Thread {
 				connection.getPort());
 
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-			BufferedReader bufferedReader = convertToBufferedReader(in);
-			String line = bufferedReader.readLine();
-			log.debug("Request line : {}", line);
-			RequestHeader request = new RequestHeader(line);
-			while (!"".equals(line) && line != null) {
-				line = bufferedReader.readLine();
-				request.addLine(line);
-				log.debug("Header : {}", line);
-			}
-			log.debug("Path : {}", request.getPathValue());
-			int contentLength = request.getContentLength();
-			if (contentLength > 0) {
-				request.setRequestBody(String.valueOf(IOUtils.readData(bufferedReader, contentLength)));
-				log.debug("Body : {}", request.getRequestBody());
-			}
 			// TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 			DataOutputStream dos = new DataOutputStream(out);
 			
 			PathFileReader pathFileReader = new PathFileReader("./webapp");
-			String responseValue = requestHeaderHandler.getResponseValue(request);
+			String responseValue = requestHeaderHandler.getResponseValue(in);
 			ResponseHeaderHandler responseHeaderHandler = new ResponseHeaderHandler(responseValue, pathFileReader);
 			responseHeaderHandler.setResponseHeaderList(requestHeaderHandler.getResponseHeaderList());
 			responseHeaderHandler.response(dos);
@@ -57,9 +42,5 @@ public class RequestHandler extends Thread {
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
-	}
-
-	private BufferedReader convertToBufferedReader(InputStream inputStream) throws UnsupportedEncodingException {
-		return new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 	}
 }
