@@ -2,21 +2,19 @@ package webserver;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import request.ResponseHeader;
+import request.ResponseHeaderValues;
 import util.SplitUtils;
 
 public class ResponseHeaderHandler {
 	private static final Logger log = LoggerFactory.getLogger(ResponseHeaderHandler.class);
 	private StatusCode statusCode;
-	private ArrayList<ResponseHeader> responseHeaders = new ArrayList<ResponseHeader>();
-
+	private ResponseHeaderValues responseHeaders = new ResponseHeaderValues();
 	private String responseUrl;
-
 	private byte[] body;
 
 	public ResponseHeaderHandler(String responseValue, PathFileReader pathFileReader) throws IOException {
@@ -35,8 +33,8 @@ public class ResponseHeaderHandler {
 		responseBody(dos, body);
 	}
 
-	public void setResponseHeaderList(ArrayList<ResponseHeader> responseHeaderList) {
-		responseHeaders.addAll(responseHeaderList);
+	public void setResponseHeaderList(ResponseHeaderValues responseHeaderValues) {
+		responseHeaders.addResponseHeaderValues(responseHeaderValues);
 	}
 
 	private StatusCode setStatusCode(String responseValue) {
@@ -56,20 +54,20 @@ public class ResponseHeaderHandler {
 	}
 
 	public void setHeader(ResponseHeader responseHeader) {
-		responseHeaders.add(responseHeader);
+		responseHeaders.addResponseHeaderValues(responseHeader);
 	}
 
 	public void setDefaultHeader() {
 		setHeader(new ResponseHeader("Content-Length", Integer.toString(body.length)));
 	}
-	
+
 	public void setAccept(String responseValue) {
 		setHeader(new ResponseHeader("Accept", getAcceptContentType(responseValue)));
 	}
 
 	private String getAcceptContentType(String responseValue) {
 		String extension = SplitUtils.getSplitedExtension(responseValue).toUpperCase();
-		if("HTML".equals(extension))
+		if ("HTML".equals(extension))
 			return "text/html";
 		if ("CSS".equals(extension))
 			return "text/css";
@@ -79,14 +77,14 @@ public class ResponseHeaderHandler {
 	}
 
 	private void debugResponseHeaders() {
-		for (ResponseHeader responseHeader : responseHeaders) {
+		for (ResponseHeader responseHeader : responseHeaders.getResponseHeaders()) {
 			log.debug(responseHeader.toString());
 		}
 	}
 
 	private void writeBytesResponseHeader(DataOutputStream dos) {
 		try {
-			for (ResponseHeader responseHeader : responseHeaders) {
+			for (ResponseHeader responseHeader : responseHeaders.getResponseHeaders()) {
 				dos.writeBytes(responseHeader.toString() + "\r\n");
 			}
 			dos.writeBytes("\r\n");

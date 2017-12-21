@@ -6,13 +6,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import controller.Controller;
+import controller.UrlController;
 import db.DataBase;
 import exception.InvalidMethodTypeException;
 import model.User;
 import request.RequestHeader;
 import request.RequestHeaderValue;
 import request.RequestLine;
-import request.ResponseHeader;
+import request.ResponseHeaderValues;
 import util.HttpRequestUtils;
 import util.HttpRequestUtils.RequestMethodType;
 import util.SplitUtils;
@@ -21,16 +23,17 @@ public class RequestHeaderHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(RequestHeaderHandler.class);
 
-	private String homePath = "/index.html";
-	private ArrayList<ResponseHeader> responseHeaders = new ArrayList<ResponseHeader>();
+	private static String HOMEPATH = "/index.html";
+	private ResponseHeaderValues responseHeaders = new ResponseHeaderValues();
 	private RequestHeaderValue requestHeaderValue;
+	private UrlController urlController = new UrlController();
 
 	public String getResponseValue(RequestHeader request) {
 		requestHeaderValue = request.getRequestHeaderValues();
 		return methodTurningPoint(request);
 	}
 
-	public ArrayList<ResponseHeader> getResponseHeaderList() {
+	public ResponseHeaderValues getResponseHeaderList() {
 		return responseHeaders;
 	}
 
@@ -48,23 +51,16 @@ public class RequestHeaderHandler {
 			return whenGet(requestLine);
 		}
 		if (RequestMethodType.POST == requestMethodType) {
-			return whenPost(request);
+			return whenPost(request, responseHeaders);
 		}
 		throw new InvalidMethodTypeException("지원하지 않는 메서드 요청입니다.");
 	}
 
-	private String whenPost(RequestHeader requestHeader) {
-		String[] splitedPath = requestHeader.getPathValue().split("/");
-		if ("user".equals(splitedPath[1])) {
-			if ("create".equals(splitedPath[2])) {
-				userSignUp(requestHeader.getRequestBody());
-				return "redirect: " + homePath;
-			}
-			if ("login".equals(splitedPath[2])) {
-				return userLogin(requestHeader.getRequestBody());
-			}
-		}
-		return "";
+	private String whenPost(RequestHeader requestHeader, ResponseHeaderValues responseHeaderValues) {
+		String url = requestHeader.getPathValue();
+		log.debug("resolveControllerUrl: " + url);
+		Controller resolveController = urlController.resolveController(url);
+		return resolveController.run(requestHeader, responseHeaderValues);
 	}
 
 	private String userList() {
@@ -83,37 +79,11 @@ public class RequestHeaderHandler {
 		return stringBuilder.toString();
 	}
 
-	private void userSignUp(String requestBody) {
-		DataBase.addUser(getUser(HttpRequestUtils.parseQueryString(requestBody)));
-	}
-
-	private String userLogin(String requestBody) {
-		Map<String, String> loginValue = HttpRequestUtils.parseQueryString(requestBody);
-		// userId password
-		String userId = loginValue.get("userId");
-		String password = loginValue.get("password");
-		User user = DataBase.findUserById(userId);
-		// 로그인 성공
-		if (password.equals(user.getPassword())) {
-			log.debug(user.getName() + " 로그인 성공");
-			responseHeaders.add(new ResponseHeader("Set-Cookie", "logined=true; Path=/"));
-			return "redirect: " + homePath;
-		}
-		log.debug("로그인 실패");
-		return "redirect: /user/login_failed.html";
-	}
-
-	private User getUser(Map<String, String> inputValue) {
-		User user = new User(inputValue.get("userId"), inputValue.get("password"), inputValue.get("name"),
-				inputValue.get("email"));
-		return user;
-	}
-
 	private String whenGet(RequestLine requestLine) {
 		String requestPath = requestLine.getRequestPath().toString();
 		String[] splitedPath = requestPath.split("/");
 		if ("/".equals(requestPath))
-			return homePath;
+			return HOMEPATH;
 		if (isWebFile(requestPath)) {
 			return requestPath;
 		}
