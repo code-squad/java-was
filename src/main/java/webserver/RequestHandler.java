@@ -22,10 +22,10 @@ public class RequestHandler extends Thread {
 	private PathFileReader pathFileReader;
 	private UrlController urlController;
 
-	public RequestHandler(Socket connectionSocket) {
+	public RequestHandler(Socket connectionSocket, UrlController urlController) {
 		this.connection = connectionSocket;
 		pathFileReader = new PathFileReader("./webapp");
-		urlController = new UrlController();
+		this.urlController = urlController;
 	}
 
 	public void run() {
