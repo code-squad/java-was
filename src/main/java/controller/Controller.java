@@ -1,10 +1,12 @@
 package controller;
 
+import request.GeneralHeaderValue;
 import request.RequestHeader;
-import request.ResponseHeaderValues;
 
 public interface Controller {
 	static String HOMEPATH = "/index.html";
 
-	public String run(RequestHeader requestHeader, ResponseHeaderValues responseHeaderValues);
+	public String run(RequestHeader requestHeader);
+	
+	public GeneralHeaderValue getResponseHeaderValue();
 }

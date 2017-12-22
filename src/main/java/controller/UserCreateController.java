@@ -4,14 +4,14 @@ import java.util.Map;
 
 import db.DataBase;
 import model.User;
+import request.GeneralHeaderValue;
 import request.RequestHeader;
-import request.ResponseHeaderValues;
 import util.HttpRequestUtils;
 
 public class UserCreateController implements Controller {
 
 	@Override
-	public String run(RequestHeader requestHeader, ResponseHeaderValues responseHeaderValues) {
+	public String run(RequestHeader requestHeader) {
 		userSignUp(requestHeader.getRequestBody());
 		return "redirect: " + HOMEPATH;
 	}
@@ -24,5 +24,10 @@ public class UserCreateController implements Controller {
 		User user = new User(inputValue.get("userId"), inputValue.get("password"), inputValue.get("name"),
 				inputValue.get("email"));
 		return user;
+	}
+
+	@Override
+	public GeneralHeaderValue getResponseHeaderValue() {
+		return null;
 	}
 }

@@ -1,7 +1,6 @@
 package request;
 
 import util.HttpRequestUtils.RequestMethodType;
-import util.SplitUtils;
 
 public class RequestLine {
 	private RequestPath requestPath;
@@ -9,9 +8,10 @@ public class RequestLine {
 	private String httpVersion;
 	
 	public RequestLine(String inputValue) {
-		methodType = RequestMethodType.getRequestMethodType(SplitUtils.getSplitedValue(inputValue, " ", 0));
-		requestPath = new RequestPath(SplitUtils.getSplitedValue(inputValue, " ", 1));
-		httpVersion = SplitUtils.getSplitedValue(inputValue, " ", 2);
+		String[] splitedValue = inputValue.split(" ");
+		methodType = RequestMethodType.getRequestMethodType(splitedValue[0]);
+		requestPath = new RequestPath(splitedValue[1]);
+		httpVersion = splitedValue[2];
 	}
 	
 	public RequestPath getRequestPath() {

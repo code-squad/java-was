@@ -4,7 +4,7 @@ import util.HttpRequestUtils.RequestMethodType;
 
 public class RequestHeader {
 	private RequestLine requestLine;	
-	private RequestHeaderValue requestHeaderValues = new RequestHeaderValue();	
+	private GeneralHeaderValue requestHeaderValues = new GeneralHeaderValue();	
 	private String requestBody = "no body content";
 	private int contentLength = 0;
 
@@ -17,7 +17,7 @@ public class RequestHeader {
 		this.requestBody = requestBody;
 	}
 	
-	public RequestHeaderValue getRequestHeaderValues(){
+	public GeneralHeaderValue getRequestHeaderValues(){
 		return requestHeaderValues;
 	}
 
@@ -26,7 +26,7 @@ public class RequestHeader {
 	}
 
 	public void addLine(String headerLine) {
-		requestHeaderValues.addRequestHeaderValue(headerLine);
+		requestHeaderValues.addGeneralHeaderValue(headerLine);
 		// 콘텐츠 확인
 		if (headerLine.startsWith("Content-Length:")) {
 			contentLength = Integer.parseInt(headerLine.substring("Content-Length:".length()).trim());

@@ -2,39 +2,68 @@ package webserver;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import request.ResponseHeader;
-import request.ResponseHeaderValues;
+import request.GeneralHeaderValue;
 import util.SplitUtils;
 
 public class ResponseHeaderHandler {
 	private static final Logger log = LoggerFactory.getLogger(ResponseHeaderHandler.class);
 	private StatusCode statusCode;
-	private ResponseHeaderValues responseHeaders = new ResponseHeaderValues();
+	private GeneralHeaderValue responseHeaders = new GeneralHeaderValue();
 	private String responseUrl;
 	private byte[] body;
 
-	public ResponseHeaderHandler(String responseValue, PathFileReader pathFileReader) throws IOException {
+	public ResponseHeaderHandler(String responseValue, PathFileReader pathFileReader,
+			GeneralHeaderValue responseHeaderValues) throws IOException {
 		statusCode = setStatusCode(responseValue);
 		if (responseValue.startsWith("dataValue: ")) {
 			body = SplitUtils.getSplitedValue(responseValue, ": ", 1).getBytes();
+		} else if (responseValue.startsWith("redirect: ")) {
+			body = "".getBytes();
 		} else {
 			body = pathFileReader.getReadAllBytes(responseUrl);
 		}
 		setAccept(responseValue);
 		setDefaultHeader();
+		if (responseHeaderValues != null) {
+			responseHeaders.addGeneralHeaderValue(responseHeaderValues);
+		}
 	}
 
+	// 실행하는 핵심 메소드
 	public void response(DataOutputStream dos) {
 		responseHeader(dos);
 		responseBody(dos, body);
 	}
 
-	public void setResponseHeaderList(ResponseHeaderValues responseHeaderValues) {
-		responseHeaders.addResponseHeaderValues(responseHeaderValues);
+	private void responseHeader(DataOutputStream dos) {
+		try {
+			dos.writeBytes("HTTP/1.1 " + statusCode.getStatusCodeValue() + " \r\n");
+			writeBytesResponseHeader(dos);
+			log.debug("HTTP/1.1 " + statusCode.getStatusCodeValue()); // statusLine
+			debugResponseHeaders();
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	private void responseBody(DataOutputStream dos, byte[] body) {
+		try {
+			dos.write(body, 0, body.length);
+			dos.flush();
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	private void debugResponseHeaders() {
+		for (Map.Entry<String, String> responseHeader : responseHeaders.getGeneralHeaderValue().entrySet()) {
+			log.debug(responseHeader.toString());
+		}
 	}
 
 	private StatusCode setStatusCode(String responseValue) {
@@ -48,21 +77,21 @@ public class ResponseHeaderHandler {
 
 	private void setRedirectUrl(String responseValue) {
 		String url = SplitUtils.getSplitedValue(responseValue, ": ", 1);
-		setHeader(new ResponseHeader("Location", url));
+		setHeader("Location", url);
 		log.debug("redirect : {}", url);
 		responseUrl = url;
 	}
 
-	public void setHeader(ResponseHeader responseHeader) {
-		responseHeaders.addResponseHeaderValues(responseHeader);
+	public void setHeader(String field, String text) {
+		responseHeaders.addGeneralHeaderValue(field, text);
 	}
 
 	public void setDefaultHeader() {
-		setHeader(new ResponseHeader("Content-Length", Integer.toString(body.length)));
+		setHeader("Content-Length", Integer.toString(body.length));
 	}
 
 	public void setAccept(String responseValue) {
-		setHeader(new ResponseHeader("Accept", getAcceptContentType(responseValue)));
+		setHeader("Accept", getAcceptContentType(responseValue));
 	}
 
 	private String getAcceptContentType(String responseValue) {
@@ -76,16 +105,11 @@ public class ResponseHeaderHandler {
 		return "*/*";
 	}
 
-	private void debugResponseHeaders() {
-		for (ResponseHeader responseHeader : responseHeaders.getResponseHeaders()) {
-			log.debug(responseHeader.toString());
-		}
-	}
-
 	private void writeBytesResponseHeader(DataOutputStream dos) {
 		try {
-			for (ResponseHeader responseHeader : responseHeaders.getResponseHeaders()) {
-				dos.writeBytes(responseHeader.toString() + "\r\n");
+			for (Map.Entry<String, String> responseHeader : responseHeaders.getGeneralHeaderValue().entrySet()) {
+				dos.writeBytes(responseHeader.getKey() + ": " + responseHeader.getValue() + "\r\n");
+				log.debug("실제 입력되는 값: " + responseHeader.getKey() + ": " + responseHeader.getValue());
 			}
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
@@ -94,29 +118,7 @@ public class ResponseHeaderHandler {
 	}
 
 	public void loginResponse() {
-		setHeader(new ResponseHeader("Cookie", "logined=true; Path=/"));
-	}
-
-	private void responseHeader(DataOutputStream dos) {
-		try {
-			log.debug("HTTP/1.1 " + statusCode.getStatusCodeValue()); // statusLine
-			debugResponseHeaders();
-
-			dos.writeBytes("HTTP/1.1 " + statusCode.getStatusCodeValue() + " \r\n");
-			writeBytesResponseHeader(dos);
-
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-	}
-
-	private void responseBody(DataOutputStream dos, byte[] body) {
-		try {
-			dos.write(body, 0, body.length);
-			dos.flush();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
+		setHeader("Cookie", "logined=true; Path=/");
 	}
 
 	public enum StatusCode {

@@ -1,28 +1,31 @@
 package webserver;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import controller.Controller;
+import controller.UrlController;
+import request.GeneralHeaderValue;
 import request.RequestHeader;
-import util.IOUtils;
 
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket connection;
-	private RequestHeaderHandler requestHeaderHandler = new RequestHeaderHandler();
+	private RequestHeaderHandler requestHeaderHandler;
+	private PathFileReader pathFileReader;
+	private UrlController urlController;
 
 	public RequestHandler(Socket connectionSocket) {
 		this.connection = connectionSocket;
+		pathFileReader = new PathFileReader("./webapp");
+		urlController = new UrlController();
 	}
 
 	public void run() {
@@ -32,13 +35,19 @@ public class RequestHandler extends Thread {
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 			// TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 			DataOutputStream dos = new DataOutputStream(out);
+			requestHeaderHandler = new RequestHeaderHandler(in);
+
+			RequestHeader request = requestHeaderHandler.getRequestHeader();
 			
-			PathFileReader pathFileReader = new PathFileReader("./webapp");
-			String responseValue = requestHeaderHandler.getResponseValue(in);
-			ResponseHeaderHandler responseHeaderHandler = new ResponseHeaderHandler(responseValue, pathFileReader);
-			responseHeaderHandler.setResponseHeaderList(requestHeaderHandler.getResponseHeaderList());
+			Controller resolveController = urlController.resolveController(request);
+			log.debug("ResolveController: "+ resolveController.getClass().getName());
+			String responseUrl = resolveController.run(request);
+			GeneralHeaderValue responseHeaderValue = resolveController.getResponseHeaderValue();
+
+			ResponseHeaderHandler responseHeaderHandler = new ResponseHeaderHandler(responseUrl, pathFileReader,
+					responseHeaderValue);
 			responseHeaderHandler.response(dos);
-			
+
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
