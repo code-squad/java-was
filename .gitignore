@@ -1,9 +1,21 @@
-/bin/
-/.settings/
-/target/
-/.classpath
-/.project
-/.idea
-*.iml
 .DS_Store
-/.gradle/
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+/out/
+/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
