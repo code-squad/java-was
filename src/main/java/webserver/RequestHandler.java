@@ -46,10 +46,14 @@ public class RequestHandler extends Thread {
 
             requestBody = IOUtils.readData(br,contentLength);
 
-            if (!requestBody.equals(""))
-                queryToModel(requestBody);
-
             DataOutputStream dos = new DataOutputStream(out);
+
+            if (!requestBody.equals("")) {
+                queryToModel(requestBody);
+                response302Header(dos);
+                return;
+            }
+
             byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
@@ -69,6 +73,17 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOOUND \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Location: /index.html\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
