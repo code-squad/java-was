@@ -12,12 +12,12 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket connection;
-	private String cookie;
 
 	public RequestHandler(Socket connectionSocket) {
 		this.connection = connectionSocket;
@@ -38,43 +38,55 @@ public class RequestHandler extends Thread {
 			String[] tokens = line.split(" ");
 			String method = tokens[0];
 			String[] url = tokens[1].split("\\?");
-			String path = url[0];
-			log.debug("method: {}, path: {}", method, path);
+			log.debug("method: {}, url: {}", method, url);
 
-			Map<String, String> headerParams = new HashMap<>();
-
-			while (!line.isEmpty()) {
-				line = br.readLine();
-				if (line.isEmpty()) {
-					break;
-				}
-				log.debug("line: {}", line);
-
-				HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
-				if (pair != null) {
-					headerParams.put(pair.getKey(), pair.getValue());
-				}
-			}
-
-			cookie = headerParams.get("Cookie");
-
+			Map<String, String> headerParams = parseHeaderParams(br);
 			DataOutputStream dos = new DataOutputStream(out);
-			if (method.equals("GET")) {
-				String query = (url.length > 1) ? url[1] : "";
-				dispatchHttpGet(path, HttpRequestUtils.parseQueryString(query));
 
-				byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
-
-				response200Header(dos, body.length);
-				responseBody(dos, body);
-			}
-
-			if (method.equals("POST")) {
-				String body = IOUtils.readData(br, Integer.parseInt(headerParams.get("Content-Length")));
-				dispatchHttpPost(path, HttpRequestUtils.parseQueryString(body), dos);
-			}
+			String body = IOUtils.readData(br, Integer.parseInt(Optional.ofNullable(headerParams.get("Content-Length")).orElse("0")));
+			dispatchHttpRequest(method, url, headerParams, HttpRequestUtils.parseQueryString(body), dos);
 		} catch (IOException e) {
 			log.error(e.getMessage());
+		}
+	}
+
+	public Map<String, String> parseHeaderParams(BufferedReader br) throws IOException {
+		Map<String, String> headerParams = new HashMap<>();
+		String line = null;
+
+		while (line == null || !line.isEmpty()) {
+			line = br.readLine();
+			if (line.isEmpty()) {
+				break;
+			}
+			log.debug("line: {}", line);
+
+			HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+			if (pair != null) {
+				headerParams.put(pair.getKey(), pair.getValue());
+			}
+		}
+
+		return headerParams;
+	}
+
+	private void dispatchHttpRequest(String method, String[] url, Map<String, String> headerParams, Map<String, String> bodyParams, DataOutputStream dos) throws IOException {
+		String path = url[0];
+
+		if (method.equals("GET")) {
+			String query = (url.length > 1) ? url[1] : "";
+			Map<String, String> params = HttpRequestUtils.parseQueryString(query);
+			dispatchHttpGet(path, params);
+
+			byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
+
+			response200Header(dos, body.length, headerParams.get("Cookie"));
+			responseBody(dos, body);
+		}
+
+		if (method.equals("POST")) {
+			String location = dispatchHttpPost(path, headerParams, bodyParams);
+			response302Header(dos, location, headerParams.get("Cookie"));
 		}
 	}
 
@@ -86,43 +98,44 @@ public class RequestHandler extends Thread {
 		}
 	}
 
-	private void dispatchHttpPost(String path, Map<String, String> bodyParams, DataOutputStream dos) {
+	private String dispatchHttpPost(String path, Map<String, String> headerParams, Map<String, String> bodyParams) {
 		switch (path) {
 			case "/user/create":
-				createUserFromParams(bodyParams, dos);
-				break;
+				return createUserFromParams(bodyParams);
 			case "/user/login":
-				loginUserFromParams(bodyParams, dos);
+				if (loginUserFromParams(bodyParams)) {
+					headerParams.put("Cookie", "logined=true");
+					return "/index.html";
+				}
+
+				headerParams.put("Cookie", "logined=false");
+				return "/user/login_failed.html";
 		}
+
+		return "";
 	}
 
-	private void createUserFromParams(Map<String, String> params) {
+	private String createUserFromParams(Map<String, String> params) {
 		User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
 		DataBase.addUser(user);
 		log.debug("user: {}", user);
+
+		return "/index.html";
 	}
 
-	private void createUserFromParams(Map<String, String> params, DataOutputStream dos) {
-		createUserFromParams(params);
-		response302Header(dos, "/index.html");
-	}
-
-	private void loginUserFromParams(Map<String, String> params, DataOutputStream dos) {
+	private boolean loginUserFromParams(Map<String, String> params) {
 		User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
 		User existedUser = DataBase.findUserById(params.get("userId"));
 		log.debug("user: {}, existedUser", user, existedUser);
 
 		if (!user.equals(existedUser)) {
-			cookie = "logined=false";
-			response302Header(dos, "/user/login_failed.html");
-			return;
+			return false;
 		}
 
-		cookie = "logined=true";
-		response302Header(dos, "/index.html");
+		return true;
 	}
 
-	private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+	private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String cookie) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
 			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
@@ -137,7 +150,7 @@ public class RequestHandler extends Thread {
 		}
 	}
 
-	private void response302Header(DataOutputStream dos, String location) {
+	private void response302Header(DataOutputStream dos, String location, String cookie) {
 		try {
 			dos.writeBytes("HTTP/1.1 302 Found \r\n");
 			dos.writeBytes("Location: " + location + "\r\n");
