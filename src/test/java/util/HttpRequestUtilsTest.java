@@ -78,7 +78,7 @@ public class HttpRequestUtilsTest {
     @Test
     public void parseUrl() throws Exception {
         String line = "GET /index.html HTTP/1.1";
-        String url = HttpRequestUtils.parseUrl(line, 0);
+        String url = HttpRequestUtils.parseUrl(line);
         assertThat(url, is("/index.html"));
     }
 

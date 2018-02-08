@@ -56,9 +56,9 @@ public class HttpRequestUtils {
         return getKeyValue(header, ": ");
     }
 
-    public static String parseUrl(String line, int index) {
+    public static String parseUrl(String line) {
         String[] token = line.split(" ");
-        return token[1].split("\\?")[index];
+        return token[1].split("\\?")[0];
     }
 
     public static class Pair {

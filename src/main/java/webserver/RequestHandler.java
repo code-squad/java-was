@@ -9,6 +9,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -26,11 +27,9 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
-            String url = HttpRequestUtils.parseUrl(line, 0);
-
-            if (line.contains("?")) {
-                queryToModel(line);
-            }
+            String url = HttpRequestUtils.parseUrl(line);
+            int contentLength = 0;
+            String requestBody;
 
             if (line == null)
                 return;
@@ -38,7 +37,17 @@ public class RequestHandler extends Thread {
             while (!line.equals("")) {
                 System.out.println(line);
                 line = br.readLine();
+
+                HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+                if (pair != null && pair.getKey().equals("Content-Length")) {
+                    contentLength = Integer.parseInt(pair.getValue());
+                }
             }
+
+            requestBody = IOUtils.readData(br,contentLength);
+
+            if (!requestBody.equals(""))
+                queryToModel(requestBody);
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
@@ -49,9 +58,8 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void queryToModel(String line) {
-        String queryString = HttpRequestUtils.parseUrl(line, 1);
-        Map<String, String> map = HttpRequestUtils.parseQueryString(queryString);
+    private void queryToModel(String body) {
+        Map<String, String> map = HttpRequestUtils.parseQueryString(body);
         User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
         log.debug("useruser: {}", user);
     }
