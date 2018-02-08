@@ -7,9 +7,13 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
 public class HttpRequestUtilsTest {
+    private static final Logger log = LoggerFactory.getLogger(HttpRequestUtilsTest.class);
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
@@ -74,7 +78,15 @@ public class HttpRequestUtilsTest {
     @Test
     public void parseUrl() throws Exception {
         String line = "GET /index.html HTTP/1.1";
-        String url = HttpRequestUtils.parseUrl(line);
+        String url = HttpRequestUtils.parseUrl(line, 0);
         assertThat(url, is("/index.html"));
+    }
+
+    @Test
+    public void parseQuery() throws Exception {
+        String queryString = "/user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
+        Map<String, String> parsed = HttpRequestUtils.parseQueryString(queryString);
+        assertThat(parsed.get("userId"), is("javajigi"));
+        assertThat(parsed.get("password"), is("password"));
     }
 }

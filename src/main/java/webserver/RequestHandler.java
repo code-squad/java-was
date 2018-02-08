@@ -3,7 +3,9 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Map;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
@@ -24,13 +26,17 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
-            String url = HttpRequestUtils.parseUrl(line);
+            String url = HttpRequestUtils.parseUrl(line, 0);
+
+            if (line.contains("?")) {
+                queryToModel(line);
+            }
 
             if (line == null)
                 return;
 
             while (!line.equals("")) {
-                log.info(line);
+                System.out.println(line);
                 line = br.readLine();
             }
 
@@ -41,6 +47,13 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private void queryToModel(String line) {
+        String queryString = HttpRequestUtils.parseUrl(line, 1);
+        Map<String, String> map = HttpRequestUtils.parseQueryString(queryString);
+        User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
+        log.debug("useruser: {}", user);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
