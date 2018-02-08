@@ -1,19 +1,14 @@
 package webserver;
 
-import com.google.common.base.Strings;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URL;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
+import java.util.Map;
 
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -36,19 +31,20 @@ public class RequestHandler extends Thread {
 				return;
 			}
 
-			String method = "";
-			String url = "";
+			log.debug("line: {}", line);
+			String[] tokens = line.split(" ");
+			String method = tokens[0];
+			String[] fullURL = tokens[1].split("\\?");
+
 			while (!line.isEmpty()) {
-				log.debug("line: {}", line);
-				String[] tokens = line.split(" ");
-
-				if (method.isEmpty() && url.isEmpty()) {
-					method = tokens[0];
-					url = tokens[1];
-				}
-
 				line = bufferedReader.readLine();
 			}
+
+			String url = fullURL[0];
+			String query = fullURL[1];
+
+			Map<String, String> params = HttpRequestUtils.parseQueryString(query);
+			log.debug("query: {}", params);
 
 			DataOutputStream dos = new DataOutputStream(out);
 			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
