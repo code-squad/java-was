@@ -3,8 +3,11 @@ package util;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 
+import model.User;
 import org.junit.Test;
 
 import util.HttpRequestUtils.Pair;
@@ -69,5 +72,12 @@ public class HttpRequestUtilsTest {
         String header = "Content-Length: 59";
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
+    }
+
+    @Test
+    public void getUserListBody() {
+        User user = new User("sehwan", "123", "sehwan", "123");
+        byte[] body = HttpRequestUtils.getUserListBody(Arrays.asList(user));
+        assertThat(new String(body, StandardCharsets.UTF_8), is(user.toString()));
     }
 }
