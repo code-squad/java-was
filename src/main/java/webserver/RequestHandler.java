@@ -54,22 +54,25 @@ public class RequestHandler extends Thread {
 				}
 			}
 
-			switch (method) {
-				case "GET":
-					String query = (url.length > 1) ? url[1] : "";
-					dispatchHttpGet(path, query);
-					break;
-				case "POST":
-					String body = IOUtils.readData(br, Integer.parseInt(headerParams.get("Content-Length")));
-					dispatchHttpPost(path, body);
-					break;
+			DataOutputStream dos = new DataOutputStream(out);
+			if (method.equals("GET")) {
+				String query = (url.length > 1) ? url[1] : "";
+				dispatchHttpGet(path, query);
+
+				byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
+
+				response200Header(dos, body.length);
+				responseBody(dos, body);
 			}
 
-			DataOutputStream dos = new DataOutputStream(out);
-			byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
+			if (method.equals("POST")) {
+				String body = IOUtils.readData(br, Integer.parseInt(headerParams.get("Content-Length")));
+				dispatchHttpPost(path, body);
 
-			response200Header(dos, body.length);
-			responseBody(dos, body);
+				response302Header(dos, "/index.html");
+			}
+
+			dos.flush();
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
@@ -107,10 +110,20 @@ public class RequestHandler extends Thread {
 		}
 	}
 
+	private void response302Header(DataOutputStream dos, String location) {
+		log.debug("here");
+		try {
+			dos.writeBytes("HTTP/1.1 302 Found \r\n");
+			dos.writeBytes("Location: " + location + "\r\n");
+			dos.writeBytes("\r\n");
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+
 	private void responseBody(DataOutputStream dos, byte[] body) {
 		try {
 			dos.write(body, 0, body.length);
-			dos.flush();
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
