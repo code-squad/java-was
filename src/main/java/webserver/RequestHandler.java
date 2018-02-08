@@ -17,6 +17,10 @@ import java.util.Optional;
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
+	private static final String COOKIE = "Cookie";
+	private static final String LOGIN_SUCCESS = "logined=true";
+	private static final String LOGIN_FAIL = "logined=false";
+
 	private Socket connection;
 
 	public RequestHandler(Socket connectionSocket) {
@@ -75,41 +79,54 @@ public class RequestHandler extends Thread {
 
 		if (method.equals("GET")) {
 			String query = (url.length > 1) ? url[1] : "";
-			Map<String, String> params = HttpRequestUtils.parseQueryString(query);
-			dispatchHttpGet(path, params);
-
-			byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
-
-			response200Header(dos, body.length, headerParams.get("Cookie"));
-			responseBody(dos, body);
+			dispatchHttpGet(path, headerParams, HttpRequestUtils.parseQueryString(query), dos);
 		}
 
 		if (method.equals("POST")) {
 			String location = dispatchHttpPost(path, headerParams, bodyParams);
-			response302Header(dos, location, headerParams.get("Cookie"));
+			response302Header(dos, location, headerParams.get(COOKIE));
 		}
 	}
 
-	private void dispatchHttpGet(String path, Map<String, String> queryParams) {
-		switch (path) {
-			case "/user/create":
-				createUserFromParams(queryParams);
-				break;
+	private void dispatchHttpGet(String path, Map<String, String> headerParams, Map<String, String> queryParams, DataOutputStream dos) throws IOException {
+		if (path.equals("/user/create")) {
+			createUserFromParams(queryParams);
 		}
+
+		if (path.equals("/user/list")) {
+			if (headerParams.get(COOKIE).contains(LOGIN_SUCCESS)) {
+				byte[] body = createUserListHtml().getBytes();
+				response200Header(dos, body.length, headerParams.get(COOKIE));
+				responseBody(dos, body);
+
+				return;
+			}
+
+			path = "/user/login.html";
+		}
+
+		byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
+		response200Header(dos, body.length, headerParams.get(COOKIE));
+		responseBody(dos, body);
 	}
 
 	private String dispatchHttpPost(String path, Map<String, String> headerParams, Map<String, String> bodyParams) {
-		switch (path) {
-			case "/user/create":
-				return createUserFromParams(bodyParams);
-			case "/user/login":
-				if (loginUserFromParams(bodyParams)) {
-					headerParams.put("Cookie", "logined=true");
-					return "/index.html";
-				}
+		if (path.equals("/user/create")) {
+			return createUserFromParams(bodyParams);
+		}
 
-				headerParams.put("Cookie", "logined=false");
-				return "/user/login_failed.html";
+		if (path.equals("/user/login")) {
+			if (headerParams.get(COOKIE).contains(LOGIN_SUCCESS)) {
+				return "/index.html";
+			}
+
+			if (loginUserFromParams(bodyParams)) {
+				headerParams.put(COOKIE, LOGIN_SUCCESS);
+				return "/index.html";
+			}
+
+			headerParams.put(COOKIE, LOGIN_FAIL);
+			return "/user/login_failed.html";
 		}
 
 		return "";
@@ -141,9 +158,11 @@ public class RequestHandler extends Thread {
 			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+
 			if (cookie != null && !cookie.isEmpty()) {
 				dos.writeBytes("Set-Cookie: " + cookie + "; Path=/\r\n");
 			}
+
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -154,9 +173,11 @@ public class RequestHandler extends Thread {
 		try {
 			dos.writeBytes("HTTP/1.1 302 Found \r\n");
 			dos.writeBytes("Location: " + location + "\r\n");
+
 			if (cookie != null && !cookie.isEmpty()) {
 				dos.writeBytes("Set-Cookie: " + cookie + "; Path=/\r\n");
 			}
+
 			dos.writeBytes("\r\n");
 			dos.flush();
 		} catch (IOException e) {
@@ -171,5 +192,29 @@ public class RequestHandler extends Thread {
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+	}
+
+	private String createUserListHtml() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<!DOCTYPE html>\n");
+		sb.append("<html lang=\"kr\">\n");
+		sb.append("<head>\n");
+		sb.append("<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n");
+		sb.append("<meta charset=\"utf-8\">\n");
+		sb.append("<title>SLiPP Java Web Programming</title>\n");
+		sb.append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1\">\n");
+		sb.append("</head>\n");
+		sb.append("<body>\n");
+		sb.append("<ul>\n");
+
+		for (User user : DataBase.findAll()) {
+			sb.append(String.format("<li>%s</li>\n", user.toString()));
+		}
+
+		sb.append("</ul>\n");
+		sb.append("</body>\n");
+		sb.append("</html>\n");
+
+		return sb.toString();
 	}
 }
