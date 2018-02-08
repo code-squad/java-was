@@ -17,6 +17,7 @@ public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket connection;
+	private String cookie;
 
 	public RequestHandler(Socket connectionSocket) {
 		this.connection = connectionSocket;
@@ -55,6 +56,8 @@ public class RequestHandler extends Thread {
 				}
 			}
 
+			cookie = headerParams.get("Cookie");
+
 			DataOutputStream dos = new DataOutputStream(out);
 			if (method.equals("GET")) {
 				String query = (url.length > 1) ? url[1] : "";
@@ -70,8 +73,6 @@ public class RequestHandler extends Thread {
 				String body = IOUtils.readData(br, Integer.parseInt(headerParams.get("Content-Length")));
 				dispatchHttpPost(path, HttpRequestUtils.parseQueryString(body), dos);
 			}
-
-
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
@@ -112,8 +113,12 @@ public class RequestHandler extends Thread {
 		log.debug("user: {}, existedUser", user, existedUser);
 
 		if (!user.equals(existedUser)) {
+			cookie = "logined=false";
 			response302Header(dos, "/user/login_failed.html");
+			return;
 		}
+
+		cookie = "logined=true";
 		response302Header(dos, "/index.html");
 	}
 
@@ -122,6 +127,10 @@ public class RequestHandler extends Thread {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
 			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+			if (cookie != null && !cookie.isEmpty()) {
+				dos.writeBytes("Set-Cookie: " + cookie + "; Path=/\r\n");
+			}
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -132,6 +141,9 @@ public class RequestHandler extends Thread {
 		try {
 			dos.writeBytes("HTTP/1.1 302 Found \r\n");
 			dos.writeBytes("Location: " + location + "\r\n");
+			if (cookie != null && !cookie.isEmpty()) {
+				dos.writeBytes("Set-Cookie: " + cookie + "; Path=/\r\n");
+			}
 			dos.writeBytes("\r\n");
 			dos.flush();
 		} catch (IOException e) {
