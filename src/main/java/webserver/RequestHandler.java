@@ -4,14 +4,15 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Map;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
-    private HttpRequestUtils httpRequestUtils;
 
     private Socket connection;
 
@@ -27,13 +28,18 @@ public class RequestHandler extends Thread {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
             log.debug("request line : {}", line);
-            String url = (line.split(" ")[1].equals("/"))? "/index.html" : line.split(" ")[1];
-            log.debug("request url : {}", url);
 
-            while(!line.equals("")) {
-                line = br.readLine();
-                log.debug("header : {}", line);
+            String[] firstLines = line.split(" ");
+
+            String url = (firstLines[1].equals("/"))? "/index.html" : firstLines[1];
+
+            Map<String, String> queryMap = HttpRequestUtils.parseQueryString(url.split("\\?")[1]);
+            if(queryMap.size() > 0) {
+                User newUser = new User(queryMap.get("userId"), queryMap.get("password"), queryMap.get("name"), queryMap.get("email"));
+                log.debug("created user : {}", newUser);
             }
+            log.debug("it's query map : {}", queryMap);
+            log.debug("request url : {}", url);
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());

@@ -6,3 +6,16 @@
 - 서버에서 클라이언트에게 보내는 데이터는 outputStream에 담는다.
 -  데이터를 라인별로 읽는게 힘들어서 Buffered Reader 로 읽는다
 - byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath()) 형태로 response body 에 해당 경로의 파일 정보를 읽어서 클라이언트에게 전달한다.
+
+
+
+##  Step2
+
+- 프레임워크에서 자동으로 query 를 parsing 해주는건 정말 꿀같은 거였다...
+
+
+
+##  Step3
+
+- ​
+
