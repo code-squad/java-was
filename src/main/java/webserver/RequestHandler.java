@@ -17,9 +17,12 @@ import java.util.Optional;
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
-	private static final String COOKIE = "Cookie";
+	private static final String HEADER_KEY_COOKIE = "Cookie";
+	private static final String HEADER_KEY_ACCEPT = "Accept";
 	private static final String LOGIN_SUCCESS = "logined=true";
 	private static final String LOGIN_FAIL = "logined=false";
+	private static final String CONTENT_TYPE_HTML = "text/html";
+	private static final String CONTENT_TYPE_CSS = "text/css";
 
 	private Socket connection;
 
@@ -32,7 +35,6 @@ public class RequestHandler extends Thread {
 				connection.getPort());
 
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-			// TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			String line = br.readLine();
 			if (line == null) {
@@ -84,29 +86,29 @@ public class RequestHandler extends Thread {
 
 		if (method.equals("POST")) {
 			String location = dispatchHttpPost(path, headerParams, bodyParams);
-			response302Header(dos, location, headerParams.get(COOKIE));
+			response302Header(dos, location, headerParams.get(HEADER_KEY_COOKIE));
 		}
 	}
 
 	private void dispatchHttpGet(String path, Map<String, String> headerParams, Map<String, String> queryParams, DataOutputStream dos) throws IOException {
+		byte[] body = null;
+
 		if (path.equals("/user/create")) {
 			createUserFromParams(queryParams);
 		}
 
 		if (path.equals("/user/list")) {
-			if (headerParams.get(COOKIE).contains(LOGIN_SUCCESS)) {
-				byte[] body = createUserListHtml().getBytes();
-				response200Header(dos, body.length, headerParams.get(COOKIE));
-				responseBody(dos, body);
-
-				return;
+			if (headerParams.get(HEADER_KEY_COOKIE).contains(LOGIN_SUCCESS)) {
+				body = createUserListHtml().getBytes();
 			}
 
 			path = "/user/login.html";
 		}
 
-		byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
-		response200Header(dos, body.length, headerParams.get(COOKIE));
+		if (body == null) {
+			body = Files.readAllBytes(new File("./webapp" + path).toPath());
+		}
+		response200Header(dos, body.length, headerParams.get(HEADER_KEY_ACCEPT).contains(CONTENT_TYPE_CSS) ? CONTENT_TYPE_CSS : CONTENT_TYPE_HTML, headerParams.get(HEADER_KEY_COOKIE));
 		responseBody(dos, body);
 	}
 
@@ -116,16 +118,16 @@ public class RequestHandler extends Thread {
 		}
 
 		if (path.equals("/user/login")) {
-			if (headerParams.get(COOKIE).contains(LOGIN_SUCCESS)) {
+			if (headerParams.get(HEADER_KEY_COOKIE).contains(LOGIN_SUCCESS)) {
 				return "/index.html";
 			}
 
 			if (loginUserFromParams(bodyParams)) {
-				headerParams.put(COOKIE, LOGIN_SUCCESS);
+				headerParams.put(HEADER_KEY_COOKIE, LOGIN_SUCCESS);
 				return "/index.html";
 			}
 
-			headerParams.put(COOKIE, LOGIN_FAIL);
+			headerParams.put(HEADER_KEY_COOKIE, LOGIN_FAIL);
 			return "/user/login_failed.html";
 		}
 
@@ -152,10 +154,10 @@ public class RequestHandler extends Thread {
 		return true;
 	}
 
-	private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String cookie) {
+	private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType, String cookie) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+			dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 
