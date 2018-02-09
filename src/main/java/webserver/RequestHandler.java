@@ -1,10 +1,10 @@
 package webserver;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.ArrayList;
+import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +31,15 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String line = br.readLine();
-            log.debug("BufferedReader : {}", br);
-            String[] firstLines = line.split(" ");
+            String[] firstLines = br.readLine().split(" ");
+            String method = firstLines[0];
+            String requestUrl = firstLines[1];
+            HashMap<String, String> headerMap = getHeaderObject(br);
+            log.debug("it's method : {}", method);
 
-            if (firstLines[0].equals("POST")) responsePost(br, out);
+            if (method.equals("POST")) responsePost(br, out, headerMap, requestUrl);
 
-            if (firstLines[0].equals("GET")) responseGet(firstLines[1], out);
+            if (method.equals("GET")) responseGet(requestUrl, out, headerMap);
 
 
         } catch (IOException e) {
@@ -45,45 +47,87 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void responsePost(BufferedReader br, OutputStream out) throws IOException {
-        String query = IOUtils.readData(br, Integer.parseInt(getHeaderObject(br).get("Content-Length")));
-
-        log.debug("query : {}", query);
-
-        Map<String, String> queryMap = HttpRequestUtils.parseQueryString(query);
-        createUser(queryMap);
-
-        DataOutputStream dos = new DataOutputStream(out);
-        response302Header(dos);
-        responseBody(dos, new byte[0]);
-
-    }
-
-    private void responseGet(String query, OutputStream out) throws IOException {
-        //디폴트 주소를 index.html로 변경하기 위함
+    private void responseGet(String query, OutputStream out, HashMap<String, String> headers) throws IOException {
         String url = (query.equals("/")) ? "/index.html" : query;
 
-        //GET Method 내 파라미터를 처리하는 로직
-        if (url.contains("?")) {
-            Map<String, String> queryMap = HttpRequestUtils.parseQueryString(url.split("\\?")[1]);
-            createUser(queryMap);
-            url = "/index.html";
+        byte[] body = null;
+
+        if (query.equals("/user/list")) {
+            if (isLogined(headers)) {
+                body = createHtml(query);
+            }
         }
+
         log.debug("request url : {}", url);
         DataOutputStream dos = new DataOutputStream(out);
-        byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-        response200Header(dos, body.length);
+        if (body == null) body = Files.readAllBytes(new File("./webapp" + url).toPath());
+        response200Header(dos, body.length, isLogined(headers));
         responseBody(dos, body);
     }
 
-    public void createUser(Map<String, String> parameter) {
+    private boolean isLogined(HashMap<String, String> headers){
+        boolean logined = false;
+        if (headers.containsKey("Cookie")){
+            log.debug("it's get islogined: {}", headers.get("Cookie"));
+            logined = headers.get("Cookie").contains("logined=true");
+        }
+
+        return logined;
+    }
+
+    private byte[] createHtml(String url) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        List<String> lines = Files.readAllLines(Paths.get("./webapp/user/list.html"));
+        lines.forEach(s -> builder.append(s.replace("{{user}}", createUserList(DataBase.findAll()))));
+        return builder.toString().getBytes();
+    }
+
+    private String createUserList(Collection<User> users) {
+        if (users.size() == 0) return "";
+        StringBuilder builder = new StringBuilder();
+        users.forEach(user -> {
+            builder.append(
+                    String.format("<tr>\n" +
+                            "<th scope=\"row\">1</th><td>%s</td> <td>%s</td> <td>%s</td><td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>\n" +
+                            "</tr>", user.getUserId(), user.getName(), user.getEmail()));
+        });
+
+        return builder.toString();
+    }
+
+    private void responsePost(BufferedReader br, OutputStream out, HashMap<String, String> headers, String requestUrl) throws IOException {
+        Map<String, String> queryMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length"))));
+        DataOutputStream dos = new DataOutputStream(out);
+        String redirectUrl = "/index.html";
+        boolean logined = false;
+
+        switch (requestUrl) {
+            case "/user/create":
+                createUser(queryMap);
+                break;
+            case "/user/login":
+                logined = login(queryMap.get("userId"), queryMap.get("password"));
+                redirectUrl = (logined) ? "/index.html" : "/user/login_failed.html";
+        }
+
+        response302Header(dos, redirectUrl, logined);
+        responseBody(dos, new byte[0]);
+    }
+
+    private void createUser(Map<String, String> parameter) {
         User newUser = new User(parameter.get("userId"), parameter.get("password"), parameter.get("name"), parameter.get("email"));
         DataBase.addUser(newUser);
         log.debug("created user : {}", newUser);
-
     }
 
-    public HashMap<String, String> getHeaderObject(BufferedReader br) throws IOException{
+    private boolean login(String userId, String password) {
+        if (!DataBase.findUserById(userId).getPassword().equals(password)) {
+            return false;
+        }
+        return true;
+    }
+
+    private HashMap<String, String> getHeaderObject(BufferedReader br) throws IOException {
         String line = br.readLine();
         HashMap<String, String> pairs = new HashMap<>();
         while (!line.isEmpty()) {
@@ -101,21 +145,23 @@ public class RequestHandler extends Thread {
         return pairs;
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, boolean logined) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes(String.format("Set-Cookie: logined=%s; Path=/ \r\n", (logined) ? "true" : "false"));
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void response302Header(DataOutputStream dos) {
+    private void response302Header(DataOutputStream dos, String redirectUrl, boolean logined) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: /index.html \r\n");
+            dos.writeBytes(String.format("Set-Cookie: logined=%s; Path=/ \r\n", (logined) ? "true" : "false"));
+            dos.writeBytes(String.format("Location: %s \r\n", redirectUrl));
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
