@@ -52,7 +52,7 @@ public class RequestHandler extends Thread {
 
         byte[] body = null;
 
-        if (query.equals("/user/list")) {
+        if (query.equals("/user/list") || query.equals("/user/list.html") ) {
             if (isLogined(headers)) {
                 body = createHtml(query);
             }
@@ -61,7 +61,7 @@ public class RequestHandler extends Thread {
         log.debug("request url : {}", url);
         DataOutputStream dos = new DataOutputStream(out);
         if (body == null) body = Files.readAllBytes(new File("./webapp" + url).toPath());
-        response200Header(dos, body.length, isLogined(headers));
+        response200Header(dos, body.length, headers);
         responseBody(dos, body);
     }
 
@@ -99,8 +99,7 @@ public class RequestHandler extends Thread {
         Map<String, String> queryMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length"))));
         DataOutputStream dos = new DataOutputStream(out);
         String redirectUrl = "/index.html";
-        boolean logined = false;
-
+        boolean logined = isLogined(headers);
         switch (requestUrl) {
             case "/user/create":
                 createUser(queryMap);
@@ -145,12 +144,12 @@ public class RequestHandler extends Thread {
         return pairs;
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, boolean logined) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, HashMap<String, String> headers) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes(String.format("Content-Type: %s;charset=utf-8\r\n", headers.get("Accept").split(",")[0]));
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes(String.format("Set-Cookie: logined=%s; Path=/ \r\n", (logined) ? "true" : "false"));
+            dos.writeBytes(String.format("Set-Cookie: logined=%s; Path=/ \r\n", (isLogined(headers)) ? "true" : "false"));
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
