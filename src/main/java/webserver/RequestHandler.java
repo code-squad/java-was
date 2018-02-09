@@ -52,7 +52,7 @@ public class RequestHandler extends Thread {
 
             switch (HttpMethod) {
                 case "GET":
-                    get(out, path);
+                    get(out, path, header);
                     break;
                 case "POST":
                     post(br, out, header, path);
@@ -64,9 +64,16 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void get(OutputStream out, String url) throws IOException {
+    private void get(OutputStream out, String url, Map<String, String> header) throws IOException {
+        byte[] body;
+        if (url.equals("/user/list")) {
+            body = Files.readAllBytes(new File("./webapp" + checkCookie(header)).toPath());
+            checkCookie(header);
+        } else {
+            body = Files.readAllBytes(new File("./webapp" + url).toPath());
+        }
+
         DataOutputStream dos = new DataOutputStream(out);
-        byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         response200Header(dos, body.length);
         responseBody(dos, body);
     }
@@ -77,8 +84,8 @@ public class RequestHandler extends Thread {
         String requestBody = IOUtils.readData(br, contentLength);
         switch (path) {
             case "/user/create":
-                saveUser(requestBody);
                 response302Header(dos);
+                saveUser(requestBody, dos);
                 break;
             case "/user/login":
                 response302Header(dos);
@@ -87,10 +94,13 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void saveUser(String body) {
+    private DataOutputStream saveUser(String body, DataOutputStream dos) throws IOException {
         Map<String, String> map = HttpRequestUtils.parseQueryString(body);
         User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
         DataBase.addUser(user);
+        dos.writeBytes("Location: /index.html\r\n");
+        dos.writeBytes("\r\n");
+        return dos;
     }
 
     private DataOutputStream login(String body, DataOutputStream dos) throws IOException {
@@ -106,6 +116,14 @@ public class RequestHandler extends Thread {
         dos.writeBytes("Set-Cookie: logined=true; Path=/ \r\n");
         dos.writeBytes("\r\n");
         return dos;
+    }
+
+    private String checkCookie(Map<String, String> header) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (header.get("Cookie").contains("logined=false")) {
+            return stringBuilder.append("/user/login.html").toString();
+        }
+        return stringBuilder.append("/user/list.html").toString();
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
