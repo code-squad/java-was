@@ -1,13 +1,17 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
+import db.DataBase;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
+import util.IOUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -23,22 +27,127 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+
+            String line = br.readLine();
+
+            if (line == null)
+                return;
+
+            String[] url = line.split(" ");
+            String HttpMethod = url[0];
+            String path = url[1];
+
+            Map<String, String> header = new HashMap<>();
+
+            while (!line.equals("")) {
+                System.out.println(line);
+                line = br.readLine();
+
+                if (!line.equals("")) {
+                    String[] keyValue = line.split(": ");
+                    header.put(keyValue[0], keyValue[1]);
+                }
+            }
+
+            switch (HttpMethod) {
+                case "GET":
+                    get(out, path, header);
+                    break;
+                case "POST":
+                    post(br, out, header, path);
+                    break;
+            }
+
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void get(OutputStream out, String url, Map<String, String> header) throws IOException {
+        byte[] body;
+        if (url.equals("/user/list")) {
+            body = Files.readAllBytes(new File("./webapp" + checkCookie(header)).toPath());
+            checkCookie(header);
+        } else {
+            body = Files.readAllBytes(new File("./webapp" + url).toPath());
+        }
+
+        DataOutputStream dos = new DataOutputStream(out);
+        response200Header(dos, body.length, header);
+        responseBody(dos, body);
+    }
+
+    private void post(BufferedReader br, OutputStream out, Map<String, String> header, String path) throws IOException {
+        DataOutputStream dos = new DataOutputStream(out);
+        int contentLength = Integer.parseInt(header.get("Content-Length"));
+        String requestBody = IOUtils.readData(br, contentLength);
+        switch (path) {
+            case "/user/create":
+                response302Header(dos);
+                saveUser(requestBody, dos);
+                break;
+            case "/user/login":
+                response302Header(dos);
+                login(requestBody, dos);
+                break;
+        }
+    }
+
+    private DataOutputStream saveUser(String body, DataOutputStream dos) throws IOException {
+        Map<String, String> map = HttpRequestUtils.parseQueryString(body);
+        User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
+        DataBase.addUser(user);
+        dos.writeBytes("Location: /index.html\r\n");
+        dos.writeBytes("\r\n");
+        return dos;
+    }
+
+    private DataOutputStream login(String body, DataOutputStream dos) throws IOException {
+        Map<String, String> map = HttpRequestUtils.parseQueryString(body);
+        User user = DataBase.findUserById(map.get("userId"));
+        if (user == null || !user.getPassword().equals(map.get("password"))) {
+            dos.writeBytes("Location: /user/login_failed.html\r\n");
+            dos.writeBytes("Set-Cookie: logined=false; Path=/ \r\n");
+            dos.writeBytes("\r\n");
+            return dos;
+        }
+        dos.writeBytes("Location: /index.html\r\n");
+        dos.writeBytes("Set-Cookie: logined=true; Path=/ \r\n");
+        dos.writeBytes("\r\n");
+        return dos;
+    }
+
+    private String checkCookie(Map<String, String> header) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (header.get("Cookie").contains("logined=false")) {
+            return stringBuilder.append("/user/login.html").toString();
+        }
+        return stringBuilder.append("/user/list.html").toString();
+    }
+
+    private String checkContentType(Map<String, String> header) {
+        if (header.get("Accept").contains("text/css")) {
+            return "text/css;";
+        }
+        return "text/html;";
+    }
+
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, Map<String, String> header) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + checkContentType(header) + "charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOOUND \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
