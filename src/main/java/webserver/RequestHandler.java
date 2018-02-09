@@ -74,7 +74,7 @@ public class RequestHandler extends Thread {
         }
 
         DataOutputStream dos = new DataOutputStream(out);
-        response200Header(dos, body.length);
+        response200Header(dos, body.length, header);
         responseBody(dos, body);
     }
 
@@ -126,10 +126,17 @@ public class RequestHandler extends Thread {
         return stringBuilder.append("/user/list.html").toString();
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private String checkContentType(Map<String, String> header) {
+        if (header.get("Accept").contains("text/css")) {
+            return "text/css;";
+        }
+        return "text/html;";
+    }
+
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, Map<String, String> header) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + checkContentType(header) + "charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
