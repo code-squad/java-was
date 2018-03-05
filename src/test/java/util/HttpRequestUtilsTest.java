@@ -73,7 +73,7 @@ public class HttpRequestUtilsTest {
     
     @Test
     public void splitString() {
-    	String line = "ABCE / EFG / HIJK"; // 앞에 공백도 같이 나온다.
+    	String line = "ABCE EFG HIJK"; 
     	String[] splitLine = HttpRequestUtils.splitString(line);
     	for (String string : splitLine) {
 			System.out.println(string);

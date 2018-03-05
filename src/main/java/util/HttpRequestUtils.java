@@ -55,12 +55,12 @@ public class HttpRequestUtils {
 
     
     /**
-     * @param
+     * @param HTTP Request Header Line
      * 
-     * @return
+     * @return split line and return String[]
      */
     public static String[] splitString(String line) {
-    	return line.split("/");
+    	return line.split(" ");
     }
     
     public static class Pair {
