@@ -43,7 +43,7 @@ public class InputHandler {
 		return body;
 	}
 	
-	private static byte[] pathByteArray(String url) throws IOException {
+	static byte[] pathByteArray(String url) throws IOException {
 		return Files.readAllBytes(new File("./webapp" + url).toPath());
 	}
 }
