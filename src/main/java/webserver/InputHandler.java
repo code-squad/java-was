@@ -20,8 +20,14 @@ public class InputHandler {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 		String line = br.readLine();
 		log.debug("header : " + line);
-		String[] splitLine = HttpRequestUtils.splitString(line);
-		String url = splitLine[1];
+		String splitLine = HttpRequestUtils.splitString(line);
+		String[] urlArray = HttpRequestUtils.splitUrl(splitLine);
+		String url = urlArray[0];
+		String parameter = "";
+		if(urlArray.length >= 2) {
+			parameter = urlArray[1];
+		}
+		log.debug(parameter);
 		log.debug("split string result : " + url);
 		while (!"".equals(line)) {
 			line = br.readLine();
@@ -40,6 +46,7 @@ public class InputHandler {
 			log.debug("if statement - /user/form.html");
 			return pathByteArray(url);
 		}
+		
 		return body;
 	}
 	

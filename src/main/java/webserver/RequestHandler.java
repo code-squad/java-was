@@ -30,7 +30,7 @@ public class RequestHandler extends Thread {
 
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 			byte[] body = InputHandler.doRequest(in);
-			DataOutputStream dos = OutputHandler.doResponse(out);
+			DataOutputStream dos = new DataOutputStream(out);
 			response200Header(dos, body.length);
 			responseBody(dos, body);
 		} catch (IOException e) {
