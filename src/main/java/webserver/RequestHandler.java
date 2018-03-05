@@ -29,27 +29,8 @@ public class RequestHandler extends Thread {
 				connection.getPort());
 
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-			// TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-//			line으로 while문을 돌리려면 값이 들어와야 하기 때문에 br.readLine() 해준다. 
-			String line = br.readLine();
-			log.debug("header : " + line);
-			String[] splitLine = HttpRequestUtils.splitString(line);
-			String url = splitLine[1];
-			log.debug("split string result : " + url);
-			while (!"".equals(line)) {
-				line = br.readLine();
-				log.debug("header : " + line);
-				if(line == null) {
-					return;
-				}
-			}
-			byte[] body = "Hello World".getBytes();
-			if(url.equals("/index.html")) {
-				body = Files.readAllBytes(new File("./webapp" + url).toPath());
-			}
-			
-			DataOutputStream dos = new DataOutputStream(out);
+			byte[] body = InputHandler.doRequest(in);
+			DataOutputStream dos = OutputHandler.doResponse(out);
 			response200Header(dos, body.length);
 			responseBody(dos, body);
 		} catch (IOException e) {
