@@ -2,11 +2,13 @@ package webserver;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +35,8 @@ public class RequestHandler extends Thread {
 			String line = br.readLine();
 			log.debug("header : " + line);
 			String[] splitLine = HttpRequestUtils.splitString(line);
-			for (String string : splitLine) {
-				log.debug(string);
-			}
+			String url = splitLine[1];
+			log.debug("split string result : " + url);
 			while (!"".equals(line)) {
 				line = br.readLine();
 				log.debug("header : " + line);
@@ -43,8 +44,12 @@ public class RequestHandler extends Thread {
 					return;
 				}
 			}
-			DataOutputStream dos = new DataOutputStream(out);
 			byte[] body = "Hello World".getBytes();
+			if(url.equals("/index.html")) {
+				body = Files.readAllBytes(new File("./webapp" + url).toPath());
+			}
+			
+			DataOutputStream dos = new DataOutputStream(out);
 			response200Header(dos, body.length);
 			responseBody(dos, body);
 		} catch (IOException e) {
