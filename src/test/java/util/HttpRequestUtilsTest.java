@@ -70,4 +70,14 @@ public class HttpRequestUtilsTest {
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
     }
+    
+    @Test
+    public void splitString() {
+    	String line = "ABCE / EFG / HIJK"; // 앞에 공백도 같이 나온다.
+    	String[] splitLine = HttpRequestUtils.splitString(line);
+    	for (String string : splitLine) {
+			System.out.println(string);
+		}
+    	assertThat(3, is(splitLine.length));
+    }
 }
