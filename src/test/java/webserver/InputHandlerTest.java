@@ -1,20 +1,20 @@
 package webserver;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
+import org.junit.Test;
+
+import db.DataBase;
+import model.User;
 
 public class InputHandlerTest {
 	private String testDirectory = "./src/test/resources/";
@@ -26,5 +26,12 @@ public class InputHandlerTest {
 		byte[] body = InputHandler.doRequest(in);
 		byte[] testBody = InputHandler.pathByteArray("/index.html");
 		assertArrayEquals(testBody, body);
+	}
+	
+	@Test
+	public void createUser_test() throws UnsupportedEncodingException {
+		InputHandler.createUser("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
+		User user = DataBase.findUserById("javajigi");
+		assertThat(user.getName(), is("%EB%B0%95%EC%9E%AC%EC%84%B1"));
 	}
 }
