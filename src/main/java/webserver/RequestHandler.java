@@ -36,16 +36,23 @@ public class RequestHandler extends Thread {
             DataOutputStream dos = new DataOutputStream(out);
             String HTTPMethod = httpRequest.getHTTPMethod();
             String URI = httpRequest.getURI();
-            if (HTTPMethod == "GET") {
+            List<String> requestHeader = httpRequest.getRequestHeader();
+            log.debug("requestHeader : {}", requestHeader.toString());
+            if (HTTPMethod.equals("GET")) {
                 if (!URI.contains("?")) {
                     readFile(dos, URI);
+                    return;
                 }
                 // create user
-                String queryString = httpRequest.getQueryString(URI);
-                createUser(httpRequest, queryString);
+//                String queryString = httpRequest.getQueryString(URI);
+////                createUser(httpRequest, queryString);
+////                response302Header(dos);
+////                return;
             }
             String requestBody = httpRequest.getRequestBody();
             createUser(httpRequest, requestBody);
+            response302Header(dos);
+            return;
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -63,7 +70,6 @@ public class RequestHandler extends Thread {
         response200Header(dos, body.length);
         responseBody(dos, body);
     }
-
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {

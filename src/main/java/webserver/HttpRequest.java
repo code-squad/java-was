@@ -20,12 +20,13 @@ public class HttpRequest {
     public List<String> requestHeader = new ArrayList<>();
     public String[] tokens;
     public String requestBody;
+    public String requestLine;
 
     public HttpRequest(InputStream in) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
         requestHeader.add(line);
-        String requestLine = requestHeader.get(0);
+        requestLine = requestHeader.get(0);
         tokens = requestLine.split(" ");
         while(!"".equals(line)){
             line = br.readLine();
@@ -35,6 +36,11 @@ public class HttpRequest {
         if(requestHeader.get(3) == "Content-Length") {
             requestBody = getRequestBody(br);
         }
+    }
+
+    public void changeURI(){
+        String newURI = getHTTPMethod() +  " " + "/index.html" + " " + getHTTPVersion();
+        requestHeader.set(0, newURI);
     }
 
     public String getRequestBody() {
@@ -84,4 +90,10 @@ public class HttpRequest {
         return Integer.parseInt(tokens[1]);
     }
 
+    @Override
+    public String toString() {
+        return "HttpRequest{" +
+                "requestHeader=" + requestHeader +
+                '}';
+    }
 }
