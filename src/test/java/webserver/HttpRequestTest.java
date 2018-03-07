@@ -24,18 +24,11 @@ public class HttpRequestTest {
     public void printAllHeader_get() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
-        List<String> requestMessage = httpRequest.getRequestMessage();
-        assertEquals("GET /user/create?userId=chloe&password=password&name=JaeSung HTTP/1.1", requestMessage.get(0));
-        assertEquals("Host: localhost:8080", requestMessage.get(1));
-        assertEquals("Connection: keep-alive", requestMessage.get(2));
-        assertEquals("Accept: */*", requestMessage.get(3));
-
-    }
-
-    @Test
-    public void printAllHeader_post() throws Exception {
-        InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
-        httpRequest = new HttpRequest(in);
+        List<String> requestHeader = httpRequest.getRequestHeader();
+        assertEquals("GET /user/create?userId=chloe&password=password&name=JaeSung HTTP/1.1", requestHeader.get(0));
+        assertEquals("Host: localhost:8080", requestHeader.get(1));
+        assertEquals("Connection: keep-alive", requestHeader.get(2));
+        assertEquals("Accept: */*", requestHeader.get(3));
 
     }
 
@@ -48,12 +41,13 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void getRequestParameter_get() throws Exception{
+    public void getRequestParameter() throws Exception{
         InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
         String uri = httpRequest.getURI();
+        String queryString = httpRequest.getQueryString(uri);
         log.debug("uri : {}", uri);
-        Map<String, String> parameters = httpRequest.getRequestParameter(uri);
+        Map<String, String> parameters = httpRequest.getRequestParameter(queryString);
         assertEquals("chloe", parameters.get("userId"));
         assertEquals("password", parameters.get("password"));
         assertEquals("JaeSung", parameters.get("name"));

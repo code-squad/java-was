@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,28 +24,6 @@ public class RequestHandler extends Thread {
     }
     // 어떤 요청이 어떤 요청인지 구분해야 할 것 같음.
     // requestLine 으로 요청 구분하고 요청에 따라 response 생성 다르게 해주어야함.
-//    public void run1() {
-//        log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-//                connection.getPort());
-//
-//        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-//            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-//            // request
-//            HttpRequest httpRequest = new HttpRequest(in);
-//            Map<String, String> parameters = httpRequest.getRequestParameter();
-//            // create user
-//            User user = new User(parameters.get("userId"), parameters.get("password"), parameters.get("name"), parameters.get("email"));
-//            // response
-//            DataOutputStream dos = new DataOutputStream(out);
-////            byte[] body = Files.readAllBytes(new File("./webapp" + requestUrl).toPath());
-//            byte[] body = "Hello World".getBytes();
-//            response200Header(dos, body.length);
-//            responseBody(dos, body);
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//        }
-//    }
-
     public void run() {
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
@@ -62,12 +41,21 @@ public class RequestHandler extends Thread {
                     readFile(dos, URI);
                 }
                 // create user
-                Map<String, String> parameters = httpRequest.getRequestParameter(URI);
-
+                String queryString = httpRequest.getQueryString(URI);
+                createUser(httpRequest, queryString);
             }
+            String requestBody = httpRequest.getRequestBody();
+            createUser(httpRequest, requestBody);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private void createUser(HttpRequest httpRequest, String queryString) {
+        Map<String, String> parameters = httpRequest.getRequestParameter(queryString);
+        User user = new User(parameters.get("userId"), parameters.get("password"), parameters.get("name"), parameters.get("email"));
+        DataBase db = new DataBase();
+        db.addUser(user);
     }
 
     private void readFile(DataOutputStream dos, String URI) throws IOException {
