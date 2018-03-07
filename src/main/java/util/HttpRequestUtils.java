@@ -58,7 +58,7 @@ public class HttpRequestUtils {
 	}
 
 	public static String[] splitUrl(String line) {
-			return line.split("\\?");
+		return line.split("\\?");
 	}
 
 	public static class Pair {
