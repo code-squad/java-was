@@ -53,8 +53,8 @@ public class HttpRequestUtils {
 		return getKeyValue(header, ": ");
 	}
 
-	public static String splitString(String line) {
-		return line.split(" ")[1];
+	public static String[] splitString(String line) {
+		return line.split(" ");
 	}
 
 	public static String[] splitUrl(String line) {

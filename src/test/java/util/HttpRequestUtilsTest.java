@@ -74,9 +74,9 @@ public class HttpRequestUtilsTest {
 	@Test
 	public void splitString() {
 		String line = "GET /index.html HTTP/1.1";
-		String url = HttpRequestUtils.splitString(line);
+		String[] url = HttpRequestUtils.splitString(line);
 		assertThat("/index.html", is(url));
-	}
+	} 
 	
 	@Test
 	public void splitUrl() {
