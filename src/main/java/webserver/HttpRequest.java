@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,19 +30,25 @@ public class HttpRequest {
         requestLine = requestHeader.get(0);
         tokens = requestLine.split(" ");
         while(!"".equals(line)){
+            if(line == null) break;
             line = br.readLine();
             requestHeader.add(line);
-            if(line == null) break;
         }
-        if(requestHeader.get(3) == "Content-Length") {
+        if(requestHeader.get(3).contains("Content-Length")) {
             requestBody = getRequestBody(br);
         }
     }
 
-    public void changeURI(){
-        String newURI = getHTTPMethod() +  " " + "/index.html" + " " + getHTTPVersion();
-        requestHeader.set(0, newURI);
+    public boolean getCookieValue(){
+        String cookieLine = requestHeader.get(requestHeader.size()-2);
+        String cookies = HttpRequestUtils.parseHeader(cookieLine).getValue();
+        log.debug("cookies : {}", cookies.toString());
+        Map<String, String> values = HttpRequestUtils.parseCookies(cookies);
+        boolean loginStatus = Boolean.parseBoolean(values.get("logined"));
+        log.debug("loginStatus : {}", loginStatus);
+        return loginStatus;
     }
+
 
     public String getRequestBody() {
         return requestBody;
@@ -71,13 +78,6 @@ public class HttpRequest {
     public Map<String, String> getRequestParameter(String queryString) {
         // extract user data
         return HttpRequestUtils.parseQueryString(queryString);
-    }
-
-    private Map<String, String> post() {
-        // post
-        String requestBody = requestHeader.get(requestHeader.size()-1);
-        log.debug("requestBody : {}", requestBody);
-        return HttpRequestUtils.parseQueryString(requestBody);
     }
 
     public String getQueryString(String URI){

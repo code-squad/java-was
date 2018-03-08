@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -37,25 +38,75 @@ public class RequestHandler extends Thread {
             String HTTPMethod = httpRequest.getHTTPMethod();
             String URI = httpRequest.getURI();
             List<String> requestHeader = httpRequest.getRequestHeader();
-            log.debug("requestHeader : {}", requestHeader.toString());
+
+            log.debug("requestHeader :{");
+            for(String s : requestHeader){
+                log.debug(s + "\n");
+            }
+            log.debug("}");
             if (HTTPMethod.equals("GET")) {
                 if (!URI.contains("?")) {
                     readFile(dos, URI);
                     return;
                 }
-                // create user
+                // user list
+                if(httpRequest.getURI().contains("/user/list")) {
+                    if(httpRequest.getCookieValue()){// in logined status
+                        // 사용자 목록 출력
+                        DataBase db = new DataBase();
+                        Collection<User> users = db.findAll();
+                        for(User user : users){
+
+                        }
+                    }
+                    // move to login page
+                    response302HeaderWithCookieLoginRequired(dos);
+                }
+                // create user(get)
 //                String queryString = httpRequest.getQueryString(URI);
 ////                createUser(httpRequest, queryString);
 ////                response302Header(dos);
 ////                return;
             }
-            String requestBody = httpRequest.getRequestBody();
-            createUser(httpRequest, requestBody);
-            response302Header(dos);
-            return;
+            // signUp
+            if(httpRequest.getURI().contains("/user/create")) {
+                responseUserSignUp(httpRequest, dos);
+                return;
+            }
+            // signIn
+            if(httpRequest.getURI().contains("/user/login")) {
+                responseUserSignIn(httpRequest, dos);
+                return;
+            }
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private void responseUserSignUp(HttpRequest httpRequest, DataOutputStream dos) {
+        String requestBody = httpRequest.getRequestBody();
+        log.debug("requestBody : {}", requestBody);
+        createUser(httpRequest, requestBody);
+        response302Header(dos);
+        return;
+    }
+
+    private void responseUserSignIn(HttpRequest httpRequest, DataOutputStream dos) {
+        String requestBody = httpRequest.getRequestBody();
+        log.debug("requestBody : {}", requestBody);
+        // 아이디 일치하는지 안하는지 확인.
+        Map<String, String> parameters = httpRequest.getRequestParameter(requestBody);
+        log.debug("id, password: {}", parameters.toString());
+        String id = parameters.get("userId");
+        DataBase db = new DataBase();
+        boolean status = false;
+        if(db.findUserById(id) != null){// 로그인 성공시
+            status = true;
+            response302HeaderWithCookieLoginSuccess(dos, status);
+            return;
+        }
+        response302HeaderWithCookieLoginFail(dos, status);
+        return;
     }
 
     private void createUser(HttpRequest httpRequest, String queryString) {
@@ -76,6 +127,39 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302HeaderWithCookieLoginSuccess(DataOutputStream dos, boolean status){
+        try {
+            dos.writeBytes("HTTP/1.1 302 OK \r\n");
+            dos.writeBytes("Location: /index.html \r\n");
+            dos.writeBytes("Set-Cookie:" + "logined=" + status + ";" + "Path=/");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302HeaderWithCookieLoginFail(DataOutputStream dos, boolean status){
+        try {
+            dos.writeBytes("HTTP/1.1 302 OK \r\n");
+            dos.writeBytes("Location: /user/login_failed.html \r\n");
+            dos.writeBytes("Set-Cookie:" + "logined=" + status + ";" + "Path=/");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302HeaderWithCookieLoginRequired(DataOutputStream dos){
+        try {
+            dos.writeBytes("HTTP/1.1 302 OK \r\n");
+            dos.writeBytes("Location: /user/login.html \r\n");
+//            dos.writeBytes("Set-Cookie:" + "logined=" + status + ";" + "Path=/");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());

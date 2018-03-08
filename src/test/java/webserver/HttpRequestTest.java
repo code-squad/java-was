@@ -53,4 +53,19 @@ public class HttpRequestTest {
         assertEquals("JaeSung", parameters.get("name"));
     }
 
+    @Test
+    public void getRequestBody() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
+        httpRequest = new HttpRequest(in);
+        String requestBody = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
+        assertEquals(requestBody, httpRequest.getRequestBody());
+    }
+
+    @Test
+    public void getCookieValue() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessageWithCookie.txt"));
+        httpRequest = new HttpRequest(in);
+        boolean loginStatus = true;
+        assertEquals(httpRequest.getCookieValue(), loginStatus);
+    }
 }
