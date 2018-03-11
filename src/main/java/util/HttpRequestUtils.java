@@ -60,6 +60,10 @@ public class HttpRequestUtils {
 	public static String[] splitUrl(String line) {
 		return line.split("\\?");
 	}
+	
+	public static String[] splitKeyValue(String line) {
+		return line.split("=");
+	}
 
 	public static class Pair {
 		String key;
