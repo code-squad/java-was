@@ -68,4 +68,25 @@ public class HttpRequestTest {
         boolean loginStatus = true;
         assertEquals(httpRequest.getCookieValue(), loginStatus);
     }
+
+    @Test
+    public void getContentType() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessageWithCookie.txt"));
+        httpRequest = new HttpRequest(in);
+        assertEquals("*/*", httpRequest.getContentType());
+    }
+
+    @Test
+    public void getContentType2() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
+        httpRequest = new HttpRequest(in);
+        assertEquals("*/*", httpRequest.getContentType());
+    }
+
+    @Test
+    public void getContentLength() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
+        httpRequest = new HttpRequest(in);
+        assertEquals(93, httpRequest.getContentLength());
+    }
 }

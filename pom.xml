@@ -32,8 +32,12 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.2.3</version>
 		</dependency>
+		<dependency>
+			<groupId>pl.allegro.tech.boot</groupId>
+			<artifactId>handlebars-spring-boot-starter</artifactId>
+			<version>0.2.0</version>
+		</dependency>
 	</dependencies>
-
 	<build>
 		<finalName>web-application-server</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>

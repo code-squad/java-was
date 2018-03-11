@@ -34,21 +34,17 @@ public class HttpRequest {
             line = br.readLine();
             requestHeader.add(line);
         }
-        if(requestHeader.get(3).contains("Content-Length")) {
+        if(hasTargetHeader("Content-Length")) {
             requestBody = getRequestBody(br);
         }
     }
 
     public boolean getCookieValue(){
-        String cookieLine = requestHeader.get(requestHeader.size()-2);
-        String cookies = HttpRequestUtils.parseHeader(cookieLine).getValue();
-        log.debug("cookies : {}", cookies.toString());
-        Map<String, String> values = HttpRequestUtils.parseCookies(cookies);
-        boolean loginStatus = Boolean.parseBoolean(values.get("logined"));
+        String cookie = getHeaderValue("Cookie");
+        boolean loginStatus = Boolean.parseBoolean(HttpRequestUtils.parseCookies(cookie).get("logined"));
         log.debug("loginStatus : {}", loginStatus);
         return loginStatus;
     }
-
 
     public String getRequestBody() {
         return requestBody;
@@ -62,12 +58,38 @@ public class HttpRequest {
         return tokens[0];
     }
 
-    public String getURI(){
+    public String getURI() {
         return tokens[1];
     }
 
-    public String getHTTPVersion(){
+    public String getHTTPVersion() {
         return tokens[2];
+    }
+
+    public String getContentType() {
+        return getHeaderValue("Accept");
+    }
+
+    public int getContentLength(){
+        return Integer.parseInt(getHeaderValue("Content-Length"));
+    }
+
+    private String getHeaderValue(String header){
+        String headerValue = "";
+        for(String line : requestHeader){
+            if(line.contains(header)) {
+                headerValue = HttpRequestUtils.parseHeader(line).getValue();
+                break;
+            }
+        }
+        return headerValue;
+    }
+
+    public boolean hasTargetHeader(String header){
+        for(String line : requestHeader){
+            if(line.contains(header)) return true;
+        }
+        return false;
     }
 
     private String getRequestBody(BufferedReader br) throws IOException {
@@ -82,12 +104,6 @@ public class HttpRequest {
 
     public String getQueryString(String URI){
         return URI.split("\\?")[1];
-    }
-
-    public int getContentLength(){
-        String line = requestHeader.get(3);
-        String[] tokens = line.split(" ");
-        return Integer.parseInt(tokens[1]);
     }
 
     @Override
