@@ -8,10 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -38,23 +34,22 @@ public class HttpResponse {
         // read static part in file first
         BufferedReader br = new BufferedReader(
                 new FileReader(new File(staticHtmlFileURI)));
-
-        // write static part
-        StringBuilder sb = new StringBuilder();
-//        String line;
-//        while(!(line = br.readLine()).equals("")) {
-//            sb.append(line + "\r\n");
-//        }
-        writeStaticPart(br, sb);
-        // write dynamic part
-        writeDynamic(sb, users);
-        // write static part
-
-        writeStaticPart(br, sb);
+        StringBuilder sb = writeDynamicHTML(users, br);
         String s = sb.toString();
         byte[] body = s.getBytes(StandardCharsets.UTF_8);
         response200Header(body.length, contentType);
         responseBody(body);
+    }
+
+    private StringBuilder writeDynamicHTML(List<User> users, BufferedReader br) throws IOException {
+        // write static part
+        StringBuilder sb = new StringBuilder();
+        writeStaticPart(br, sb);
+        // write dynamic part
+        writeDynamic(sb, users);
+        // write static part
+        writeStaticPart(br, sb);
+        return sb;
     }
 
     private void writeStaticPart(BufferedReader br, StringBuilder sb) throws IOException {
@@ -76,7 +71,7 @@ public class HttpResponse {
         }
     }
 
-    public void writeDynamic(StringBuilder sb, List<User> users) throws IOException {
+    public void writeDynamic(StringBuilder sb, List<User> users) {
         for(User user : users){
             sb.append("<tr> \r\n");
             sb.append("<th scope=\"row\">" + (users.indexOf(user)+1) + "</th> <td>" + user.getUserId() +"</td> <td>" + user.getName() +"</td> <td>"+ user.getEmail() +"</td><td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>\n");
@@ -106,7 +101,6 @@ public class HttpResponse {
     public void responseUserSignIn(HttpRequest httpRequest) {
         String requestBody = httpRequest.getRequestBody();
         log.debug("requestBody : {}", requestBody);
-        // 아이디 일치하는지 안하는지 확인.
         Map<String, String> parameters = httpRequest.getRequestParameter(requestBody);
         log.debug("id, password: {}", parameters.toString());
         String id = parameters.get("userId");
