@@ -3,13 +3,19 @@ package util;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Map;
+
 
 import org.junit.Test;
 
 import util.HttpRequestUtils.Pair;
+import webserver.RequestHandler;
 
 public class HttpRequestUtilsTest {
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
@@ -17,10 +23,11 @@ public class HttpRequestUtilsTest {
         assertThat(parameters.get("userId"), is("javajigi"));
         assertThat(parameters.get("password"), is(nullValue()));
 
-        queryString = "userId=javajigi&password=password2";
+        queryString = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         parameters = HttpRequestUtils.parseQueryString(queryString);
         assertThat(parameters.get("userId"), is("javajigi"));
-        assertThat(parameters.get("password"), is("password2"));
+        assertThat(parameters.get("password"), is("password"));
+        assertThat(parameters.get("email"), is("javajigi%40slipp.net"));
     }
 
     @Test

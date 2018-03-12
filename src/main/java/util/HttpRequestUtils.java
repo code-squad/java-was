@@ -26,7 +26,7 @@ public class HttpRequestUtils {
         return parseValues(cookies, ";");
     }
 
-    private static Map<String, String> parseValues(String values, String separator) {
+    public static Map<String, String> parseValues(String values, String separator) {
         if (Strings.isNullOrEmpty(values)) {
             return Maps.newHashMap();
         }
@@ -36,7 +36,7 @@ public class HttpRequestUtils {
                 .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
     }
 
-    static Pair getKeyValue(String keyValue, String regex) {
+   public static Pair getKeyValue(String keyValue, String regex) {
         if (Strings.isNullOrEmpty(keyValue)) {
             return null;
         }
