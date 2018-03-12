@@ -108,4 +108,8 @@ public class HttpRequest {
 		}
 		return (String) httpMap.get("logined");
 	}
+
+	public String getAccept() {
+		return (String) httpMap.get("Accept");
+	}
 }

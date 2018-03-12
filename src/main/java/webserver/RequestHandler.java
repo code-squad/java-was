@@ -35,11 +35,12 @@ public class RequestHandler extends Thread {
 				connection.getPort());
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream();) {
 			HttpRequest reqst = new HttpRequest(in);
+			
 			String url = reqst.getURI();
 			String method = reqst.getMethod();
+			String accept = reqst.getAccept();
 			Map<String, String> param = reqst.getParam();
 			String logined = reqst.getLogined();
-			log.debug("-----------------------logined : " + logined);
 			byte[] body = pathByteArray("/index.html");
 
 			if (url.equals("/")) {
@@ -66,12 +67,12 @@ public class RequestHandler extends Thread {
 				log.debug("if statement - /user/login_failed.html");
 				response200(pathByteArray(url), out);
 			}
-
-			if (url.equals("/css/styles.css")) {
-				log.debug("if statement - /css/styles.css");
+			
+			if (accept.contains("text/css")) {
+				log.debug("if statement - text/css");
 				response200CSS(pathByteArray(url), out);
 			}
-			
+
 			if (url.equals("/user/create")) {
 				log.debug("if statement - /user/create");
 				if (method.equals("GET")) {
@@ -91,23 +92,11 @@ public class RequestHandler extends Thread {
 				}
 				response302Header("/user/login_failed.html", out);
 			}
-			
+
 			if (url.equals("/user/list")) {
 				log.debug("if statement - /user/list");
 				if (logined.contains("logined=true;")) {
-					Collection<User> users = DataBase.findAll();
-					StringBuilder sb = new StringBuilder();
-					sb.append("<table>");
-					for (User user : users) {
-						sb.append("<tr>");
-						sb.append("<td>" + user.getUserId() + "</td>");
-						sb.append("<td>" + user.getName() + "</td>");
-						sb.append("<td>" + user.getEmail() + "</td>");
-						sb.append("</tr>");
-					}
-					sb.append("</table>");
-					body = sb.toString().getBytes();
-					response200(body, out);
+					setUserListOut(out);
 				}
 				if (logined.contains("logined=false;")) {
 					response302Header("/user/login.html", out);
@@ -116,6 +105,23 @@ public class RequestHandler extends Thread {
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+	}
+
+	private void setUserListOut(OutputStream out) {
+		byte[] body;
+		Collection<User> users = DataBase.findAll();
+		StringBuilder sb = new StringBuilder();
+		sb.append("<table>");
+		for (User user : users) {
+			sb.append("<tr>");
+			sb.append("<td>" + user.getUserId() + "</td>");
+			sb.append("<td>" + user.getName() + "</td>");
+			sb.append("<td>" + user.getEmail() + "</td>");
+			sb.append("</tr>");
+		}
+		sb.append("</table>");
+		body = sb.toString().getBytes();
+		response200(body, out);
 	}
 
 	void createUser(Map<String, String> param) throws UnsupportedEncodingException {
@@ -147,13 +153,13 @@ public class RequestHandler extends Thread {
 			log.error(e.getMessage());
 		}
 	}
-	
+
 	private void response200CSS(byte[] body, OutputStream out) {
 		DataOutputStream dos = new DataOutputStream(out);
 		response200CSSHeader(dos, body.length);
 		responseBody(dos, body);
 	}
-	
+
 	private void response200CSSHeader(DataOutputStream dos, int lengthOfBodyContent) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
