@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,33 +26,42 @@ public class HttpRequestTest {
     public void printAllHeader_get() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
-        List<String> requestHeader = httpRequest.getRequestHeader();
-        assertEquals("GET /user/create?userId=chloe&password=password&name=JaeSung HTTP/1.1", requestHeader.get(0));
-        assertEquals("Host: localhost:8080", requestHeader.get(1));
-        assertEquals("Connection: keep-alive", requestHeader.get(2));
-        assertEquals("Accept: */*", requestHeader.get(3));
+        assertEquals("GET /user/create?userId=chloe&password=password&name=JaeSung HTTP/1.1", httpRequest.getHeader("requestLine"));
+        assertEquals("localhost:8080",  httpRequest.getHeader("Host"));
+        assertEquals("keep-alive",  httpRequest.getHeader("Connection"));
+        assertEquals("*/*",  httpRequest.getHeader("Accept"));
 
     }
 
     @Test
-    public void getURI() throws Exception{
-        InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
+    public void printAllHeader_post() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
-        String uri = "/user/create?userId=chloe&password=password&name=JaeSung";
-        assertEquals(uri, httpRequest.getURI());
+        assertEquals("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net", httpRequest.getRequestBody());
     }
 
     @Test
-    public void getRequestParameter() throws Exception{
+    public void getMethod() throws IOException {
         InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
-        String uri = httpRequest.getURI();
-        String queryString = httpRequest.getQueryString(uri);
-        log.debug("uri : {}", uri);
-        Map<String, String> parameters = httpRequest.getRequestParameter(queryString);
-        assertEquals("chloe", parameters.get("userId"));
-        assertEquals("password", parameters.get("password"));
-        assertEquals("JaeSung", parameters.get("name"));
+        assertEquals("GET", httpRequest.getMethod());
+    }
+
+    @Test
+    public void getPath() throws IOException {
+        InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
+        httpRequest = new HttpRequest(in);
+        assertEquals("/user/create", httpRequest.getPath());
+    }
+
+    @Test
+    public void getParameter() throws IOException {
+        InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
+        httpRequest = new HttpRequest(in);
+        assertEquals("chloe", httpRequest.getParameter("userId"));
+        assertEquals("password", httpRequest.getParameter("password"));
+        assertEquals("JaeSung", httpRequest.getParameter("name"));
+
     }
 
     @Test

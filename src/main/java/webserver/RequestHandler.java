@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import db.DataBase;
@@ -28,15 +29,14 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             // request
             HttpRequest httpRequest = new HttpRequest(in);
-            String HTTPMethod = httpRequest.getHTTPMethod();
-            String URI = httpRequest.getURI();
-            List<String> requestHeader = httpRequest.getRequestHeader();
+            String HTTPMethod = httpRequest.getMethod();
+            String URI = httpRequest.getRequestLine();
+            Map<String, String> requestHeader = httpRequest.getTotalHeader();
 
             // response
             HttpResponse httpResponse = new HttpResponse(out);
             String contentType = "text/html";
             printRequestHeader(requestHeader);
-            // styleSheet
             if (HTTPMethod.equals("GET")) {
                 handleGetRequest(httpRequest, URI, httpResponse, contentType);
                 return;
@@ -89,12 +89,21 @@ public class RequestHandler extends Thread {
         httpResponse.readFile(URI, contentType);
         return;
     }
+//
+//    private void printRequestHeader1(Map<String, String> requestHeader) {
+//        log.debug("requestHeader :{");
+//        for(String s : requestHeader){
+//            log.debug(s + "\n");
+//        }
+//        log.debug("}");
+//    }
 
-    private void printRequestHeader(List<String> requestHeader) {
+    private void printRequestHeader(Map<String, String> requestHeader) {
+        requestHeader.forEach((header, value) -> {
+                    if(header.equals("requestLine")) log.debug(value + "\n");
+                    log.debug(header + ": " + value + "\n");
+                });
         log.debug("requestHeader :{");
-        for(String s : requestHeader){
-            log.debug(s + "\n");
-        }
         log.debug("}");
     }
 }
