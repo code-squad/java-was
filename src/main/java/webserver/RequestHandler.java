@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class RequestHandler extends Thread {
     }
     // 어떤 요청이 어떤 요청인지 구분해야 할 것 같음.
     // requestLine 으로 요청 구분하고 요청에 따라 response 생성 다르게 해주어야함.
+    
     public void run() {
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
@@ -29,64 +31,31 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             // request
             HttpRequest httpRequest = new HttpRequest(in);
-            String HTTPMethod = httpRequest.getMethod();
-            String URI = httpRequest.getRequestLine();
-
-            // response
             HttpResponse httpResponse = new HttpResponse(out);
+            // response
+            // create user(get, post)
+            Map<String, AbstractController> controllers = new HashMap<>();
+            controllers.put("/user/create", new CreateUserController());
+            controllers.put("/user/login", new LoginController());
+            controllers.put("/user/list", new UserListController());
+
             String contentType = "text/html";
-            if (HTTPMethod.equals("GET")) {
-                handleGetRequest(httpRequest, URI, httpResponse, contentType);
-                return;
+            if(httpRequest.getContentType().contains("text/css")){
+                contentType = "text/css";
             }
-            handlePostRequest(httpRequest, URI, httpResponse);
+
+            controllers.forEach((k, v) -> {
+                if(httpRequest.getURI().contains(k)){
+                    v.service(httpRequest, httpResponse);
+                    return;
+                }
+            });
+
+            httpResponse.forward(contentType, httpResponse.readFileToByte(httpRequest.getURI()));
+            return;
+
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
-
-    private void handlePostRequest(HttpRequest httpRequest, String URI, HttpResponse httpResponse) {
-        if(URI.contains("/user/create")) {
-            httpResponse.responseUserSignUp(httpRequest, "/index.html");
-            return;
-        }
-        // signIn
-        if(URI.contains("/user/login")) {
-            String userId = httpRequest.getParameter("userId");
-            httpResponse.responseUserSignIn(userId);
-            return;
-        }
-    }
-
-    private void handleGetRequest(HttpRequest httpRequest, String URI, HttpResponse httpResponse, String contentType) throws IOException {
-        if(httpRequest.getContentType().contains("text/css")){
-            contentType = "text/css";
-        }
-        if(URI.contains("/user/create")) {
-            // create user(get)
-            String queryString = httpRequest.getQueryString(URI);
-            httpResponse.createUser(httpRequest, queryString);
-            httpResponse.sendRedirect("/index.html");
-            return;
-        }
-        // user list
-        if(URI.contains("/user/list")) {
-            if(httpRequest.getCookieValue()){// in logined status
-                // 사용자 목록 출력
-                DataBase db = new DataBase();
-                // Collection to List
-                List<User> users = db.findAll().stream().collect(Collectors.toList());
-                byte[] body = httpResponse.createDynamicHTML("./webapp/user/list_static.html", users);
-                httpResponse.forward(URI, contentType, body);
-                return;
-            }
-            // move to login page
-            httpResponse.responseWithCookie(false, "/user/login.html");
-            return;
-        }
-        // read file
-        httpResponse.forward(URI, contentType, httpResponse.readFileToByte(URI));
-        return;
-    }
-
 }

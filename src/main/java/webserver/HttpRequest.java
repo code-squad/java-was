@@ -32,6 +32,7 @@ public class HttpRequest {
             requestBody = getRequestBody(br);
             log.debug(requestBody);
         }
+        log.debug("\n");
     }
 
     private void readHeader(BufferedReader br) throws IOException {
@@ -48,18 +49,12 @@ public class HttpRequest {
     }
 
     public String getMethod(){
-        return getRequestLine().split(" ")[0];
+        return getHeader("requestLine").split(" ")[0];
     }
 
     public String getPath(){
-        String URI = getRequestLine().split(" ")[1];
-        if(URI.contains("?")) return URI.split("\\?")[0];
-        return URI;
-    }
-
-    public String getParameter(String key){
-        String URI = getRequestLine().split(" ")[1];
-        return getRequestParameter(URI.split("\\?")[1]).get(key);
+        if(getURI().contains("?")) return getURI().split("\\?")[0];
+        return getURI();
     }
 
     public Map<String, String> getRequestParameter(String queryString) {
@@ -71,8 +66,8 @@ public class HttpRequest {
         return URI.split("\\?")[1];
     }
 
-    public String getRequestLine(){
-        return getHeader("requestLine");
+    public String getURI(){
+        return getHeader("requestLine").split(" ")[1];
     }
 
     public boolean getCookieValue(){
@@ -97,15 +92,6 @@ public class HttpRequest {
     public String getRequestBody(){
         return requestBody;
     }
-//
-//    public void printRequestHeader() {
-//        header.forEach((key, value) -> {
-//            if(key.equals("requestLine")) log.debug(value + "\n");
-//            else log.debug(key + ": " + value + "\n");
-//        });
-//        log.debug("requestHeader :{");
-//        log.debug("}");
-//    }
 
     @Override
     public String toString() {

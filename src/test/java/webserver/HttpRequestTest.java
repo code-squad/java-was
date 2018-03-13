@@ -55,13 +55,19 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void getParameter() throws IOException {
+    public void getRequestParameter_post() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
+        httpRequest = new HttpRequest(in);
+        Map<String, String> p = httpRequest.getRequestParameter(httpRequest.getRequestBody());
+        assertEquals("javajigi", p.get("userId"));
+    }
+
+    @Test
+    public void getRequestParameter_get() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
-        assertEquals("chloe", httpRequest.getParameter("userId"));
-        assertEquals("password", httpRequest.getParameter("password"));
-        assertEquals("JaeSung", httpRequest.getParameter("name"));
-
+        Map<String, String> p = httpRequest.getRequestParameter(httpRequest.getQueryString(httpRequest.getURI()));
+        assertEquals("chloe", p.get("userId"));
     }
 
     @Test

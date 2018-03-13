@@ -26,12 +26,11 @@ public class HttpResponseTest {
         users.add(user2);
     }
 
-//    @Test
-//    public void readFile() throws IOException {
-//        HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
-//        byte[] body =
-//        response.forward("/index.html", "text/html", httpResponse.readFileToByte(URI));
-//    }
+    @Test
+    public void createUser() throws Exception {
+        HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
+
+    }
 
     @Test
     public void file() throws Exception {

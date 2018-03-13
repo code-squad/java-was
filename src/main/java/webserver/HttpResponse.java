@@ -21,7 +21,7 @@ public class HttpResponse {
         dos = new DataOutputStream(out);
     }
 
-    public void forward(String URI, String contentType, byte[] body) throws IOException {
+    public void forward(String contentType, byte[] body){
         // path 에 해당하는 파일을 읽어온다.
         response200Header(body.length, contentType);
         responseBody(body);
@@ -40,12 +40,18 @@ public class HttpResponse {
         return Files.readAllBytes(new File("./webapp" + URI).toPath());
     }
 
-    public byte[] createDynamicHTML(String staticHtmlFileURI, List<User> users) throws IOException {
-        BufferedReader br = new BufferedReader(
-                new FileReader(new File(staticHtmlFileURI)));
-        StringBuilder sb = writeDynamicHTML(users, br);
-        String s = sb.toString();
-        return s.getBytes(StandardCharsets.UTF_8);
+    public byte[] createDynamicHTML(String staticHtmlFileURI, List<User> users) {
+        try {
+            BufferedReader br = new BufferedReader(
+                    new FileReader(new File(staticHtmlFileURI)));
+            StringBuilder sb = writeDynamicHTML(users, br);
+            return sb.toString().getBytes(StandardCharsets.UTF_8);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e1){
+            e1.printStackTrace();
+        }
+        return null;
     }
 
     private StringBuilder writeDynamicHTML(List<User> users, BufferedReader br) throws IOException {
@@ -80,12 +86,10 @@ public class HttpResponse {
         }
     }
 
-    public void responseUserSignUp(HttpRequest httpRequest, String location) {
-        String requestBody = httpRequest.getRequestBody();
-        log.debug("requestBody : {}", requestBody);
-        createUser(httpRequest, requestBody);
-        sendRedirect(location);
-        return;
+    public void createUser(Map<String, String> parameters) {
+        User user = new User(parameters.get("userId"), parameters.get("password"), parameters.get("name"), parameters.get("email"));
+        DataBase db = new DataBase();
+        db.addUser(user);
     }
 
     public void responseUserSignIn(String userId) {
@@ -96,12 +100,6 @@ public class HttpResponse {
         }
         responseWithCookie(false, "/user/login_failed.html");
         return;
-    }
-    public void createUser(HttpRequest httpRequest, String queryString) {
-        Map<String, String> parameters = httpRequest.getRequestParameter(queryString);
-        User user = new User(parameters.get("userId"), parameters.get("password"), parameters.get("name"), parameters.get("email"));
-        DataBase db = new DataBase();
-        db.addUser(user);
     }
 
     public void response200Header(int lengthOfBodyContent, String contentType) {
