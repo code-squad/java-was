@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -24,18 +22,22 @@ public class HttpRequest {
     public HttpRequest(InputStream in) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         // add request line
-        header.put("requestLine", br.readLine());
+        String line = br.readLine();
+        header.put("requestLine", line);
+        log.debug(line);
         // add other header
         readHeader(br);
         // add request body
         if(getHeader("Content-Length") != null) {
             requestBody = getRequestBody(br);
+            log.debug(requestBody);
         }
     }
 
     private void readHeader(BufferedReader br) throws IOException {
         String line = br.readLine();
         if(line == null || line.equals("")) return;
+        log.debug(line);
         HttpRequestUtils.Pair pair =  HttpRequestUtils.parseHeader(line);
         header.put(pair.getKey(), pair.getValue());
         readHeader(br);
@@ -43,10 +45,6 @@ public class HttpRequest {
 
     public String getHeader(String key) {
         return header.get(key);
-    }
-
-    public Map<String, String> getTotalHeader(){
-        return header;
     }
 
     public String getMethod(){
@@ -84,10 +82,6 @@ public class HttpRequest {
         return loginStatus;
     }
 
-    public String getRequestBody() {
-        return requestBody;
-    }
-
     public String getContentType() {
         return getHeader("Accept");
     }
@@ -99,6 +93,19 @@ public class HttpRequest {
     private String getRequestBody(BufferedReader br) throws IOException {
         return IOUtils.readData(br, getContentLength());
     }
+
+    public String getRequestBody(){
+        return requestBody;
+    }
+//
+//    public void printRequestHeader() {
+//        header.forEach((key, value) -> {
+//            if(key.equals("requestLine")) log.debug(value + "\n");
+//            else log.debug(key + ": " + value + "\n");
+//        });
+//        log.debug("requestHeader :{");
+//        log.debug("}");
+//    }
 
     @Override
     public String toString() {

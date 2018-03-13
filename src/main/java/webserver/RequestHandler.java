@@ -31,17 +31,14 @@ public class RequestHandler extends Thread {
             HttpRequest httpRequest = new HttpRequest(in);
             String HTTPMethod = httpRequest.getMethod();
             String URI = httpRequest.getRequestLine();
-            Map<String, String> requestHeader = httpRequest.getTotalHeader();
 
             // response
             HttpResponse httpResponse = new HttpResponse(out);
             String contentType = "text/html";
-            printRequestHeader(requestHeader);
             if (HTTPMethod.equals("GET")) {
                 handleGetRequest(httpRequest, URI, httpResponse, contentType);
                 return;
             }
-            // signUp
             handlePostRequest(httpRequest, URI, httpResponse);
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -55,7 +52,8 @@ public class RequestHandler extends Thread {
         }
         // signIn
         if(URI.contains("/user/login")) {
-            httpResponse.responseUserSignIn(httpRequest);
+            String userId = httpRequest.getParameter("userId");
+            httpResponse.responseUserSignIn(userId);
             return;
         }
     }
@@ -68,7 +66,7 @@ public class RequestHandler extends Thread {
             // create user(get)
             String queryString = httpRequest.getQueryString(URI);
             httpResponse.createUser(httpRequest, queryString);
-            httpResponse.response302Header("/index.html");
+            httpResponse.sendRedirect("/index.html");
             return;
         }
         // user list
@@ -78,32 +76,17 @@ public class RequestHandler extends Thread {
                 DataBase db = new DataBase();
                 // Collection to List
                 List<User> users = db.findAll().stream().collect(Collectors.toList());
-                httpResponse.createDynamicHTML("./webapp/user/list_static.html", users, contentType);
+                byte[] body = httpResponse.createDynamicHTML("./webapp/user/list_static.html", users);
+                httpResponse.forward(URI, contentType, body);
                 return;
             }
             // move to login page
-            httpResponse.response302HeaderWithCookieLoginRequired();
+            httpResponse.responseWithCookie(false, "/user/login.html");
             return;
         }
         // read file
-        httpResponse.readFile(URI, contentType);
+        httpResponse.forward(URI, contentType, httpResponse.readFileToByte(URI));
         return;
     }
-//
-//    private void printRequestHeader1(Map<String, String> requestHeader) {
-//        log.debug("requestHeader :{");
-//        for(String s : requestHeader){
-//            log.debug(s + "\n");
-//        }
-//        log.debug("}");
-//    }
 
-    private void printRequestHeader(Map<String, String> requestHeader) {
-        requestHeader.forEach((header, value) -> {
-                    if(header.equals("requestLine")) log.debug(value + "\n");
-                    log.debug(header + ": " + value + "\n");
-                });
-        log.debug("requestHeader :{");
-        log.debug("}");
-    }
 }

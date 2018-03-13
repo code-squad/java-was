@@ -26,16 +26,17 @@ public class HttpResponseTest {
         users.add(user2);
     }
 
-    @Test
-    public void readFile() throws IOException {
-        HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
-        response.readFile("/index.html", "text/html");
-    }
+//    @Test
+//    public void readFile() throws IOException {
+//        HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
+//        byte[] body =
+//        response.forward("/index.html", "text/html", httpResponse.readFileToByte(URI));
+//    }
 
     @Test
     public void file() throws Exception {
         HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
-        response.createDynamicHTML("./webapp/user/list_static.html", users, "text/html");
+        response.createDynamicHTML("./webapp/user/list_static.html", users);
 
     }
 
