@@ -22,7 +22,7 @@ public class RequestHandler extends Thread {
     }
     // 어떤 요청이 어떤 요청인지 구분해야 할 것 같음.
     // requestLine 으로 요청 구분하고 요청에 따라 response 생성 다르게 해주어야함.
-    
+
     public void run() {
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());

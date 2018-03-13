@@ -92,7 +92,7 @@ public class HttpResponse {
         db.addUser(user);
     }
 
-    public void responseUserSignIn(String userId) {
+    public void loginUser(String userId) {
         DataBase db = new DataBase();
         if(db.findUserById(userId) != null){// 로그인 성공시
             responseWithCookie(true, "/index.html");
@@ -118,14 +118,6 @@ public class HttpResponse {
             sendRedirect(location);
             dos.writeBytes("Set-Cookie:" + "logined=" + logined + ";" + "Path=/");
         } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    public void addHeader(String header, String value) {
-        try {
-            dos.writeBytes(header + ": " + value + "\r\n");
-        }catch (IOException e){
             log.error(e.getMessage());
         }
     }

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,13 +26,7 @@ public class HttpResponseTest {
     }
 
     @Test
-    public void createUser() throws Exception {
-        HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
-
-    }
-
-    @Test
-    public void file() throws Exception {
+    public void createDynamicHTML() throws Exception {
         HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
         response.createDynamicHTML("./webapp/user/list_static.html", users);
 

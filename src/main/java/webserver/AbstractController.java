@@ -10,7 +10,6 @@ public abstract class AbstractController implements Controller {
     }
 
     public void doPost(HttpRequest request, HttpResponse response) {
-
     }
 
 

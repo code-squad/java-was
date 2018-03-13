@@ -3,6 +3,7 @@ package webserver;
 import java.util.Map;
 
 public class CreateUserController extends AbstractController {
+
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
         String requestBody = request.getRequestBody();

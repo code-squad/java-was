@@ -21,13 +21,12 @@ public class HttpRequest {
 
     public HttpRequest(InputStream in) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        // add request line
         String line = br.readLine();
         header.put("requestLine", line);
         log.debug(line);
-        // add other header
+
         readHeader(br);
-        // add request body
+
         if(getHeader("Content-Length") != null) {
             requestBody = getRequestBody(br);
             log.debug(requestBody);
