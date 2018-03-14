@@ -34,15 +34,28 @@ public class RequestHandler extends Thread {
 		log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
 				connection.getPort());
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream();) {
+			
+
 			HttpRequest reqst = new HttpRequest(in);
+			
+			
+			
+			
+			
 			
 			String url = reqst.getURI();
 			String method = reqst.getMethod();
 			String accept = reqst.getAccept();
 			Map<String, String> param = reqst.getParam();
 			String logined = reqst.getLogined();
+			
+			
+			
 			byte[] body = pathByteArray("/index.html");
 
+			
+			
+			
 			if (url.equals("/")) {
 				log.debug("if statement - /");
 				response200(body, out);
