@@ -1,7 +1,5 @@
 package webserver;
 
-import db.DataBase;
-
 import java.util.Map;
 
 public class LoginController extends AbstractController {
@@ -12,6 +10,5 @@ public class LoginController extends AbstractController {
         Map<String, String> p = request.getRequestParameter(requestBody);
         String userId = p.get("userId");
         response.loginUser(userId);
-        return;
     }
 }
