@@ -25,16 +25,7 @@ public class HttpRequest {
 		String line = br.readLine();
 		log.debug("FIRST LINE : " + line);
 		setMethodAndPath(line);
-
-		while (!"".equals(line)) {
-			line = br.readLine();
-			log.debug("header : " + line);
-			if (line == null) {
-				break;
-			}
-			headerToMap(line);
-		}
-
+		line = repeatReadLine(br, line);
 		String method = (String) httpMap.get("Method");
 		String uri = (String) httpMap.get("URI");
 
@@ -47,8 +38,20 @@ public class HttpRequest {
 		}
 	}
 
+	private String repeatReadLine(BufferedReader br, String line) throws IOException {
+		while (!"".equals(line)) {
+			line = br.readLine();
+			log.debug("header : " + line);
+			if (line == null) {
+				break;
+			}
+			headerToMap(line);
+		}
+		return line;
+	}
+
 	private void setMethodAndPath(String line) {
-		String[] splitLine = HttpRequestUtils.splitString(line);
+		String[] splitLine = HttpRequestUtils.splitStringBlank(line);
 		httpMap.put("Method", splitLine[0]);
 		httpMap.put("URI", splitLine[1]);
 	}
@@ -56,9 +59,9 @@ public class HttpRequest {
 	private void headerToMap(String line) {
 		String[] splitLine = HttpRequestUtils.splitString(line);
 		if (!"".equals(splitLine[0])) {
-			httpMap.put(substringKey(splitLine[0]), splitLine[1]);
+			httpMap.put(splitLine[0], splitLine[1]);
 		}
-		if (!"".equals(splitLine[0]) & splitLine[0].equals("Cookie:")) {
+		if (!"".equals(splitLine[0]) & splitLine[0].equals("Cookie")) {
 			checkLogined(splitLine);
 		}
 	}
@@ -72,12 +75,6 @@ public class HttpRequest {
 				httpMap.put("logined", "logined=false;");
 			}
 		}
-	}
-
-	private String substringKey(String splitLine) {
-		int idx = splitLine.indexOf(":");
-		String key = splitLine.substring(0, idx);
-		return key;
 	}
 
 	private void extractGetParam(String line) {
@@ -101,7 +98,7 @@ public class HttpRequest {
 	public Map<String, String> getParam() {
 		return (Map<String, String>) httpMap.get("Param");
 	}
-	
+
 	public String getLogined() {
 		if (httpMap.get("logined") == null) {
 			return "logined=false;";
