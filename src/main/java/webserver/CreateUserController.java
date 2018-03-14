@@ -1,6 +1,5 @@
 package webserver;
 
-import db.DataBase;
 import model.User;
 
 public class CreateUserController extends AbstractController {

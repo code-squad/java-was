@@ -34,13 +34,14 @@ public class RequestHandler extends Thread {
             HttpResponse httpResponse = new HttpResponse(out);
             // response
             // create user(get, post)
-            Map<String, AbstractController> controllers = new HashMap<>();
+            Map<String, Controller> controllers = new HashMap<>();
             controllers.put("/user/create", new CreateUserController());
             controllers.put("/user/login", new LoginController());
             controllers.put("/user/list", new UserListController());
 
             String contentType = "text/html";
-            if(httpRequest.getContentType().contains("text/css")){
+
+            if(httpRequest.isStyleSheet()){
                 contentType = "text/css";
             }
 

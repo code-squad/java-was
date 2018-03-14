@@ -4,7 +4,8 @@ import db.DataBase;
 
 public abstract class AbstractController implements Controller {
     // 현재 추상 메소드가 존재하지 않지만 이 클래스의 인스턴스의 생성을 방지하기 위해서 추상 클래스로 설정했다.
-    DataBase db;
+    DataBase db = new DataBase();
+
     @Override
     public void service(HttpRequest request, HttpResponse response) {
         HttpMethod method = request.getMethod();
@@ -13,12 +14,10 @@ public abstract class AbstractController implements Controller {
     }
 
     public void doPost(HttpRequest request, HttpResponse response) {
-        db = new DataBase();
     }
 
 
     public void doGet(HttpRequest request, HttpResponse response) {
-
     }
 
 }

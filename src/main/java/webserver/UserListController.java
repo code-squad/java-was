@@ -12,7 +12,6 @@ public class UserListController extends AbstractController {
     public void doGet(HttpRequest request, HttpResponse response) {
         if(request.getCookieValue()){// in logined status
             // 사용자 목록 출력
-            DataBase db = new DataBase();
             // Collection to List
             List<User> users = db.findAll().stream().collect(Collectors.toList());
             byte[] body = response.createDynamicHTML("./webapp/user/list_static.html", users);

@@ -66,6 +66,10 @@ public class HttpRequest {
         return getHeader("Accept");
     }
 
+    public boolean isStyleSheet(){
+       return getContentType().contains("text/css");
+    }
+
     public int getContentLength(){
         return Integer.parseInt(getHeader("Content-Length"));
     }
