@@ -5,6 +5,10 @@ import webserver.HttpResponse;
 
 public class ListUserController extends AbstractController {
 
+	public ListUserController() {
+		System.out.println("ListUserController");
+	}
+	
 	@Override
 	public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
 		// TODO Auto-generated method stub
