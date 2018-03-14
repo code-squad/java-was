@@ -45,13 +45,13 @@ public class RequestHandler extends Thread {
             }
 
             controllers.forEach((k, v) -> {
-                if(httpRequest.getURI().contains(k)){
+                if(httpRequest.getPath().contains(k)){
                     v.service(httpRequest, httpResponse);
                     return;
                 }
             });
 
-            httpResponse.forward(contentType, httpResponse.readFileToByte(httpRequest.getURI()));
+            httpResponse.forward(contentType, httpResponse.readFileToByte(httpRequest.getPath()));
             return;
 
         } catch (IOException e) {

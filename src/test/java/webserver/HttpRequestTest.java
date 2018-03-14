@@ -26,7 +26,6 @@ public class HttpRequestTest {
     public void printAllHeader_get() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
-        assertEquals("GET /user/create?userId=chloe&password=password&name=JaeSung HTTP/1.1", httpRequest.getHeader("requestLine"));
         assertEquals("localhost:8080",  httpRequest.getHeader("Host"));
         assertEquals("keep-alive",  httpRequest.getHeader("Connection"));
         assertEquals("*/*",  httpRequest.getHeader("Accept"));
@@ -44,7 +43,7 @@ public class HttpRequestTest {
     public void getMethod() throws IOException {
         InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
-        assertEquals("GET", httpRequest.getMethod());
+        assertEquals(HttpMethod.GET, httpRequest.getMethod());
     }
 
     @Test
@@ -60,14 +59,6 @@ public class HttpRequestTest {
         httpRequest = new HttpRequest(in);
         Map<String, String> p = httpRequest.getRequestParameter(httpRequest.getRequestBody());
         assertEquals("javajigi", p.get("userId"));
-    }
-
-    @Test
-    public void getRequestParameter_get() throws Exception {
-        InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
-        httpRequest = new HttpRequest(in);
-        Map<String, String> p = httpRequest.getRequestParameter(httpRequest.getQueryString(httpRequest.getURI()));
-        assertEquals("chloe", p.get("userId"));
     }
 
     @Test

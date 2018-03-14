@@ -18,11 +18,12 @@ public class HttpRequest {
     // requestHeader 를 map 으로 바꾼다.
     public Map<String, String> header = new HashMap<>();
     public String requestBody;
+    private RequestLine requestLine;
 
     public HttpRequest(InputStream in) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = br.readLine();
-        header.put("requestLine", line);
+        requestLine = new RequestLine(line);
         log.debug(line);
 
         readHeader(br);
@@ -47,27 +48,17 @@ public class HttpRequest {
         return header.get(key);
     }
 
-    public HttpMethod getMethod(){
-        String method = getHeader("requestLine").split(" ")[0];
-        return HttpMethod.valueOf(method);
+    public String getPath(){
+        return requestLine.getPath();
     }
 
-    public String getPath(){
-        if(getURI().contains("?")) return getURI().split("\\?")[0];
-        return getURI();
+    public HttpMethod getMethod(){
+        return requestLine.getMethod();
     }
 
     public Map<String, String> getRequestParameter(String queryString) {
         // extract user data
         return HttpRequestUtils.parseQueryString(queryString);
-    }
-
-    public String getQueryString(String URI){
-        return URI.split("\\?")[1];
-    }
-
-    public String getURI(){
-        return getHeader("requestLine").split(" ")[1];
     }
 
     public boolean getCookieValue(){
