@@ -1,6 +1,5 @@
 package webserver;
 
-import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,14 +7,11 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class HttpResponse {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
     private DataOutputStream dos;
-    public Map<String, String> header = new HashMap<>();
 
     public HttpResponse(OutputStream out) {
         dos = new DataOutputStream(out);
@@ -86,16 +82,6 @@ public class HttpResponse {
         }
     }
 
-    public void loginUser(String userId) {
-        DataBase db = new DataBase();
-        if(db.findUserById(userId) != null){// 로그인 성공시
-            responseWithCookie(true, "/index.html");
-            return;
-        }
-        responseWithCookie(false, "/user/login_failed.html");
-        return;
-    }
-
     public void response200Header(int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
@@ -107,10 +93,10 @@ public class HttpResponse {
         }
     }
 
-    public void responseWithCookie(boolean logined, String location){
+    public void responseWithCookie(boolean isLogined, String location){
         try {
             sendRedirect(location);
-            dos.writeBytes("Set-Cookie:" + "logined=" + logined + ";" + "Path=/");
+            dos.writeBytes("Set-Cookie:" + "logined=" + isLogined + ";" + "Path=/");
         } catch (IOException e) {
             log.error(e.getMessage());
         }

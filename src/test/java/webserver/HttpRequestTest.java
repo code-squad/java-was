@@ -33,13 +33,6 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void printAllHeader_post() throws Exception {
-        InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
-        httpRequest = new HttpRequest(in);
-        assertEquals("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net", httpRequest.getRequestBody());
-    }
-
-    @Test
     public void getMethod() throws IOException {
         InputStream in = new FileInputStream(new File(testDirectory + "getRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
@@ -54,21 +47,12 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void getRequestParameter_post() throws Exception {
-        InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
-        httpRequest = new HttpRequest(in);
-        Map<String, String> p = httpRequest.getRequestParameter(httpRequest.getRequestBody());
-        assertEquals("javajigi", p.get("userId"));
-    }
-
-    @Test
     public void getParameter() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
         String requestBody = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         assertEquals("javajigi", httpRequest.getParameter("userId"));
         assertEquals("password", httpRequest.getParameter("password"));
-
     }
 
     @Test

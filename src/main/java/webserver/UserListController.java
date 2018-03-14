@@ -1,6 +1,5 @@
 package webserver;
 
-import db.DataBase;
 import model.User;
 
 import java.util.List;
