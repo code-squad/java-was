@@ -86,12 +86,6 @@ public class HttpResponse {
         }
     }
 
-    public void createUser(Map<String, String> parameters) {
-        User user = new User(parameters.get("userId"), parameters.get("password"), parameters.get("name"), parameters.get("email"));
-        DataBase db = new DataBase();
-        db.addUser(user);
-    }
-
     public void loginUser(String userId) {
         DataBase db = new DataBase();
         if(db.findUserById(userId) != null){// 로그인 성공시

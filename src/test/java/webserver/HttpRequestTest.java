@@ -62,11 +62,13 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void getRequestBody() throws Exception {
+    public void getParameter() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "postRequestMessage.txt"));
         httpRequest = new HttpRequest(in);
         String requestBody = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
-        assertEquals(requestBody, httpRequest.getRequestBody());
+        assertEquals("javajigi", httpRequest.getParameter("userId"));
+        assertEquals("password", httpRequest.getParameter("password"));
+
     }
 
     @Test

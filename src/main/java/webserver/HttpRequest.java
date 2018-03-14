@@ -16,8 +16,8 @@ import util.IOUtils;
 public class HttpRequest {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
     // requestHeader 를 map 으로 바꾼다.
-    public Map<String, String> header = new HashMap<>();
-    public String requestBody;
+    private Map<String, String> header = new HashMap<>();
+    private Map<String, String> params = new HashMap<>();
     private RequestLine requestLine;
 
     public HttpRequest(InputStream in) throws IOException {
@@ -29,8 +29,7 @@ public class HttpRequest {
         readHeader(br);
 
         if(getHeader("Content-Length") != null) {
-            requestBody = getRequestBody(br);
-            log.debug(requestBody);
+            params = getRequestBody(br);
         }
         log.debug("\n");
     }
@@ -56,11 +55,6 @@ public class HttpRequest {
         return requestLine.getMethod();
     }
 
-    public Map<String, String> getRequestParameter(String queryString) {
-        // extract user data
-        return HttpRequestUtils.parseQueryString(queryString);
-    }
-
     public boolean getCookieValue(){
         String cookie = getHeader("Cookie");
         boolean loginStatus = Boolean.parseBoolean(HttpRequestUtils.parseCookies(cookie).get("logined"));
@@ -76,19 +70,22 @@ public class HttpRequest {
         return Integer.parseInt(getHeader("Content-Length"));
     }
 
-    private String getRequestBody(BufferedReader br) throws IOException {
-        return IOUtils.readData(br, getContentLength());
+    private Map<String, String> getRequestBody(BufferedReader br) throws IOException {
+        String requestBody = IOUtils.readData(br, getContentLength());
+        log.debug("requestBody : {}", requestBody);
+        return HttpRequestUtils.parseQueryString(requestBody);
     }
 
-    public String getRequestBody(){
-        return requestBody;
+    public String getParameter(String key){
+        return params.get(key);
     }
 
     @Override
     public String toString() {
         return "HttpRequest{" +
                 "header=" + header +
-                ", requestBody='" + requestBody + '\'' +
+                ", params=" + params +
+                ", requestLine=" + requestLine +
                 '}';
     }
 }
