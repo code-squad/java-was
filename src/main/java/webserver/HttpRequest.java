@@ -47,8 +47,9 @@ public class HttpRequest {
         return header.get(key);
     }
 
-    public String getMethod(){
-        return getHeader("requestLine").split(" ")[0];
+    public HttpMethod getMethod(){
+        String method = getHeader("requestLine").split(" ")[0];
+        return HttpMethod.valueOf(method);
     }
 
     public String getPath(){
