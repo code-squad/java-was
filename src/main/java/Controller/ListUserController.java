@@ -1,24 +1,21 @@
 package Controller;
 
+import java.io.IOException;
+
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
 public class ListUserController extends AbstractController {
 
-	public ListUserController() {
-		System.out.println("ListUserController");
-	}
-	
 	@Override
-	public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+		String logined = httpRequest.getLogined();
 
-	@Override
-	public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-		// TODO Auto-generated method stub
-		
+		if (logined.contains("logined=true;")) {
+			httpResponse.forward("loginList");
+		}
+		if (logined.contains("logined=false;")) {
+			httpResponse.sendRedirect("/user/login.html", false);
+		}
 	}
-	
 }

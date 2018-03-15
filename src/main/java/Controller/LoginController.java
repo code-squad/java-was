@@ -1,24 +1,23 @@
 package Controller;
 
+import java.io.IOException;
+import java.util.Map;
+
+import db.DataBase;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
 public class LoginController extends AbstractController {
 
-	public LoginController() {
-		System.out.println("LoginController");
-	}
-	
 	@Override
-	public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-		// TODO Auto-generated method stub
-		
+	public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+		if (loginCheck(httpRequest.getParam())) {
+			httpResponse.sendRedirect("/index.html", true);
+		}
+		httpResponse.sendRedirect("/user/login_failed.html", false);
 	}
 
-	@Override
-	public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-		// TODO Auto-generated method stub
-		
+	boolean loginCheck(Map<String, String> param) {
+		return DataBase.findUserById(param.get("userId")).getPassword().equals(param.get("password"));
 	}
-
 }
