@@ -6,6 +6,8 @@ import java.util.Map;
 
 public class RequestLine {
     private String requestLine;
+    private Map<String, String> params;
+
 
     public RequestLine(String requestLine){
         this.requestLine = requestLine;
@@ -26,7 +28,7 @@ public class RequestLine {
     }
 
     public String getParameter(String key){
-        Map<String, String> p = HttpRequestUtils.parseQueryString(getURI().split("\\?")[1]);
-        return p.get(key);
+        params = HttpRequestUtils.parseQueryString(getURI().split("\\?")[1]);
+        return params.get(key);
     }
 }

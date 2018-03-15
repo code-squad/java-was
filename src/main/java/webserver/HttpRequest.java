@@ -67,6 +67,7 @@ public class HttpRequest {
     }
 
     public boolean isStyleSheet(){
+        if(getContentType() == null) return false;
        return getContentType().contains("text/css");
     }
 

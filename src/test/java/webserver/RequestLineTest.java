@@ -20,4 +20,10 @@ public class RequestLineTest {
         line = new RequestLine(getRequestLine);
         assertEquals("chloe", line.getParameter("userId"));
     }
+
+    @Test
+    public void getURI() {
+        line = new RequestLine(getRequestLine);
+        assertEquals("/user/create?userId=chloe&password=password&name=JaeSung", line.getURI());
+    }
 }

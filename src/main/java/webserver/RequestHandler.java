@@ -11,12 +11,10 @@ public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private Map<String, Controller> controllers;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
         // 사용자 요청이 있을 때마다 매번 Map을 초기화지 않기 위해 한번만 처리.
-        controllers = RequestMapping.createController();
     }
 
     public void run() {
@@ -30,7 +28,9 @@ public class RequestHandler extends Thread {
             // response
             HttpResponse httpResponse = new HttpResponse(out);
 
-            if(controllers.get(httpRequest.getPath()) == null){
+            Controller controller = RequestMapping.getController(httpRequest.getPath());
+
+            if(controller == null){
                 String contentType = "text/html";
                 if(httpRequest.isStyleSheet()){
                     contentType = "text/css";
@@ -39,7 +39,7 @@ public class RequestHandler extends Thread {
                 return;
             }
 
-            controllers.get(httpRequest.getPath()).service(httpRequest, httpResponse);
+            controller.service(httpRequest, httpResponse);
 
 
         } catch (IOException e) {
