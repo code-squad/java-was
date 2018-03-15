@@ -1,7 +1,3 @@
-HTTP/1.1 200 OK 
-Content-Type: text/html;charset=utf-8
-Content-Length: 4883
-
 <!DOCTYPE html>
 <html lang="kr">
 <head>
@@ -88,7 +84,6 @@ Content-Length: 4883
                 </tr>
                 </thead>
                 <tbody>
-
 <tr> 
 <th scope="row">1</th> <td>id1</td> <td>name1</td> <td>jwb8705@gmail.com</td><td><a href="#" class="btn btn-success" role="button">수정</a></td>
 </tr> 

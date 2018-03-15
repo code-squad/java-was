@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class HttpResponseTest {
     List<User> users;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         user1 = new User("id1", "password1", "name1", "jwb8705@gmail.com");
         user2 = new User("id2", "password2", "name2", "jwb8705@naver.com");
         users = new ArrayList<>();
@@ -27,16 +26,10 @@ public class HttpResponseTest {
     }
 
     @Test
-    public void readFile() throws IOException {
+    public void createDynamicHTML() throws Exception {
         HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
-        response.readFile("/index.html", "text/html");
-    }
-
-    @Test
-    public void file() throws Exception {
-        HttpResponse response = new HttpResponse(createOutputStream("HttpResponse.txt"));
-        response.createDynamicHTML("./webapp/user/list_static.html", users, "text/html");
-
+        byte[] body = response.createDynamicHTML("./webapp/user/list_static.html", users);
+        response.responseBody(body);
     }
 
     private OutputStream createOutputStream(String filename) throws FileNotFoundException {
