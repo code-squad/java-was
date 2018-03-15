@@ -4,17 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import Controller.AbstractController;
 import Controller.Controller;
-import Controller.CreateUserController;
-import Controller.ListUserController;
-import Controller.LoginController;
 
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -35,33 +29,25 @@ public class RequestHandler extends Thread {
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream();) {
 			HttpRequest httpRequest = new HttpRequest(in);
 			HttpResponse httpResponse = new HttpResponse(out);
-			String url = httpRequest.getURI();
-			Controller controller = Stream.of(RqstUri.values()).filter(s -> s.getUri().equals(url)).findFirst().orElse(RqstUri.GET_FILE).createController();
-			controller.service(httpRequest, httpResponse);
+			
+			Controller controller = RequestMapping.getController(httpRequest.getURI());
+			
+			if (controller != null) {
+				controller.service(httpRequest, httpResponse);
+			} 
+			if (controller == null) {
+				String uri = httpRequest.getURI();
+				httpResponse.forward(defaultPage(uri));
+			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
 	}
-
-	private enum RqstUri {
-		USER_CREATE("/user/create", () -> new CreateUserController()), 
-		USER_LOGIN("/user/login", () -> new LoginController()), 
-		USER_LIST("/user/list", () -> new ListUserController()), GET_FILE("", () -> new AbstractController() {});
-
-		final private String uri;
-		final private Supplier<Controller> expression;
-
-		private RqstUri(String uri, Supplier<Controller> expression) {
-			this.uri = uri;
-			this.expression = expression;
+	
+	private String defaultPage(String uri) {
+		if(uri.equals("/")) {
+			return "/index.html";
 		}
-
-		public Controller createController() {
-			return expression.get();
-		}
-
-		public String getUri() {
-			return uri;
-		}
+		return uri;
 	}
 }

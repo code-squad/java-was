@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,7 @@ import model.User;
 public class HttpResponse {
 	private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
 	private OutputStream out;
+	private Map<String, String> headers = new HashMap<>();
 
 	public HttpResponse(OutputStream out) {
 		this.out = out;
@@ -23,45 +27,25 @@ public class HttpResponse {
 
 	public void forward(String url) throws IOException {
 		DataOutputStream dos = new DataOutputStream(out);
-		byte[] body = pathByteArray("/index.html");
-
-		if (!url.equals("/") & url.contains("/")) {
-			body = pathByteArray(url);
-		}
-
-		if (url.equals("loginList")) {
-			body = setUserListOut();
-		}
-
+		byte[] body = pathByteArray(url);
 		dos.writeBytes("HTTP/1.1 200 OK \r\n");
-
 		if (url.endsWith(".js")) {
 			dos.writeBytes("Content-Type: application/javascript;charset=UTF-8\r\n");
-		}
-
-		else if (url.endsWith(".css")) {
+		} else if (url.endsWith(".css")) {
 			dos.writeBytes("Content-Type: text/css\r\n");
-		}
-
-		else {
+		} else {
 			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 		}
-
 		dos.writeBytes("Content-Length: " + body.length + "\r\n");
 		dos.writeBytes("\r\n");
 		responseBody(dos, body);
 	}
 
-	public void sendRedirect(String url, boolean login) throws IOException {
+	public void sendRedirect(String url) throws IOException {
 		DataOutputStream dos = new DataOutputStream(out);
 		dos.writeBytes("HTTP/1.1 302 Found \r\n");
 		dos.writeBytes("Location: " + url + "\r\n");
-		if (login) {
-			dos.writeBytes("Set-Cookie: logined=true; Path=/ \r\n");
-		}
-		if (!login) {
-			dos.writeBytes("Set-Cookie: logined=false; Path=/ \r\n");
-		}
+		setDynamicHeader(dos);
 		dos.writeBytes("\r\n");
 	}
 
@@ -78,18 +62,27 @@ public class HttpResponse {
 		}
 	}
 
-	private byte[] setUserListOut() {
-		Collection<User> users = DataBase.findAll();
-		StringBuilder sb = new StringBuilder();
-		sb.append("<table>");
-		for (User user : users) {
-			sb.append("<tr>");
-			sb.append("<td>" + user.getUserId() + "</td>");
-			sb.append("<td>" + user.getName() + "</td>");
-			sb.append("<td>" + user.getEmail() + "</td>");
-			sb.append("</tr>");
+	private void setDynamicHeader(DataOutputStream dos) {
+		Set<String> ks = headers.keySet();
+		for (String key : ks) {
+			try {
+				dos.writeBytes(key + ":" + headers.get(key) + "\r\n");
+			} catch (IOException e) {
+				log.error(e.getMessage());
+			}
 		}
-		sb.append("</table>");
-		return sb.toString().getBytes();
+	}
+
+	public void setHeader(String key, String value) {
+		headers.put(key, value);
+	}
+
+	public void forwardDynamic(byte[] body) throws IOException {
+		DataOutputStream dos = new DataOutputStream(out);
+		dos.writeBytes("HTTP/1.1 200 OK \r\n");
+		dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+		dos.writeBytes("Content-Length: " + body.length + "\r\n");
+		dos.writeBytes("\r\n");
+		responseBody(dos, body);
 	}
 }

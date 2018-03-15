@@ -12,9 +12,11 @@ public class LoginController extends AbstractController {
 	@Override
 	public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
 		if (loginCheck(httpRequest.getParam())) {
-			httpResponse.sendRedirect("/index.html", true);
+			httpResponse.setHeader("Set-Cookie", "logined=true;");
+			httpResponse.sendRedirect("/index.html");
 		}
-		httpResponse.sendRedirect("/user/login_failed.html", false);
+		httpResponse.setHeader("Set-Cookie", "logined=false;");
+		httpResponse.sendRedirect("/user/login_failed.html");
 	}
 
 	boolean loginCheck(Map<String, String> param) {

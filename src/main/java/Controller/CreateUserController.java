@@ -18,7 +18,7 @@ public class CreateUserController extends AbstractController {
 	@Override
 	public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
 		createUser(httpRequest.getParam());
-		httpResponse.sendRedirect("/index.html", false);
+		httpResponse.sendRedirect("/index.html");
 	}
 
 	void createUser(Map<String, String> param) throws UnsupportedEncodingException {

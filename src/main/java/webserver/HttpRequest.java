@@ -15,8 +15,9 @@ import util.IOUtils;
 
 public class HttpRequest {
 	private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
-	private Map<String, Object> httpMap = new HashMap<>();
-
+	private Map<String, String> httpMap = new HashMap<>();
+	private Map<String, String> param = new HashMap<>();
+	
 	public HttpRequest(InputStream in) throws IOException {
 		readLine(new BufferedReader(new InputStreamReader(in, "UTF-8")));
 	}
@@ -26,16 +27,23 @@ public class HttpRequest {
 		log.debug("FIRST LINE : " + line);
 		setMethodAndPath(line);
 		line = repeatReadLine(br, line);
-		String method = (String) httpMap.get("Method");
-		String uri = (String) httpMap.get("URI");
+		String method = httpMap.get("Method");
+		String uri = httpMap.get("URI");
 
-		if (method.equals("GET") & uri.contains("?")) {
+		if (HttpMethod.GET.whichMethod(method) & uri.contains("?")) {
+			// POST 방식에서 쿼리스트링 들어오는거 받을 수 있는지 테스트
 			extractGetParam(uri);
 		}
 
-		if (method.equals("POST") & httpMap.get("Content-Length") != null) {
-			extractPostParam(IOUtils.readData(br, Integer.parseInt((String) httpMap.get("Content-Length"))));
+		if (HttpMethod.POST.whichMethod(method) & httpMap.get("Content-Length") != null) {
+			createParam(IOUtils.readData(br, Integer.parseInt(httpMap.get("Content-Length"))));
 		}
+	}
+	
+	private void setMethodAndPath(String line) {
+		String[] splitLine = HttpRequestUtils.splitStringBlank(line);
+		httpMap.put("Method", splitLine[0]);
+		httpMap.put("URI", splitLine[1]);
 	}
 
 	private String repeatReadLine(BufferedReader br, String line) throws IOException {
@@ -50,63 +58,47 @@ public class HttpRequest {
 		return line;
 	}
 
-	private void setMethodAndPath(String line) {
-		String[] splitLine = HttpRequestUtils.splitStringBlank(line);
-		httpMap.put("Method", splitLine[0]);
-		httpMap.put("URI", splitLine[1]);
-	}
-
 	private void headerToMap(String line) {
 		String[] splitLine = HttpRequestUtils.splitString(line);
 		if (!"".equals(splitLine[0])) {
 			httpMap.put(splitLine[0], splitLine[1]);
 		}
-		if (!"".equals(splitLine[0]) & splitLine[0].equals("Cookie")) {
-			checkLogined(splitLine);
-		}
 	}
-
-	private void checkLogined(String[] splitLine) {
-		for (String string : splitLine) {
-			if (string.contains("true")) {
-				httpMap.put("logined", "logined=true;");
-			}
-			if (string.contains("false")) {
-				httpMap.put("logined", "logined=false;");
-			}
-		}
+		
+	private void createParam(String line) {
+		param = HttpRequestUtils.parseQueryString(line);
 	}
 
 	private void extractGetParam(String line) {
 		String[] splitGet = HttpRequestUtils.splitUrl(line);
 		httpMap.put("URI", splitGet[0]);
-		httpMap.put("Param", HttpRequestUtils.parseQueryString(splitGet[1]));
-	}
-
-	private void extractPostParam(String line) {
-		httpMap.put("Param", HttpRequestUtils.parseQueryString(line));
+		createParam(splitGet[1]);
 	}
 
 	public String getMethod() {
-		return (String) httpMap.get("Method");
+		return httpMap.get("Method");
 	}
 
 	public String getURI() {
-		return (String) httpMap.get("URI");
+		return httpMap.get("URI");
 	}
 
 	public Map<String, String> getParam() {
-		return (Map<String, String>) httpMap.get("Param");
+		return param;
 	}
 
 	public String getLogined() {
 		if (httpMap.get("logined") == null) {
 			return "logined=false;";
 		}
-		return (String) httpMap.get("logined");
+		return httpMap.get("logined");
 	}
 
 	public String getAccept() {
-		return (String) httpMap.get("Accept");
+		return httpMap.get("Accept");
+	}
+	
+	public String getCookie() {
+		return httpMap.get("Cookie");
 	}
 }
