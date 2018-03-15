@@ -1,5 +1,6 @@
 package webserver;
 
+import db.DataBase;
 import model.User;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class UserListController extends AbstractController {
         if(request.getCookieValue()){// in logined status
             // 사용자 목록 출력
             // Collection to List
-            List<User> users = db.findAll().stream().collect(Collectors.toList());
+            List<User> users = DataBase.findAll().stream().collect(Collectors.toList());
             byte[] body = response.createDynamicHTML("./webapp/user/list_static.html", users);
             response.forward("text/html", body);
             return;
