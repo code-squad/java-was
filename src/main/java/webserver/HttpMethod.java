@@ -1,5 +1,8 @@
 package webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public enum HttpMethod {
 	GET("GET"), POST("POST");
 	
@@ -15,5 +18,23 @@ public enum HttpMethod {
 	
 	public boolean whichMethod(String method) {
 		return this.getMethod().equals(method);
+	}
+	
+	public static HttpMethod getEnum(String method) {
+		
+		for (HttpMethod httpMethod : HttpMethod.values()) {
+			if (httpMethod.getMethod().equals(method)) {
+				return httpMethod;
+			}
+		}
+		return HttpMethod.GET;
+	}
+	
+	public boolean isGet() {
+		return this.getMethod().equals("GET");
+	}
+	
+	public boolean isPost() {
+		return this.getMethod().equals("POST");
 	}
 }

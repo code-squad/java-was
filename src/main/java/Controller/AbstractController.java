@@ -14,13 +14,13 @@ public abstract class AbstractController implements Controller {
 	
 	@Override
 	public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-		String method = httpRequest.getMethod();
+		HttpMethod method = httpRequest.getMethod();
 			try {
-				if (HttpMethod.GET.whichMethod(method)) {
+				if (method.isGet()) {
 					doGet(httpRequest, httpResponse);
 				}
 				
-				if (HttpMethod.POST.whichMethod(method)) {
+				if (method.isPost()) {
 					doPost(httpRequest, httpResponse);
 				}
 			} catch (Exception e) {
