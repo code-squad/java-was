@@ -57,10 +57,6 @@ public class HttpRequestUtils {
 		return line.split(": ");
 	}
 	
-	public static String[] splitStringBlank(String line) {
-		return line.split(" ");
-	}
-
 	public static String[] splitUrl(String line) {
 		return line.split("\\?");
 	}
