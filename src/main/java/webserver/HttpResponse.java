@@ -41,6 +41,15 @@ public class HttpResponse {
 		responseBody(dos, body);
 	}
 
+	public void forwardDynamic(byte[] body) throws IOException {
+		DataOutputStream dos = new DataOutputStream(out);
+		dos.writeBytes("HTTP/1.1 200 OK \r\n");
+		dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+		dos.writeBytes("Content-Length: " + body.length + "\r\n");
+		dos.writeBytes("\r\n");
+		responseBody(dos, body);
+	}
+
 	public void sendRedirect(String url) throws IOException {
 		DataOutputStream dos = new DataOutputStream(out);
 		dos.writeBytes("HTTP/1.1 302 Found \r\n");
@@ -75,14 +84,5 @@ public class HttpResponse {
 
 	public void setHeader(String key, String value) {
 		headers.put(key, value);
-	}
-
-	public void forwardDynamic(byte[] body) throws IOException {
-		DataOutputStream dos = new DataOutputStream(out);
-		dos.writeBytes("HTTP/1.1 200 OK \r\n");
-		dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-		dos.writeBytes("Content-Length: " + body.length + "\r\n");
-		dos.writeBytes("\r\n");
-		responseBody(dos, body);
 	}
 }
