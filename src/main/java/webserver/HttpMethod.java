@@ -24,17 +24,17 @@ public enum HttpMethod {
 		
 		for (HttpMethod httpMethod : HttpMethod.values()) {
 			if (httpMethod.getMethod().equals(method)) {
-				return httpMethod;
+				return httpMethod;	
 			}
 		}
 		return HttpMethod.GET;
 	}
 	
 	public boolean isGet() {
-		return this.getMethod().equals("GET");
+		return this == GET;
 	}
 	
 	public boolean isPost() {
-		return this.getMethod().equals("POST");
+		return this == POST;
 	}
 }

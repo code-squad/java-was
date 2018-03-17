@@ -17,7 +17,7 @@ public class HttpRequest {
 	private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
 	private Map<String, String> headers = new HashMap<>();
 	private Map<String, String> params = new HashMap<>();
-	private RequestLine requestLine = new RequestLine();
+	private RequestLine requestLine;
 	
 	public HttpRequest(InputStream in) throws IOException {
 		readLine(new BufferedReader(new InputStreamReader(in, "UTF-8")));
@@ -31,7 +31,7 @@ public class HttpRequest {
 		HttpMethod method = getMethod();
 		String uri = requestLine.getUri();
 
-		if (method.isGet() & uri.contains("?")) {
+		if (method.isGet() & requestLine.isContains("?")) {
 			extractGetParam(uri);
 		}
 
@@ -42,8 +42,7 @@ public class HttpRequest {
 	
 	private void setMethodAndPath(String line) {
 		String[] splitLine = HttpRequestUtils.splitStringBlank(line);
-		requestLine.setMethod(splitLine[0]);
-		requestLine.setUri(splitLine[1]);
+		requestLine = new RequestLine(splitLine);
 	}
 
 	private String repeatReadLine(BufferedReader br, String line) throws IOException {
@@ -71,8 +70,7 @@ public class HttpRequest {
 
 	private void extractGetParam(String line) {
 		String[] splitGet = HttpRequestUtils.splitUrl(line);
-		requestLine.setUri(HttpHeader.URI.getHeader());
-		createParam(splitGet[1]);
+		createParam(requestLine.splitUriParam(splitGet));
 	}
 
 	public HttpMethod getMethod() {
