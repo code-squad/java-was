@@ -17,8 +17,8 @@ public class RequestLine {
 		return uri;
 	}
 	
-	public boolean isContains(String string) {
-		return uri.contains(string);
+	public boolean isContains(String headerKey) {
+		return uri.contains(headerKey);
 	}
 	
 	public String splitUriParam(String[] splitGet) {
