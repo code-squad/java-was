@@ -27,7 +27,6 @@ public class RequestHandlerTest {
 
 	@Test
 	public void get_method_test() throws IOException {
-		// InputStream stream = new
 		// ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
 		InputStream in = new FileInputStream(new File(testDirectory + "Http_GET_index.txt"));
 		HttpRequest reqst = new HttpRequest(in);
@@ -46,22 +45,5 @@ public class RequestHandlerTest {
 		InputStream in = new FileInputStream(new File(testDirectory + "Http_POST_User.txt"));
 		HttpRequest reqst = new HttpRequest(in);
 		assertThat("/user/create", is(reqst.getURI()));
-	}
-
-	@Test
-	public void createUser_test() {
-		RequestHandler rqst = new RequestHandler();
-		Map<String, String> param = new HashMap<>();
-		param.put("userId", "javajigi");
-		param.put("password", "password");
-		param.put("name", "박재성");
-		param.put("email", "javajigi%40slipp.net");
-		
-		try {
-			rqst.createUser(param);
-			assertThat("박재성", is(DataBase.findUserById("javajigi").getName()));
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
 	}
 }
