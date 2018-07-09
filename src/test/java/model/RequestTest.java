@@ -28,6 +28,11 @@ public class RequestTest {
     }
 
     @Test
+    public void readMethod() {
+        assertThat(request.getMethod(), is("GET"));
+    }
+
+    @Test
     public void readHeaders() {
         assertThat(request.getHeader("Host"), is("localhost:8080"));
     }

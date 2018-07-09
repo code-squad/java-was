@@ -29,6 +29,10 @@ public class Request {
         return line.getPath();
     }
 
+    public String getMethod() {
+        return line.getMethod();
+    }
+
     public String getHeader(String key) {
         return headers.getHeader(key);
     }
