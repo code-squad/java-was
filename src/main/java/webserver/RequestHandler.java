@@ -20,11 +20,10 @@ public class RequestHandler extends Thread {
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-
-            /*** input ***/
             Request request = new Request(in);
 
-            /*** output : refactoring target ***/
+            /*** TODO : refactoring target ***/
+            /*Response response = new Response(out);*/
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + request.getPath()).toPath());
             response200Header(dos, body.length);

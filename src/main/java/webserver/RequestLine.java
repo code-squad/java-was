@@ -19,4 +19,8 @@ class RequestLine {
     String getPath() {
         return path;
     }
+
+    boolean isIncludeBody() {
+        return method.isIncludeBody();
+    }
 }
