@@ -36,4 +36,9 @@ public class RequestTest {
     public void readHeaders_err() {
         request.getHeader("colin");
     }
+
+    @Test
+    public void readBody() {
+        assertThat(request.getBody(), is(""));
+    }
 }

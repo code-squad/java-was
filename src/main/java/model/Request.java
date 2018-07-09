@@ -10,9 +10,7 @@ public class Request {
     private RequestHeaders headers;
     private RequestBody body;
 
-    /* TODO : 깔끔하게 만들 수 없나? */
     public Request(InputStream in) throws IOException {
-
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         line = new RequestLine(br.readLine());
         headers = new RequestHeaders();
@@ -24,6 +22,7 @@ public class Request {
             }
             headers.add(data);
         }
+        body = new RequestBody(br.readLine());
     }
 
     public String getPath() {
@@ -32,5 +31,9 @@ public class Request {
 
     public String getHeader(String key) {
         return headers.getHeader(key);
+    }
+
+    public String getBody() {
+        return body.get();
     }
 }
