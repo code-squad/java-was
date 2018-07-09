@@ -1,7 +1,8 @@
-package model;
+package webserver;
 
 import exception.NotSupportedMethod;
 import org.junit.Test;
+import webserver.HttpMethod;
 
 import static org.junit.Assert.*;
 

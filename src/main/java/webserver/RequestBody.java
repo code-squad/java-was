@@ -1,4 +1,4 @@
-package model;
+package webserver;
 
 import com.google.common.base.Strings;
 

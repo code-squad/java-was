@@ -1,11 +1,11 @@
 package webserver;
 
-import model.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -26,7 +26,7 @@ public class RequestHandler extends Thread {
 
             /*** output : refactoring target ***/
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+            byte[] body = Files.readAllBytes(new File("./webapp" + request.getPath()).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
 

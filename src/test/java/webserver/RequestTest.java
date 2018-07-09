@@ -1,4 +1,4 @@
-package model;
+package webserver;
 
 import exception.HeaderNotFoundException;
 import org.junit.Before;

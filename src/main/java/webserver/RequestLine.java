@@ -1,4 +1,4 @@
-package model;
+package webserver;
 
 class RequestLine {
     private static final String SPLIT_REGEX = " ";
