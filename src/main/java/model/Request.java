@@ -1,30 +1,36 @@
 package model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class Request {
-    private static final Logger log = LoggerFactory.getLogger(Request.class);
-
-    private RequestPath path;
+    private RequestLine line;
     private RequestHeaders headers;
     private RequestBody body;
 
+    /* TODO : 깔끔하게 만들 수 없나? */
     public Request(InputStream in) throws IOException {
+
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String data = br.readLine();
-        log.debug("requestLine : {}", data);
-        while (!data.equals("")) {
-            data = br.readLine();
-            if (data == null) {
+        line = new RequestLine(br.readLine());
+        headers = new RequestHeaders();
+
+        while (true) {
+            String data = br.readLine();
+            if (data == null || data.equals("")) {
                 break;
             }
-            log.debug("requestHeader : {}", data);
+            headers.add(data);
         }
+    }
+
+    public String getPath() {
+        return line.getPath();
+    }
+
+    public String getHeader(String key) {
+        return headers.getHeader(key);
     }
 }

@@ -1,5 +1,6 @@
 package model;
 
+import exception.HeaderNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -7,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class RequestTest {
     private static final Logger log = LoggerFactory.getLogger(RequestTest.class);
@@ -19,7 +23,17 @@ public class RequestTest {
     }
 
     @Test
-    public void requestInit() {
+    public void readPath() {
+        assertThat(request.getPath(), is("/index.html"));
+    }
 
+    @Test
+    public void readHeaders() {
+        assertThat(request.getHeader("Host"), is("localhost:8080"));
+    }
+
+    @Test(expected = HeaderNotFoundException.class)
+    public void readHeaders_err() {
+        request.getHeader("colin");
     }
 }

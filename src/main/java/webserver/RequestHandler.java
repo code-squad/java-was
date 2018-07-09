@@ -4,10 +4,7 @@ import model.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class RequestHandler extends Thread {
@@ -27,13 +24,14 @@ public class RequestHandler extends Thread {
             /*** input ***/
             Request request = new Request(in);
 
-            /*** output ***/
+            /*** output : refactoring target ***/
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = "Hello World".getBytes();
             response200Header(dos, body.length);
             responseBody(dos, body);
+
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("error occurred : {}", e.getMessage());
         }
     }
 
