@@ -5,22 +5,16 @@ import exception.NotSupportedMethod;
 import java.util.Arrays;
 
 public enum HttpMethod {
-    GET(false),
-    POST(true),
-    PUT(true),
-    DELETE(false);
-
-    private boolean isIncludeBody;
-
-    HttpMethod(boolean isIncludeBody) {
-        this.isIncludeBody = isIncludeBody;
-    }
+    GET,
+    POST,
+    PUT,
+    DELETE;
 
     public static HttpMethod get(String value) {
         return Arrays.stream(HttpMethod.values()).filter(method -> method.name().equals(value)).findFirst().orElseThrow(NotSupportedMethod::new);
     }
 
     public boolean isIncludeBody() {
-        return isIncludeBody;
+        return (this != GET && this != DELETE);
     }
 }
