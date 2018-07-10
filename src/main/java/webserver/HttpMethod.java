@@ -13,8 +13,4 @@ public enum HttpMethod {
     public static HttpMethod get(String value) {
         return Arrays.stream(HttpMethod.values()).filter(method -> method.name().equals(value)).findFirst().orElseThrow(NotSupportedMethod::new);
     }
-
-    public boolean isIncludeBody() {
-        return (this != GET && this != DELETE);
-    }
 }

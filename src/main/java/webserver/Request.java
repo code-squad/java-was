@@ -1,5 +1,7 @@
 package webserver;
 
+import util.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +26,8 @@ public class Request {
             headers.add(data);
         }
 
-        if (line.isIncludeBody()) {
-            body = new RequestBody(br.readLine());
+        if (headers.isExistHeader("Content-Length")) {
+            body = new RequestBody(IOUtils.readData(br, headers.getHeaderNumberFormat("Content-Length")));
         }
     }
 
@@ -43,7 +45,7 @@ public class Request {
 
     public String getBody() {
         if (Objects.isNull(body)) {
-            return "";
+            return RequestBody.empty();
         }
         return body.get();
     }

@@ -13,6 +13,10 @@ class RequestBody {
         this.body = body;
     }
 
+    static String empty() {
+        return "";
+    }
+
     String get() {
         return body;
     }

@@ -35,8 +35,4 @@ class RequestLine {
         }
         return params.get(key);
     }
-
-    boolean isIncludeBody() {
-        return method.isIncludeBody();
-    }
 }
