@@ -16,18 +16,24 @@ public class RequestHandler extends Thread {
         this.connection = connectionSocket;
     }
 
+    @Override
     public void run() {
+        Socket socket = new Socket();
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             Request request = new Request(in);
 
             /*** TODO : refactoring target ***/
-            /*Response response = new Response(out);*/
+            Response response = new Response(out);
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + request.getPath()).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
+
+
+            /*** handle request, response ***/
+            Controller controller = HandlerMapper.mapHandler(request.getPath());
 
         } catch (IOException e) {
             log.error("error occurred : {}", e.getMessage());

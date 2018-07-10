@@ -48,7 +48,7 @@ public class Request {
         return body.get();
     }
 
-    public String getParam(String userId) {
-        return line.getParam(userId);
+    public String getParam(String key) {
+        return line.getParam(key);
     }
 }
