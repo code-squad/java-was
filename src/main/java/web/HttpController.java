@@ -22,7 +22,7 @@ public class HttpController {
         return "user/form.html";
     }
 
-    @RequestMapping(method = "GET", path = "/user/create")
+    @RequestMapping(method = "POST", path = "/user/create")
     public String userCreate(Map<String, String> params) {
         User user = new User()
                 .setUserId(params.get("userId"))
@@ -33,8 +33,7 @@ public class HttpController {
         log.debug("created user {}", user.toString());
 
         DataBase.getInstance().addUser(user);
-        // TODO create user and return login success view
-        return "index.html";
+        return "redirect:/index.html";
     }
 
 }
