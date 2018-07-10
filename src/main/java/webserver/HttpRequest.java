@@ -1,5 +1,6 @@
 package webserver;
 
+import model.User;
 import util.HttpRequestUtils;
 
 import java.io.BufferedReader;
@@ -32,5 +33,9 @@ public class HttpRequest {
 
     public Resource getResource() {
         return requestLine.getResource();
+    }
+
+    public User getUser() {
+        return requestLine.getUser();
     }
 }
