@@ -16,10 +16,12 @@ public class RequestTest {
     private static final Logger log = LoggerFactory.getLogger(RequestTest.class);
 
     private Request request;
+    private Request signRequest;
 
     @Before
     public void setUp() throws Exception {
         request = new Request(new FileInputStream(new File(getClass().getClassLoader().getResource("request.txt").getFile())));
+        signRequest = new Request(new FileInputStream(new File(getClass().getClassLoader().getResource("signRequest.txt").getFile())));
     }
 
     @Test
@@ -45,5 +47,15 @@ public class RequestTest {
     @Test
     public void readBody() {
         assertThat(request.getBody(), is(""));
+    }
+
+    @Test
+    public void readQueryParams() {
+        assertThat(signRequest.getParam("userId"), is("colin"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void readQueryParams_err() {
+        signRequest.getParam("invalid");
     }
 }
