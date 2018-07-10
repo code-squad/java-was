@@ -6,6 +6,10 @@ public class User {
     private String name;
     private String email;
 
+    public User() {
+
+    }
+
     public User(String userId, String password, String name, String email) {
         this.userId = userId;
         this.password = password;
@@ -27,6 +31,26 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public User setUserId(String userId) {
+        this.userId = userId;
+        return this;
+    }
+
+    public User setPassword(String password) {
+        this.password = password;
+        return this;
+    }
+
+    public User setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public User setEmail(String email) {
+        this.email = email;
+        return this;
     }
 
     @Override

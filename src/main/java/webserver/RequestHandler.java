@@ -23,9 +23,7 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream();
              OutputStream out = connection.getOutputStream()) {
-
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-
             Request request = new Request(br);
             Resolver resolver = new Resolver();
             resolver.resolve(request, out);

@@ -30,14 +30,18 @@ public class Resolver {
             log.debug("request path : {}", path);
             log.debug("request method : {}", httpMethod);
             if (requestMapping.path().equals(path) && requestMapping.method().equals(httpMethod)) {
+                if (request.getParams() != null) {
+                    viewFileName = (String) method.invoke(new HttpController(), request.params);
+                    break;
+                }
                 viewFileName = (String) method.invoke(new HttpController());
+                break;
             }
         }
-        byte[] body = Files.readAllBytes(new File("src/main/resources/static/" + viewFileName).toPath());
+        byte[] body = Files.readAllBytes(new File("webapp/" + viewFileName).toPath());
         response200Header(dos, body.length);
         responseBody(dos, body);
     }
-
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
