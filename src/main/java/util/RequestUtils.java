@@ -1,6 +1,10 @@
 package util;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RequestUtils {
 
@@ -12,18 +16,24 @@ public class RequestUtils {
         return Arrays.asList(pathAndParams.split("\\?"));
     }
 
-    public static List<Pair> splitParams(String params) {
-        List<Pair> pairs = new ArrayList<>();
-        String[] paramsToken = params.split("&");
-        for (String param : paramsToken) {
-            String[] token = param.split("=");
-            pairs.add(new Pair(token[0], token[1]));
+    public static Map<String, String> splitQueryString(String queryString) {
+        return splitValues(queryString, "&");
+    }
+
+    private static Map<String, String> splitValues(String target, String regex) {
+        if (Strings.isNullOrEmpty(target)) {
+            return Maps.newHashMap();
         }
-        return pairs;
+        String[] token = target.split(regex);
+        return Arrays.stream(token).map(t -> getKeyValue(t, "=")).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
 
     public static Optional<Pair> splitHeader(String header) {
-        String[] token = header.split(": ");
+        return getKeyValue(header, ": ");
+    }
+
+    private static Optional<Pair> getKeyValue(String keyValue, String regex) {
+        String[] token = keyValue.split(regex);
         if (token.length != 2) {
             return Optional.empty();
         }

@@ -55,6 +55,11 @@ public class RequestTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void readQueryParams_err_not_exist() {
+        assertThat(request.getParam("userId"), is("colin"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void readQueryParams_err() {
         signRequest.getParam("invalid");
     }

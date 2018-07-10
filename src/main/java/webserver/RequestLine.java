@@ -1,9 +1,7 @@
 package webserver;
 
 import util.RequestUtils;
-import util.RequestUtils.Pair;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,16 +17,8 @@ class RequestLine {
         method = HttpMethod.get(lines.get(0));
 
         List<String> pathAndParamsToken = splitPathAndParams(lines.get(1));
-        params = new HashMap<>();
-        if (pathAndParamsToken.size() == 2) {
-            initParams(pathAndParamsToken.get(1));
-        }
         path = pathAndParamsToken.get(0);
-    }
-
-    private void initParams(String paramsSource) {
-        List<Pair> paramPairs = RequestUtils.splitParams(paramsSource);
-        paramPairs.forEach(pair -> params.put(pair.getKey(), pair.getValue()));
+        params = RequestUtils.splitQueryString(pathAndParamsToken.stream().filter(o -> pathAndParamsToken.indexOf(o) > 0).findFirst().orElse(null));
     }
 
     String getMethod() {
