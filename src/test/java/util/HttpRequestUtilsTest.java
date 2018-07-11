@@ -1,13 +1,13 @@
 package util;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import org.junit.Test;
+import util.HttpRequestUtils.Pair;
 
 import java.util.Map;
 
-import org.junit.Test;
-
-import util.HttpRequestUtils.Pair;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 public class HttpRequestUtilsTest {
     @Test
@@ -53,19 +53,19 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void getKeyValue() throws Exception {
+    public void getKeyValue() {
         Pair pair = HttpRequestUtils.getKeyValue("userId=javajigi", "=");
         assertThat(pair, is(new Pair("userId", "javajigi")));
     }
 
     @Test
-    public void getKeyValue_invalid() throws Exception {
+    public void getKeyValue_invalid() {
         Pair pair = HttpRequestUtils.getKeyValue("userId", "=");
         assertThat(pair, is(nullValue()));
     }
 
     @Test
-    public void parseHeader() throws Exception {
+    public void parseHeader() {
         String header = "Content-Length: 59";
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
