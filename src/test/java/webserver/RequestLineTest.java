@@ -6,14 +6,16 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 public class RequestLineTest {
     private static final Logger logger = LoggerFactory.getLogger(RequestLineTest.class);
 
     private static final String SAMPLE_LINE = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
-    private static final String SAMPLE_URI = "/user/create";
-    private static final String SAMPLE_QUERYSTRING = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
+    private static final String URI = "/user/create";
+    private static final String QUERYSTRING = "userId=javajigi&password=password&name=박재성&email=javajigi@slipp.net";
     private RequestLine requestLine;
 
     @Before
@@ -22,26 +24,21 @@ public class RequestLineTest {
     }
 
     @Test
-    public void parseUrl() {
-        String[] expected = new String[]{SAMPLE_URI, SAMPLE_QUERYSTRING};
-        assertArrayEquals(expected, requestLine.parseUrl());
-    }
-
-    @Test
-    public void getResource() {
-        assertEquals(SAMPLE_URI, requestLine.getResource().toString());
+    public void getPath() {
+        assertEquals(URI, requestLine.getPath());
     }
 
     @Test
     public void getQueryString() {
-        assertEquals(SAMPLE_QUERYSTRING, requestLine.getQueryString());
+        assertEquals(QUERYSTRING, requestLine.getQueryString());
     }
 
     @Test
-    public void getUser() {
-        User expected = new User("javajigi", "password", "박재성", "javajigi@slipp.net");
-        User actual = requestLine.getUser();
-        assertEquals(expected.toString(), actual.toString());
-        logger.debug(actual.toString());
+    public void getQueryParameters() {
+        Map<String, String> params = requestLine.getQueryParameters();
+        assertEquals("javajigi", params.get("userId"));
+        assertEquals("password", params.get("password"));
+        assertEquals("박재성", params.get("name"));
+        assertEquals("javajigi@slipp.net", params.get("email"));
     }
 }

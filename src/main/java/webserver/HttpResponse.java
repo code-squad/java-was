@@ -9,16 +9,13 @@ import java.io.OutputStream;
 
 public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
-    private Resource resource;
+    private final OutputStream out;
 
-    public HttpResponse() {
+    public HttpResponse(OutputStream out) {
+        this.out = out;
     }
 
-    public HttpResponse(Resource resource) {
-        this.resource = resource;
-    }
-
-    public void writeResponse(OutputStream out) throws IOException {
+    public void writeResponse(Resource resource) throws IOException {
         if (resource == null) {
             return;
         }

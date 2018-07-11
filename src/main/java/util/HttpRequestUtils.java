@@ -59,7 +59,7 @@ public class HttpRequestUtils {
         return requestLine.split(" ");
     }
 
-    public static String decode(String encoded) throws UnsupportedEncodingException {
+    public static String decodeUrlEncoding(String encoded) throws UnsupportedEncodingException {
         return URLDecoder.decode(encoded, "UTF-8");
     }
 

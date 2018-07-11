@@ -70,4 +70,11 @@ public class HttpRequestUtilsTest {
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
     }
+
+    @Test
+    public void decodeUrlEncoding() throws Exception {
+        String encoded = "name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
+        String decoded = HttpRequestUtils.decodeUrlEncoding(encoded);
+        assertThat(decoded, is("name=박재성&email=javajigi@slipp.net"));
+    }
 }

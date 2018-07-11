@@ -24,22 +24,20 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest request = new HttpRequest(in);
-            HttpResponse response;
+            HttpResponse response = new HttpResponse(out);
             if (request.getPath().startsWith("/user/create")) {
-                Map<String, String> userParams = request.getQueryParameters();
+
+                Map<String, String> userParams = request.getParameters();
                 User user = new User(userParams.get("userId"), userParams.get("password"), userParams.get("name"), userParams.get("email"));
                 log.debug("Created User: {}", user);
-                response = new HttpResponse(new Resource("/index.html"));
+                response.writeResponse(new Resource("/index.html"));
             } else {
-                response = new HttpResponse(new Resource(request.getPath()));
+                response.writeResponse(new Resource(request.getPath()));
             }
-
-            response.writeResponse(out);
 
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
-
 
 }

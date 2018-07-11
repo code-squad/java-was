@@ -1,7 +1,13 @@
 package webserver;
 
 public enum HttpMethod {
-    GET, POST, PUT, DELETE;
+    GET("GET"), POST("POST"), PUT("PUT"), DELETE("DELETE");
+
+    private final String method;
+
+    HttpMethod(String method) {
+        this.method = method;
+    }
 
     public static HttpMethod ofValue(String method) {
         switch (method) {
@@ -15,5 +21,10 @@ public enum HttpMethod {
                 return DELETE;
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return method;
     }
 }

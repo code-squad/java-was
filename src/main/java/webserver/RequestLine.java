@@ -9,15 +9,16 @@ import java.util.Map;
 
 public class RequestLine {
     private static final Logger logger = LoggerFactory.getLogger(RequestLine.class);
+    private final HttpMethod method;
+    private final String url;
 
-    private HttpMethod method;
-    private String url;
 
     public RequestLine(String line) {
         try {
             String[] requestLine = HttpRequestUtils.parseRequestLine(line);
             this.method = HttpMethod.ofValue(requestLine[0]);
-            this.url = HttpRequestUtils.decode(requestLine[1]);
+            this.url = HttpRequestUtils.decodeUrlEncoding(requestLine[1]);
+
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -31,11 +32,20 @@ public class RequestLine {
         return parseUrl()[1];
     }
 
-    public String getPath() {
+    String getPath() {
         return parseUrl()[0];
+    }
+
+    public boolean isMethod(HttpMethod method) {
+        return this.method == method;
     }
 
     public Map<String, String> getQueryParameters() {
         return HttpRequestUtils.parseQueryString(getQueryString());
+    }
+
+    @Override
+    public String toString() {
+        return method + " " + url;
     }
 }
