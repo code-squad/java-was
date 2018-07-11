@@ -20,5 +20,6 @@ Reader객체는 한 문자단위로 입출력을 한다.
 BufferReader는 readLine()이라는 한줄씩 읽을수있는 메서드가 있기때문에 한줄을 통째로 String으로 저장할수있다.
 
 
-
+## 요구사항 3단계 잠깐휴식
+redirect 방식은 내부적으로 HTTP Status 302코드와 Location을 활용한다.
 
