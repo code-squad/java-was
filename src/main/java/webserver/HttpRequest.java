@@ -1,6 +1,5 @@
 package webserver;
 
-import model.User;
 import util.HttpRequestUtils;
 
 import java.io.BufferedReader;
@@ -9,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static util.HttpRequestUtils.Pair;
 
@@ -31,11 +31,11 @@ public class HttpRequest {
         }
     }
 
-    public Resource getResource() {
-        return requestLine.getResource();
+    public String getPath() {
+        return requestLine.getPath();
     }
 
-    public User getUser() {
-        return requestLine.getUser();
+    public Map<String, String> getQueryParameters() {
+        return requestLine.getQueryParameters();
     }
 }

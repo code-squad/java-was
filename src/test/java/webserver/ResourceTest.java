@@ -16,7 +16,7 @@ public class ResourceTest {
 
     @Test
     public void getResource() throws Exception {
-        byte[] page = resource.getContent();
+        byte[] page = resource.get();
         assertTrue(new String(page).contains("SLiPP Java Web Programming"));
     }
 

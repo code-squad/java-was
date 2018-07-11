@@ -6,14 +6,14 @@ import java.nio.file.Files;
 import java.util.Objects;
 
 class Resource {
-    private final String uri;
+    private final String path;
 
     Resource(String uri) {
-        this.uri = uri;
+        this.path = uri;
     }
 
-    byte[] getContent() throws IOException {
-        return Files.readAllBytes(new File("./webapp" + uri).toPath());
+    byte[] get() throws IOException {
+        return Files.readAllBytes(new File("./webapp" + path).toPath());
     }
 
     @Override
@@ -21,17 +21,17 @@ class Resource {
         if (this == o) return true;
         if (!(o instanceof Resource)) return false;
         Resource resource = (Resource) o;
-        return Objects.equals(uri, resource.uri);
+        return Objects.equals(path, resource.path);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(uri);
+        return Objects.hash(path);
     }
 
     @Override
     public String toString() {
-        return uri;
+        return path;
     }
 }
