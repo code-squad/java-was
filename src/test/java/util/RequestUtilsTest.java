@@ -1,8 +1,7 @@
 package util;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import webserver.HttpMethod;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,13 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class RequestUtilsTest {
-    private static final Logger log = LoggerFactory.getLogger(RequestUtilsTest.class);
+
+    @Test
+    public void splitRequestLine() {
+        List<String> token = RequestUtils.splitRequestLine("GET /index.html HTTP/1.1");
+        assertThat(token.size(), is(3));
+        assertThat(token.get(0), is(HttpMethod.GET.name()));
+    }
 
     @Test
     public void splitPathAndParams() {

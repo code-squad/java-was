@@ -1,22 +1,12 @@
 package util;
 
-import exception.HandlerMappingException;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class HandlerMapperUtils {
 
     public static String parseControllerName(String requestPath) {
-        if (requestPath.equals("/")) {
+        int secondSlash = requestPath.replaceFirst("/", "").indexOf("/") + 1;
+        if (secondSlash == 0) {
             return requestPath;
         }
-
-        Pattern pattern = Pattern.compile("\\/(.*?)\\/");
-        Matcher matcher = pattern.matcher(requestPath);
-        if (!matcher.find()) {
-            throw new HandlerMappingException();
-        }
-        return matcher.group(matcher.start()).replaceAll("/", "");
+        return requestPath.substring(0, secondSlash).toLowerCase();
     }
 }

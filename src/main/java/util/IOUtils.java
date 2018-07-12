@@ -2,8 +2,10 @@ package util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Optional;
 
 public class IOUtils {
+    public static final String CONTENT_LENGTH = "Content-Length";
     /**
      * @param BufferedReader는
      *            Request Body를 시작하는 시점이어야
@@ -12,9 +14,13 @@ public class IOUtils {
      * @return
      * @throws IOException
      */
-    public static String readData(BufferedReader br, int contentLength) throws IOException {
-        char[] body = new char[contentLength];
-        br.read(body, 0, contentLength);
-        return String.copyValueOf(body);
+    public static Optional<String> readData(BufferedReader br, String contentLength) throws IOException {
+        int length = Integer.parseInt(contentLength);
+        if (length == 0) {
+            return Optional.empty();
+        }
+        char[] body = new char[length];
+        br.read(body, 0, length);
+        return Optional.of(String.copyValueOf(body));
     }
 }

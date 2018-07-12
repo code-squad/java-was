@@ -16,6 +16,6 @@ public class IOUtilsTest {
         StringReader sr = new StringReader(data);
         BufferedReader br = new BufferedReader(sr);
 
-        logger.debug("parse body : {}", IOUtils.readData(br, data.length()));
+        logger.debug("parse body : {}", IOUtils.readData(br, String.valueOf(data.getBytes().length)));
     }
 }

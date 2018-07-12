@@ -1,6 +1,7 @@
-package webserver;
+package webserver.request;
 
-import exception.HeaderNotFoundException;
+import exception.NotFoundHeaderException;
+import exception.NotFoundRequestParameterException;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,12 +17,12 @@ public class RequestTest {
     private static final Logger log = LoggerFactory.getLogger(RequestTest.class);
 
     private Request request;
-    private Request signRequest;
+    private Request signUpRequest;
 
     @Before
     public void setUp() throws Exception {
         request = new Request(new FileInputStream(new File(getClass().getClassLoader().getResource("request.txt").getFile())));
-        signRequest = new Request(new FileInputStream(new File(getClass().getClassLoader().getResource("signRequest.txt").getFile())));
+        signUpRequest = new Request(new FileInputStream(new File(getClass().getClassLoader().getResource("signUpRequest.txt").getFile())));
     }
 
     @Test
@@ -39,7 +40,7 @@ public class RequestTest {
         assertThat(request.getHeader("Host"), is("localhost:8080"));
     }
 
-    @Test(expected = HeaderNotFoundException.class)
+    @Test(expected = NotFoundHeaderException.class)
     public void readHeaders_err() {
         request.getHeader("colin");
     }
@@ -51,16 +52,16 @@ public class RequestTest {
 
     @Test
     public void readQueryParams() {
-        assertThat(signRequest.getParam("userId"), is("colin"));
+        assertThat(signUpRequest.getParam("userId"), is("colin"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NotFoundRequestParameterException.class)
     public void readQueryParams_err_not_exist() {
         assertThat(request.getParam("userId"), is("colin"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NotFoundRequestParameterException.class)
     public void readQueryParams_err() {
-        signRequest.getParam("invalid");
+        signUpRequest.getParam("invalid");
     }
 }

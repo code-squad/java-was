@@ -1,6 +1,6 @@
 package webserver;
 
-import exception.NotSupportedMethod;
+import exception.NotSupportedMethodException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,7 +13,7 @@ public class HttpMethodTest {
         assertEquals(method, HttpMethod.GET);
     }
 
-    @Test(expected = NotSupportedMethod.class)
+    @Test(expected = NotSupportedMethodException.class)
     public void methodGet_err() {
         HttpMethod.get("COLIN");
     }

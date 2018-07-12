@@ -1,6 +1,6 @@
 package webserver;
 
-import exception.NotSupportedMethod;
+import exception.NotSupportedMethodException;
 
 import java.util.Arrays;
 
@@ -11,6 +11,6 @@ public enum HttpMethod {
     DELETE;
 
     public static HttpMethod get(String value) {
-        return Arrays.stream(HttpMethod.values()).filter(method -> method.name().equals(value)).findFirst().orElseThrow(NotSupportedMethod::new);
+        return Arrays.stream(HttpMethod.values()).filter(method -> method.name().equals(value)).findFirst().orElseThrow(NotSupportedMethodException::new);
     }
 }
