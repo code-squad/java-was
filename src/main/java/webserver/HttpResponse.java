@@ -9,37 +9,22 @@ import java.io.OutputStream;
 
 public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
-    private final OutputStream out;
+    private final StatusLine statusLine;
+    private final ResponseHeaders headers;
+    private final ResponseBody body;
 
-    public HttpResponse(OutputStream out) {
-
-        this.out = out;
+    public HttpResponse(HttpStatus status, HttpHeaders headers, Resource resource) {
+        this.statusLine = new StatusLine(status);
+        this.headers = new ResponseHeaders(headers);
+        this.body = new ResponseBody(resource);
     }
 
-    public void writeResponse(Resource resource) throws IOException {
-        if (resource == null) {
-            return;
-        }
-        DataOutputStream dos = new DataOutputStream(out);
-        byte[] body = resource.get();
-        response200Header(dos, body.length);
-        responseBody(dos, body);
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    public void writeResponse(OutputStream out) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
+            DataOutputStream dos = new DataOutputStream(out);
+            statusLine.writeStatusLine(dos);
+            headers.writeHeaders(dos, body);
+            body.writeBody(dos);
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());

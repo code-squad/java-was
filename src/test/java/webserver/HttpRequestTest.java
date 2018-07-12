@@ -2,6 +2,8 @@ package webserver;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Map;
@@ -10,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HttpRequestTest {
+    private static final Logger logger = LoggerFactory.getLogger(HttpRequestTest.class);
     private HttpRequest request;
 
     @Before

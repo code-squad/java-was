@@ -19,7 +19,9 @@ public class RequestLine {
         try {
             String[] requestLine = HttpRequestUtils.parseRequestLine(reader.readLine());
             this.method = HttpMethod.ofValue(requestLine[0]);
+            logger.debug("METHOD: {}, {}", method, this.hashCode());
             this.url = HttpRequestUtils.decodeUrlEncoding(requestLine[1]);
+            logger.debug("URL: {}", url);
 
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException(e.getMessage());

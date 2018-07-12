@@ -17,23 +17,29 @@ public class RequestHandler extends Thread {
         this.connection = connectionSocket;
     }
 
+    @Override
     public void run() {
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest request = new HttpRequest(in);
-            HttpResponse response = new HttpResponse(out);
-            if (request.getPath().startsWith("/user/create")) {
-
+            HttpResponse response;
+            HttpHeaders headers = new HttpHeaders();
+            if (request.getPath().startsWith("/user/create") && request.isMethod(HttpMethod.POST)) {
                 Map<String, String> userParams = request.getParameters();
                 User user = new User(userParams.get("userId"), userParams.get("password"), userParams.get("name"), userParams.get("email"));
                 log.debug("Created User: {}", user);
-                response.writeResponse(new Resource("/index.html"));
+
+                headers.addHeader(HttpHeader.CONTENT_TYPE, "text/html;charset=utf-8");
+                headers.addHeader(HttpHeader.LOCATION, "/index.html");
+                response = new HttpResponse(HttpStatus.FOUND, headers , Resource.ofEmpty());
             } else {
-                response.writeResponse(new Resource(request.getPath()));
+                response = new HttpResponse(HttpStatus.OK, headers, Resource.of(request.getPath()));
             }
+
+
+            response.writeResponse(out);
 
         } catch (IOException e) {
             log.error(e.getMessage());

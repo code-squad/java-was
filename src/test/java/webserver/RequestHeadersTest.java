@@ -24,19 +24,19 @@ public class RequestHeadersTest {
 
     @Test
     public void containsHeader() {
-        assertTrue(requestHeaders.containsHeader("Host"));
-        assertTrue(requestHeaders.containsHeader("Connection"));
-        assertTrue(requestHeaders.containsHeader("Content-Length"));
-        assertTrue(requestHeaders.containsHeader("Content-Type"));
-        assertTrue(requestHeaders.containsHeader("Accept"));
+        assertTrue(requestHeaders.containsHeader(HttpHeader.HOST));
+        assertTrue(requestHeaders.containsHeader(HttpHeader.CONNECTION));
+        assertTrue(requestHeaders.containsHeader(HttpHeader.CONTENT_LENGTH));
+        assertTrue(requestHeaders.containsHeader(HttpHeader.CONTENT_TYPE));
+        assertTrue(requestHeaders.containsHeader(HttpHeader.ACCEPT));
 
-        assertFalse(requestHeaders.containsHeader("Authorization"));
+        assertFalse(requestHeaders.containsHeader(HttpHeader.AUTHORIZATION));
     }
 
     @Test
     public void getHeader() {
-        assertEquals("localhost:8080", requestHeaders.getHeader("Host"));
-        assertEquals("keep-alive", requestHeaders.getHeader("Connection"));
-        assertEquals("93", requestHeaders.getHeader("Content-Length"));
+        assertEquals("localhost:8080", requestHeaders.getHeader(HttpHeader.HOST));
+        assertEquals("keep-alive", requestHeaders.getHeader(HttpHeader.CONNECTION));
+        assertEquals("93", requestHeaders.getHeader(HttpHeader.CONTENT_LENGTH));
     }
 }
