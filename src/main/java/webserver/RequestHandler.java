@@ -24,15 +24,19 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream();
              OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            DataOutputStream dos = new DataOutputStream(out);
             Request request = new Request(br);
-            Resolver resolver = new Resolver();
-            resolver.resolve(request, out);
+            FrontController resolver = new FrontController();
+            Response response = resolver.resolveRequest(request);
+            response.send(dos);
 
         } catch (IOException e) {
             log.error(e.getMessage());
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
             e.printStackTrace();
         }
     }

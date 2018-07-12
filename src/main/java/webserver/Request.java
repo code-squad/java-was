@@ -12,9 +12,9 @@ public class Request {
 
     private final Logger log = LoggerFactory.getLogger(Request.class);
     private final String httpVersion;
-    HttpMethod httpMethod;
-    String path;
-    Map<String, String> params;
+    private HttpMethod httpMethod;
+    private String path;
+    private Map<String, String> params;
 
     public Request(BufferedReader br) throws IOException {
         PathParams pathParams = new PathParams(br);

@@ -10,9 +10,12 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
+import static webserver.WebServer.DEFAULT_PORT;
+import static webserver.WebServer.HOST;
+
 public class Response {
 
-    public static final String DOMAIN = "http://localhost:8080";
+    public static final String DOMAIN = HOST + ":" + DEFAULT_PORT;
 
     private final Logger log = LoggerFactory.getLogger(Response.class);
 
@@ -21,14 +24,14 @@ public class Response {
     private Map<String, String> headers = new HashMap<>();
     byte[] body;
 
-    public Response(Request request, String viewFileName) throws IOException {
+    public Response(Request request, byte[] body, String viewFileName) {
         if (viewFileName.contains("redirect")) {
-            HTTP_STATUS = HttpStatus.FOUND;
             viewFileName = viewFileName.replace("redirect:/", "");
-            headers.put("Location", DOMAIN+"/"+viewFileName);
+            HTTP_STATUS = HttpStatus.FOUND;
+            headers.put("Location", DOMAIN+"/" + viewFileName);
             log.debug("redirect location : {}", viewFileName);
         }
-        body = Files.readAllBytes(new File("webapp/" + viewFileName).toPath());
+        this.body = body;
         httpVersion = request.getHttpVersion();
         headers.put("Content-Type", "text/html;charset=utf-8\r\n");
         headers.put("Content-Length", String.valueOf(body.length));
@@ -37,7 +40,6 @@ public class Response {
     private void responseHeader(DataOutputStream dos, Map<String, String> headers) {
         try {
             dos.writeBytes(String.format("%s %s\r\n", httpVersion, HTTP_STATUS.toString()));
-
             headers.forEach((String k, String v) -> {
                 try {
                     dos.writeBytes(k + ": " + v + "\r\n");
@@ -45,7 +47,6 @@ public class Response {
                     e.printStackTrace();
                 }
             });
-
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
