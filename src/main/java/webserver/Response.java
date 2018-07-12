@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,5 +63,25 @@ public class Response {
     public void send(DataOutputStream dos) {
         responseHeader(dos, headers);
         responseBody(dos, body);
+    }
+
+    public static String getDOMAIN() {
+        return DOMAIN;
+    }
+
+    public String getHttpVersion() {
+        return httpVersion;
+    }
+
+    public HttpStatus getHTTP_STATUS() {
+        return HTTP_STATUS;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public byte[] getBody() {
+        return body;
     }
 }

@@ -34,7 +34,8 @@ public class PathParams {
                 if (pathAndParams.length == 2) params = HttpRequestUtils.parseQueryString(pathAndParams[1]);
                 while(true) {
                     String temp = br.readLine();
-                    if (temp.isEmpty()) break;
+                    log.debug("each line : {}", temp);
+                    if (temp == null) break;
                     String[] headerParams = temp.split(": ");
                     headers.put(headerParams[0], headerParams[1].trim());
                 }

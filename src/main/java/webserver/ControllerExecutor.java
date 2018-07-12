@@ -15,12 +15,16 @@ public class ControllerExecutor {
         for (Method method : declaredMethods) {
             RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
             if (requestMapping.path().equals(request.getPath()) && requestMapping.method().equals(request.getHttpMethod().toString())) {
-                if (request.getParams() != null) {
-                    return (String) method.invoke(clazz.newInstance(), request.params);
-                }
-                return (String) method.invoke(clazz.newInstance());
+                return getString(clazz, request, method);
             }
         }
         throw new RuntimeException("잘못된 요청입니다.");
+    }
+
+    private static String getString(Class<?> clazz, Request request, Method method) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (request.getParams() != null) {
+            return (String) method.invoke(clazz.newInstance(), request.getParams());
+        }
+        return (String) method.invoke(clazz.newInstance());
     }
 }

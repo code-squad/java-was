@@ -23,11 +23,13 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream();
              OutputStream out = connection.getOutputStream()) {
+
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             DataOutputStream dos = new DataOutputStream(out);
+
             Request request = new Request(br);
-            FrontController resolver = new FrontController();
-            Response response = resolver.resolveRequest(request);
+            FrontController frontController = new FrontController();
+            Response response = frontController.resolveRequest(request);
             response.send(dos);
 
         } catch (IOException e) {

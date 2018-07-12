@@ -6,8 +6,12 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataBase {
+
+    private final Logger log = LoggerFactory.getLogger(DataBase.class);
 
     private static DataBase dataBase = new DataBase();
 
@@ -17,12 +21,15 @@ public class DataBase {
 
     private Map<String, User> users = Maps.newHashMap();
 
-    public void addUser(User user) {
-        users.put(user.getUserId(), user);
+    public User addUser(User user) {
+        log.debug("add user : {}", user);
+        return users.put(user.getUserId(), user);
     }
 
     public User findUserById(String userId) {
-        return users.get(userId);
+        User findUser = users.get(userId);
+        log.debug("find by user id : {}", findUser);
+        return findUser;
     }
 
     public Collection<User> findAll() {
