@@ -12,6 +12,7 @@ public class HttpResponse {
     private final OutputStream out;
 
     public HttpResponse(OutputStream out) {
+
         this.out = out;
     }
 

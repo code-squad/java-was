@@ -10,8 +10,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HttpRequestTest {
-    private static final String REQUEST_LINE = "GET /user/create?userId=javajigi&password=password&name=박재성&email=javajigi@slipp.net";
-    private static final String REQUEST_HEADER = "Host: localhost:8080";
     private HttpRequest request;
 
     @Before

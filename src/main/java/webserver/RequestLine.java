@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
@@ -13,9 +15,9 @@ public class RequestLine {
     private final String url;
 
 
-    public RequestLine(String line) {
+    public RequestLine(BufferedReader reader) throws IOException {
         try {
-            String[] requestLine = HttpRequestUtils.parseRequestLine(line);
+            String[] requestLine = HttpRequestUtils.parseRequestLine(reader.readLine());
             this.method = HttpMethod.ofValue(requestLine[0]);
             this.url = HttpRequestUtils.decodeUrlEncoding(requestLine[1]);
 

@@ -2,41 +2,26 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.HttpRequestUtils;
 import util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Map;
-
-import static util.HttpRequestUtils.Pair;
 
 public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
-    private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String CONTENT_LENGTH = "Content-Length"; //많아지면 enum
     private final RequestLine requestLine;
     private final RequestHeaders headers;
     private final RequestBody body;
 
     public HttpRequest(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        this.requestLine = new RequestLine(reader.readLine());
-
-        Map<String, String> params = new HashMap<>();
-        while (true) {
-            String line = reader.readLine();
-            if ("".equals(line) || line == null) {
-                break;
-            }
-            Pair pair = HttpRequestUtils.parseHeader(line);
-            params.put(pair.getKey(), pair.getValue());
-        }
-        this.headers = new RequestHeaders(params);
-
+        this.requestLine = new RequestLine(reader);
+        this.headers = new RequestHeaders(reader);
         if (requestLine.isMethod(HttpMethod.POST)) {
             String body = IOUtils.readData(reader, Integer.parseInt(headers.getHeader(CONTENT_LENGTH)));
             this.body = RequestBody.of(body);
@@ -47,10 +32,6 @@ public class HttpRequest {
 
     public String getPath() {
         return requestLine.getPath();
-    }
-
-    public String getHeader(String key) {
-        return headers.getHeader(key);
     }
 
     public RequestBody getBody() {
