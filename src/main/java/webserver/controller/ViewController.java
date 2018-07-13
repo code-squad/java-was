@@ -19,7 +19,7 @@ public class ViewController implements Controller {
         try {
             byte[] body = Files.readAllBytes(new File(STATIC_FILE_DIR + request.getPath()).toPath());
             return response.setStatus(HttpStatus.OK)
-                    .setHeader(CONTENT_TYPE, "text/html;charset=utf-8")
+                    .setHeader(CONTENT_TYPE, request.getHeader("Accept"))
                     .setHeader(CONTENT_LENGTH, String.valueOf(body.length))
                     .setBody(new String(body));
         } catch (IOException e) {

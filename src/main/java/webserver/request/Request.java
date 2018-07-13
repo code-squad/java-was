@@ -1,7 +1,5 @@
 package webserver.request;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import util.IOUtils;
 import webserver.HttpBody;
 import webserver.HttpHeader;
@@ -16,8 +14,6 @@ import java.io.InputStreamReader;
 import static util.IOUtils.CONTENT_LENGTH;
 
 public class Request {
-    private static final Logger log = LoggerFactory.getLogger(Request.class);
-
     private RequestLine line;
     private HttpHeader header;
     private HttpBody body;
@@ -65,6 +61,6 @@ public class Request {
     }
 
     public Controller getHandler() {
-        return HandlerMapper.mapHandler(line.getPath());
+        return HandlerMapper.mapHandler(this);
     }
 }

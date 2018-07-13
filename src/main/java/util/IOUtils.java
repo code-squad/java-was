@@ -6,11 +6,10 @@ import java.util.Optional;
 
 public class IOUtils {
     public static final String CONTENT_LENGTH = "Content-Length";
+
     /**
-     * @param BufferedReader는
-     *            Request Body를 시작하는 시점이어야
-     * @param contentLength는
-     *            Request Header의 Content-Length 값이다.
+     * @param BufferedReader는 Request Body를 시작하는 시점이어야
+     * @param contentLength는  Request Header의 Content-Length 값이다.
      * @return
      * @throws IOException
      */

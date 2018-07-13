@@ -23,7 +23,7 @@ public class UserControllerTest {
     public void setUp() throws Exception {
         request = new Request(new FileInputStream(new File(getClass().getClassLoader().getResource("signUpRequest.txt").getFile())));
         response = new Response(new MockOutputStream());
-        controller = HandlerMapper.mapHandler(request.getPath());
+        controller = HandlerMapper.mapHandler(request);
     }
 
     @Test
