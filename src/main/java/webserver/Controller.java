@@ -1,78 +1,42 @@
 package webserver;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.HttpRequestUtils;
-import util.IOUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 public class Controller {
 
     private static final Logger log = LoggerFactory.getLogger(Controller.class);
-    private static final String METHOD = "method";
-    private static final String URL = "url";
 
-    public static String parseRequestUrl(BufferedReader request) throws IOException {
-        String firstLine = request.readLine();
-        String method = HttpRequestUtils.parseUrl(firstLine, METHOD);
-        String url = HttpRequestUtils.parseUrl(firstLine, URL);
-        String path = null;
-
-        log.debug("Method : {}", method);
-
-        if (method.equals("GET")) {
-            path = getMethod(url);
-        }
-
-        if (url.equals("/user/create")) {
-            log.debug("Start!!");
-            String body = readBody(request);
-            return createUser(url, body);
-        }
-
-        return path;
+    public static void createUser(HttpRequest request, HttpResponse response) throws IOException {
+        User user = new User(request.getParams("userId"), request.getParams("password"), request.getParams("name"), request.getParams("email"));
+        DataBase.addUser(user);
+        log.debug("User : {}", user);
+        response.redirect("/index.html");
     }
 
-    private static String getMethod(String url) {
-        List<String> urlAndQueryString = Arrays.asList(url.split("\\?"));
-        String getUrl = urlAndQueryString.get(0).trim();
-        if (urlAndQueryString.size() != 2) {
-            return getUrl;
+    public static void login(HttpRequest request, HttpResponse response) throws IOException {
+        User user = DataBase.findUserById(request.getParams("userId"));
+        if (user == null || !user.matchPassword(request.getParams("password"))) {
+            response.loginFailed("/user/login_failed.html");
+            log.debug("Login failed");
+            return;
         }
-
-        String queryString = urlAndQueryString.get(1).trim();
-        log.debug("Get Url : {}", getUrl);
-        log.debug("QueryString : {}", queryString);
-        return getUrl;
+        log.debug("Login Success");
+        response.redirectWithCookie("/index.html");
     }
 
-    private static String createUser(String url, String queryStrings) {
-        Map<String, String> queryString = HttpRequestUtils.parseQueryString(queryStrings);
-        User user = new User(queryString.get("userId"), queryString.get("password"), queryString.get("name"), queryString.get("email"));
-        log.debug("Create User : {}", user);
-        return "/index.html";
-    }
-
-    private static String readBody(BufferedReader request) throws IOException {
-        String line = request.readLine();
-        int size = 0;
-
-        while (!line.equals("")) {
-            log.debug("header : {}", line);
-            line = request.readLine();
-            if (line.startsWith("Content-Length")) {
-                size = Integer.parseInt(line.substring(line.indexOf(":") + 1).trim());
-                log.debug("Size : {}", size);
-            }
+    public static void getStaticFile(HttpRequest request, HttpResponse response) throws IOException {
+        String accept = request.getHeader("Accept");
+            log.debug("Stylesheet~! : {}", accept);
+        if (accept != null && accept.contains("text/css")) {
+            log.debug("Stylesheet! : {}", accept);
+            response.getStylesheet(request.getUrl());
+            return;
         }
-        line = IOUtils.readData(request, size);
-        log.debug("Body : {}", line);
-        return line;
+        response.getResponse(request.getUrl());
     }
 }

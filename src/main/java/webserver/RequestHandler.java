@@ -1,12 +1,11 @@
 package webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import util.HttpRequestUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -23,23 +22,31 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            InputStreamReader input = new InputStreamReader(in);
-            BufferedReader request = new BufferedReader(input);
-            String url = Controller.parseRequestUrl(request);
-            log.debug("url : {}", url);
-
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            HttpRequest request = HttpFactory.init(in);
+//            log.debug("url : {}", url);
+            HttpResponse response = new  HttpResponse(out);
+            if (request.getUrl().equals("/user/create")) {
+                Controller.createUser(request, response);
+                return;
+            }
+            if (request.getUrl().equals("/user/login")) {
+                Controller.login(request,response);
+                log.debug("Login finish");
+                return;
+            }
+            Controller.getStaticFile(request, response);
+//            DataOutputStream dos = new DataOutputStream(out);
+//            Controller.checkRedirect(url, dos);
+//            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+//            responseHeader(dos, body.length);
+//            responseBody(dos, body);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void responseHeader(DataOutputStream dos, int lengthOfBodyContent) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
