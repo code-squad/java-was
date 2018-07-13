@@ -12,7 +12,7 @@ public class StatusLine {
     }
 
     public void writeStatusLine(DataOutputStream dos) throws IOException {
-        dos.writeBytes(toString());
+        dos.writeBytes(toString() + "\r\n");
     }
 
     public boolean isRedirect() {

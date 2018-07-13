@@ -12,15 +12,17 @@ import static org.junit.Assert.*;
 
 public class StatusLineTest {
     private StatusLine statusLine;
-    private DataOutputStream out;
+    private final DataOutputStream dos = new DataOutputStream(System.out);
 
-    @Before
-    public void setUp() throws Exception {
-
+    @Test
+    public void writeStatusLine_200() throws Exception {
+        statusLine = new StatusLine(HttpStatus.OK);
+        statusLine.writeStatusLine(dos);
     }
 
     @Test
-    public void writeStatusLine() {
-        assertTrue(false);
+    public void writeStatusLine_302() throws Exception {
+        statusLine = new StatusLine(HttpStatus.FOUND);
+        statusLine.writeStatusLine(dos);
     }
 }

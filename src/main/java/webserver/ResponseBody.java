@@ -19,10 +19,10 @@ public class ResponseBody {
     }
 
     public boolean exists() {
-        return resource.isEmpty();
+        return !resource.isEmpty();
     }
 
-    public int getContentLength() {
-        return resource.getLength();
+    public int getContentLength() throws IOException {
+        return resource.getBytes().length;
     }
 }
