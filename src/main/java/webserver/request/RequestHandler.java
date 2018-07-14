@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.controller.Controller;
 import webserver.response.Response;
+import webserver.support.controller.HandlerMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +26,7 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             Request request = new Request(in);
             Response response = new Response(out);
-            Controller controller = request.getHandler();
+            Controller controller = HandlerMapper.mapHandler(request);
             controller.process(request, response);
             response.response();
         } catch (IOException e) {

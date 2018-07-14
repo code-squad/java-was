@@ -8,6 +8,6 @@ public class HandlerMapper {
     private static final ControllerPool controllerPool = ControllerPool.of();
 
     public static Controller mapHandler(Request request) {
-        return controllerPool.search(request.getPath());
+        return controllerPool.search(request);
     }
 }

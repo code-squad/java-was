@@ -3,8 +3,6 @@ package webserver.request;
 import util.IOUtils;
 import webserver.HttpBody;
 import webserver.HttpHeader;
-import webserver.controller.Controller;
-import webserver.support.controller.HandlerMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,7 +58,11 @@ public class Request {
         return line.getParameters();
     }
 
-    public Controller getHandler() {
-        return HandlerMapper.mapHandler(this);
+    public String getFirstUri() {
+        return line.getFirstPath();
+    }
+
+    public String getUriExcludeParams() {
+        return line.getUriExcludeParams();
     }
 }

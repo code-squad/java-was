@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.annotation.RequestMapping;
+import webserver.request.Request;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -27,8 +28,8 @@ public class ControllerPool<T extends Controller> {
         return container;
     }
 
-    public T search(String requestPath) {
-        String searchUri = parseFirstUri(requestPath);
+    public T search(Request request) {
+        String searchUri = request.getFirstUri();
         Optional<Class<T>> maybeControllerClass = controllers.stream().filter(clazz -> clazz.isAnnotationPresent(RequestMapping.class)).filter(clazz -> clazz.getAnnotation(RequestMapping.class).value().contains(searchUri)).findFirst();
         if (!maybeControllerClass.isPresent()) {
             return get(viewControllerClass);
@@ -36,7 +37,7 @@ public class ControllerPool<T extends Controller> {
         }
 
         Class<T> controllerClass = maybeControllerClass.get();
-        String excludeParams = parseExcludeParams(requestPath);
+        String excludeParams = request.getUriExcludeParams();
         boolean isMatch = Arrays.stream(controllerClass.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .map(method -> method.getAnnotation(RequestMapping.class))
@@ -66,17 +67,5 @@ public class ControllerPool<T extends Controller> {
             System.exit(1);
             return null;
         }
-    }
-
-    private String parseFirstUri(String requestPath) {
-        int secondSlash = requestPath.replaceFirst("/", "").indexOf("/") + 1;
-        if (secondSlash == 0) {
-            return requestPath;
-        }
-        return requestPath.substring(0, secondSlash).toLowerCase();
-    }
-
-    private String parseExcludeParams(String requestPath) {
-        return requestPath.split("\\?")[0];
     }
 }

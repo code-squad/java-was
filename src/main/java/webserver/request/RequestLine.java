@@ -40,4 +40,16 @@ class RequestLine {
     RequestParameter getParameters() {
         return parameter;
     }
+
+    String getFirstPath() {
+        int secondSlash = path.replaceFirst("/", "").indexOf("/") + 1;
+        if (secondSlash == 0) {
+            return path;
+        }
+        return path.substring(0, secondSlash).toLowerCase();
+    }
+
+    String getUriExcludeParams() {
+        return path.split("\\?")[0];
+    }
 }

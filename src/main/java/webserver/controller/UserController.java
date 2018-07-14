@@ -16,7 +16,6 @@ public class UserController implements Controller {
     }
 
     /* TODO : 리팩토링 - 지금 유저를 생성하는 것 밖에 못함(맵핑을 더 디데일하게) */
-    @Override
     @RequestMapping("/create")
     public Response process(Request request, Response response) {
         if (ModelInitializer.init(request.getParameters(), User.class).isPresent()) {
