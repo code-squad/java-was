@@ -1,0 +1,5 @@
+GET /user/create?userId=lsc109&password=1234&name=gram HTTP/1.1 
+Host: localhost:8080 
+Connection: keep-alive 
+Accept: */*
+

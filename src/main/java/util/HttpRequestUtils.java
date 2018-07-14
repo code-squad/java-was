@@ -17,12 +17,16 @@ public class HttpRequestUtils {
 	
 	public static String getUrl(String firstLine) {
         List<String> splited = Arrays.asList(firstLine.split(" "));
-        if(splited.size() != 3) {
-        	
-        }
         String path = splited.get(1);
         log.debug("request path :{}",path);
         return path;
+	}
+
+	public static String getMethod(String firstLine) {
+		List<String> splited = Arrays.asList(firstLine.split(" "));
+		String method = splited.get(0).trim();
+		log.debug("request method :{}",method);
+		return method;
 	}
 	
     /**
