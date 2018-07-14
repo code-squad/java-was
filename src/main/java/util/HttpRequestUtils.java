@@ -38,7 +38,7 @@ public class HttpRequestUtils {
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
 
-    static Pair getKeyValue(String keyValue, String regex) {
+    public static Pair getKeyValue(String keyValue, String regex) {
         if (Strings.isNullOrEmpty(keyValue)) {
             return null;
         }

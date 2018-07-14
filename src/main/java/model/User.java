@@ -65,4 +65,8 @@ public class User {
     public int hashCode() {
         return Objects.hash(userId, password, name, email);
     }
+
+    public boolean matchPassword(String password) {
+        return this.password.equals(password);
+    }
 }

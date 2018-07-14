@@ -4,6 +4,11 @@ public class HeaderPathUtils {
 
     public static String extractPath(String line) {
         String[] paths = line.split(" ");
+
+        if (paths.length != 3) {
+            return null;
+        }
+
         return paths[1];
     }
 
