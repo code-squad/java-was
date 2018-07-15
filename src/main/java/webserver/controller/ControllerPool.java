@@ -41,7 +41,7 @@ public class ControllerPool<T extends Controller> {
         boolean isMatch = Arrays.stream(controllerClass.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .map(method -> method.getAnnotation(RequestMapping.class))
-                .anyMatch(annotation -> String.valueOf(controllerClass.getAnnotation(RequestMapping.class).value() + annotation.value()).equals(excludeParams));
+                .anyMatch(annotation -> request.isMatchMethod(annotation.method()) && (String.valueOf(controllerClass.getAnnotation(RequestMapping.class).value() + annotation.value()).equals(excludeParams)));
 
         return isMatch ? get(controllerClass) : get(viewControllerClass);
     }

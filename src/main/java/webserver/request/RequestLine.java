@@ -52,4 +52,8 @@ class RequestLine {
     String getUriExcludeParams() {
         return path.split("\\?")[0];
     }
+
+    boolean isMatchMethod(HttpMethod method) {
+        return this.method == method;
+    }
 }

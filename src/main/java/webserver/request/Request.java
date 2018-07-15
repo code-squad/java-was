@@ -3,6 +3,7 @@ package webserver.request;
 import util.IOUtils;
 import webserver.HttpBody;
 import webserver.HttpHeader;
+import webserver.HttpMethod;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -64,5 +65,9 @@ public class Request {
 
     public String getUriExcludeParams() {
         return line.getUriExcludeParams();
+    }
+
+    public boolean isMatchMethod(HttpMethod method) {
+        return line.isMatchMethod(method);
     }
 }
