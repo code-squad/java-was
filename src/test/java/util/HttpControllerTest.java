@@ -15,8 +15,6 @@ public class HttpControllerTest {
 
     @Test
     public void createUser() {
-
-
         Map<String, String> params = new HashMap<>();
         params.put("userId", "javajigi");
         params.put("password", "test");
@@ -36,4 +34,6 @@ public class HttpControllerTest {
         assertThat(viewName, is("redirect:/index.html"));
         assertThat(dataBase.findUserById("javajigi"), is(user));
     }
+
+
 }

@@ -35,8 +35,9 @@ public class PathParams {
                 while(true) {
                     String temp = br.readLine();
                     log.debug("each line : {}", temp);
-                    if (temp == null) break;
+                    if (temp.trim().isEmpty()) break;
                     String[] headerParams = temp.split(": ");
+                    log.debug("header params : {}", headerParams);
                     headers.put(headerParams[0], headerParams[1].trim());
                 }
                 break;

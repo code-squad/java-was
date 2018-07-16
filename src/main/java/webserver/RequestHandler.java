@@ -36,8 +36,6 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
         } catch (InstantiationException e) {
             e.printStackTrace();
         }
