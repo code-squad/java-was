@@ -31,12 +31,25 @@ public class Controller {
 
     public static void getStaticFile(HttpRequest request, HttpResponse response) throws IOException {
         String accept = request.getHeader("Accept");
-            log.debug("Stylesheet~! : {}", accept);
+        log.debug("Stylesheet! : {}", accept);
         if (accept != null && accept.contains("text/css")) {
-            log.debug("Stylesheet! : {}", accept);
-            response.getStylesheet(request.getUrl());
+//            response.getStylesheet(request.getUrl());
+            response.getResponse(request.getUrl(), ContentType.CSS);
             return;
         }
-        response.getResponse(request.getUrl());
+        response.getResponse(request.getUrl(), ContentType.HTML);
+    }
+
+
+    public static void showUser(HttpRequest request, HttpResponse response) throws Exception {
+        String cookie = request.getHeader("Cookie");
+        log.debug("Cookies : {}", cookie);
+        if (!cookie.contains("logined=true")) {
+            response.redirect("/login.html");
+            return;
+        }
+        ModelAndView modelAndView = new ModelAndView("/user/list.html");
+        modelAndView.setAttribute("user", DataBase.findAll());
+        response.modelAndViewResponse(modelAndView);
     }
 }

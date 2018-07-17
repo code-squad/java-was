@@ -23,7 +23,6 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest request = HttpFactory.init(in);
-//            log.debug("url : {}", url);
             HttpResponse response = new  HttpResponse(out);
             if (request.getUrl().equals("/user/create")) {
                 Controller.createUser(request, response);
@@ -34,13 +33,14 @@ public class RequestHandler extends Thread {
                 log.debug("Login finish");
                 return;
             }
+
+            if (request.getUrl().equals("/user/list")) {
+                Controller.showUser(request, response);
+                log.debug("User List");
+                return;
+            }
             Controller.getStaticFile(request, response);
-//            DataOutputStream dos = new DataOutputStream(out);
-//            Controller.checkRedirect(url, dos);
-//            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-//            responseHeader(dos, body.length);
-//            responseBody(dos, body);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }

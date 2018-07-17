@@ -1,11 +1,7 @@
 import org.junit.Test;
-import webserver.Controller;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 public class ControllerTest {
 
@@ -22,7 +18,7 @@ public class ControllerTest {
 //    }
 
     @Test
-    public void mapTest(){
+    public void mapTest() {
         Map<String, String> test = new HashMap<>();
         test.put("test", "1");
         test.put("test1", "2");
@@ -30,4 +26,26 @@ public class ControllerTest {
 
         System.out.println(test.get("test5"));
     }
+
+//    @Test
+//    public void stringBuilderTest() throws Exception {
+//        ModelAndView modelAndView = new ModelAndView("/user/list.html");
+//        User user = new User("riverway", "password", "kang", "rlfghks@naver.com");
+//        modelAndView.setAttribute("user", user);
+//        modelAndView.transfer();
+//        String model = "{{#a}}";
+//        String model2 = "{{/a}}";
+//
+//        String start = body1.substring(0, body1.indexOf(model));
+//        System.out.println("Start : " + start);
+//        String result = body1.substring(body1.indexOf(model), body1.indexOf(model2));
+//
+//
+//
+//
+//        System.out.println(result);
+//        String last = body1.substring(body1.indexOf(model2));
+//        System.out.println(last);
+//        StringBuilder sb = new StringBuilder();
+//    }
 }
