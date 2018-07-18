@@ -7,7 +7,10 @@ public enum HttpHeader {
     CONNECTION("Connection"),
     ACCEPT("Accept"),
     AUTHORIZATION("Authorization"),
-    LOCATION("Location");
+    LOCATION("Location"),
+    SET_COOKIE("Set-Cookie"),
+    COOKIE("Cookie");
+
 
     private final String header;
 

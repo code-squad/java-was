@@ -44,6 +44,10 @@ public class HttpRequest {
         return body.getParameters();
     }
 
+    String getCookie() {
+        return headers.getHeader(HttpHeader.COOKIE);
+    }
+
     boolean isMethod(HttpMethod method) {
         return requestLine.isMethod(method);
     }
