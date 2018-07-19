@@ -1,11 +1,11 @@
-package Controller;
+package controller;
 
 import java.io.IOException;
 
 import model.HttpRequest;
 import model.HttpResponse;
 
-abstract class AbstractController implements Controller{
+abstract class AbstractController implements FrontController{
 
 	@Override
 	public void service(HttpRequest request, HttpResponse response) throws IOException {

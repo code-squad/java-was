@@ -1,33 +1,24 @@
 package webserver;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import Controller.Controller;
-import Controller.CreateUserController;
-import Controller.ListUserController;
-import Controller.LoginController;
-import db.DataBase;
+import annotation.Controller;
+import annotation.RequestMapping;
+import controller.FrontController;
 import model.HttpRequest;
 import model.HttpResponse;
-import model.RequestMapping;
-import model.User;
-import util.HttpRequestUtils;
-import util.IOUtils;
+import model.ControllerFactory;
 
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -46,7 +37,8 @@ public class RequestHandler extends Thread {
 			HttpRequest httpRequest = HttpRequest.of(in);
 			HttpResponse httpResponse = new HttpResponse(out);
 
-			Controller controller = RequestMapping.getController(httpRequest.getUrl());
+
+			FrontController controller = ControllerFactory.getController(httpRequest.getUrl());
 
 			if (controller == null) {
 				log.debug("controller null");

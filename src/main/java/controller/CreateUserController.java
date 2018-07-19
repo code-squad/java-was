@@ -1,4 +1,4 @@
-package Controller;
+package controller;
 
 import java.io.IOException;
 
@@ -9,7 +9,6 @@ import db.DataBase;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
-import webserver.RequestHandler;
 
 public class CreateUserController extends AbstractController  {
 	private static final Logger log = LoggerFactory.getLogger(AbstractController.class);
