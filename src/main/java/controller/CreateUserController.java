@@ -5,17 +5,21 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import annotation.Controller;
+import annotation.RequestMapping;
 import db.DataBase;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
 
-public class CreateUserController extends AbstractController  {
-	private static final Logger log = LoggerFactory.getLogger(AbstractController.class);
+@Controller
+@RequestMapping("/create")
+public class CreateUserController {
+	private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
-	
-	@Override
-	void doPost(HttpRequest request, HttpResponse response) {
+
+	@RequestMapping("")
+	public void create(HttpRequest request, HttpResponse response) {
 		log.debug("requestUrl : {}",request.getUrl());
 		
 			User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
@@ -26,10 +30,6 @@ public class CreateUserController extends AbstractController  {
 			response.sendRedirect();
 	}
 
-
-	@Override
-	void doGet(HttpRequest request, HttpResponse response) throws IOException {
-	}
 
 
 }

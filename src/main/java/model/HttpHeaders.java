@@ -37,6 +37,9 @@ public class HttpHeaders {
 	}
 
 	public String findByHeaderName(String headerName) {
+		if(headers.get(headerName)==null) {
+			return "";
+		}
 		return headers.get(headerName).trim();
 	}
 	

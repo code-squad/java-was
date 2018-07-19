@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,18 +39,37 @@ public class RequestHandler extends Thread {
 			HttpRequest httpRequest = HttpRequest.of(in);
 			HttpResponse httpResponse = new HttpResponse(out);
 
-
-			FrontController controller = ControllerFactory.getController(httpRequest.getUrl());
+			log.debug("requestUrl : {} " , httpRequest.getUrl());
+			Object controller = ControllerFactory.getController(httpRequest.getUrl());
 
 			if (controller == null) {
 				log.debug("controller null");
 				httpResponse.forward(getDefaultPath(httpRequest.getUrl()));
 			} else {
 				log.debug("controller exist");
-				controller.service(httpRequest, httpResponse);
+				
+				
+				String path = controller.getClass().getAnnotation(RequestMapping.class).value();
+				Method[] method = controller.getClass().getMethods();
+				
+				for (Method method2 : method) {
+					if(method2.isAnnotationPresent(RequestMapping.class)) {
+						if(httpRequest.getUrl().equals(path+method2.getAnnotation(RequestMapping.class).value())) {
+							try {
+								method2.invoke(controller, httpRequest, httpResponse);
+							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+								System.out.println("앗");
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+				
+				
 			}
 
 		} catch (IOException e) {
+			System.out.println("D");
 			log.error(e.getMessage());
 		}
 	}
