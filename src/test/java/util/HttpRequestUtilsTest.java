@@ -70,4 +70,20 @@ public class HttpRequestUtilsTest {
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
     }
+
+    @Test
+    public void parseUrl() throws Exception {
+        String header = "GET /index.html HTTP/1.1";
+        assertThat(HttpRequestUtils.parseUrl(header, "url"), is("/index.html"));
+    }
+
+    @Test
+    public void parseGetUrl() throws Exception{
+        String header = "GET /user/create?userId=kang&password=1234&name=riverway&email=test%40123 HTTP/1.1";
+        String parse = HttpRequestUtils.parseUrl(header, "url");
+        System.out.println(parse);
+        String[] parse2 = parse.split("\\?");
+        assertThat(parse2[0], is("/user/create"));
+        assertThat(parse2[1], is("userId=kang&password=1234&name=riverway&email=test%40123"));
+    }
 }
