@@ -138,7 +138,7 @@ public class RequestHandler extends Thread {
             byte[] body = null;
             if (path.startsWith("/user/list")) {
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("<!DOCTYPE html>\n" +
+                appendStringBuilder(stringBuilder, "<!DOCTYPE html>\n" +
                         "<html lang=\"kr\">\n" +
                         "<head>\n" +
                         "  <meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n" +
@@ -249,7 +249,7 @@ public class RequestHandler extends Thread {
                     }
                 }
 
-                stringBuilder.append("</tbody>\n" +
+                appendStringBuilder(stringBuilder, "</tbody>\n" +
                         "      </table>\n" +
                         "    </div>\n" +
                         "  </div>\n" +
@@ -279,6 +279,10 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private void appendStringBuilder(StringBuilder stringBuilder, String s) {
+        stringBuilder.append(s);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
