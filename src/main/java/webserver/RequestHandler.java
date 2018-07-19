@@ -2,6 +2,9 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.Controller;
+import web.DispatcherServlet;
+import web.ForwardController;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,22 +26,10 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest request = HttpFactory.init(in);
             HttpResponse response = new HttpResponse(out);
-            if (request.getUrl().equals("/user/create")) {
-                Controller.createUser(request, response);
-                return;
-            }
-            if (request.getUrl().equals("/user/login")) {
-                Controller.login(request, response);
-                log.debug("Login finish");
-                return;
-            }
+            DispatcherServlet dispatcherServlet = new DispatcherServlet();
 
-            if (request.getUrl().equals("/user/list")) {
-                Controller.showUser(request, response);
-                log.debug("User List");
-                return;
-            }
-            Controller.forward(request, response);
+            Controller controller = dispatcherServlet.match(request.getUrl());
+            controller.service(request, response);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

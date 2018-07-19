@@ -3,18 +3,18 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ControllerTest {
+public class ForwardControllerTest {
 
 //    @Test
 //    public void parseUrl(){
 //        String firstLine = "/user/create?userId=kang&password=1234&name=riverway&email=test@naver.com";
-//        assertThat(Controller.getMethod(firstLine), is("/user/create"));
+//        assertThat(ForwardController.getMethod(firstLine), is("/user/create"));
 //    }
 //
 //    @Test
 //    public void parseUrl_no_queryString(){
 //        String firstLine = "/user/create";
-//        assertThat(Controller.getMethod(firstLine), is("/user/create"));
+//        assertThat(ForwardController.getMethod(firstLine), is("/user/create"));
 //    }
 
     @Test

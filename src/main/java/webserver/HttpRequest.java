@@ -26,6 +26,8 @@ public class HttpRequest {
         List<String> urlAndQueryString = Arrays.asList(url.split("\\?"));
         this.url = new HttpUrl(urlAndQueryString.get(0).trim());
         this.parameters = new  HttpParameter(existParameter(urlAndQueryString, br));
+        
+        log.debug("Url : {} , Method : {}", getUrl(), getMethod());
     }
 
     public String getUrl() {
@@ -56,5 +58,9 @@ public class HttpRequest {
             return null;
         }
         return url.get(1).trim();
+    }
+
+    public boolean isGetMethod(){
+        return method.isGetMethod();
     }
 }
