@@ -36,6 +36,13 @@ public class Resource {
         return path.length();
     }
 
+    //TODO: 동적 페이지 생성을 여기다??
+//    byte[] generatePage() throws IOException {
+//        byte[] bytes = Files.readAllBytes(new File("./webapp" + path).toPath());
+//        String content = new String(bytes);
+//        StringBuilder builder = new StringBuilder();
+//    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

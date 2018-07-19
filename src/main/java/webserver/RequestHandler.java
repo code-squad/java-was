@@ -72,7 +72,12 @@ public class RequestHandler extends Thread {
                     response = new HttpResponse(HttpStatus.OK, headers, Resource.of("/login.html"));
                 }
             }
-
+            /*
+            TODO: Ask about threading.
+            Each handler is a tread and so they share heap memory. This means that every instance that is being
+            instantiated in the process of creating a request/response object, can be accessed by multiple threads. So,
+            in order to avoid collisions, it is best not to use singleton objects.
+            */
             response.writeResponse(out);
 
         } catch (IOException e) {
