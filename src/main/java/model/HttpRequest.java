@@ -77,6 +77,10 @@ public class HttpRequest {
 	public String getUrl() {
 		return url;
 	}
+	
+	public Boolean urlCorrect(String mappingUrl) {
+		return url.equals(mappingUrl);
+	}
 
 	public String getMethod() {
 		return method;

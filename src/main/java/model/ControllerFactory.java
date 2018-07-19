@@ -8,69 +8,70 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import annotation.Controller;
 import annotation.RequestMapping;
-import controller.CreateUserController;
-import controller.ListUserController;
-import controller.LoginController;
 
 public class ControllerFactory {
 
+	private static final Logger log = LoggerFactory.getLogger(ControllerFactory.class);
+	private static final String CONTROLLER_PACKAGE_NAME = "controller";
 	private static Map<String, Object> controllers = new HashMap<String, Object>();
 
 	static {
 
-		String packageName = "controller";
-		String packageNameSlashed = "./" + packageName.replace(".", "/");
+		String packageNameSlashed = "./" + CONTROLLER_PACKAGE_NAME.replace(".", "/");
 		URL packageDirURL = Thread.currentThread().getContextClassLoader().getResource(packageNameSlashed);
-
 		String directoryString = packageDirURL.getFile();
 
 		File directory = new File(directoryString);
-		List<Class> list = new ArrayList<>();
+		List<Class<?>> list = new ArrayList<>();
 		if (directory.exists()) {
 			String[] files = directory.list();
 			for (String fileName : files) {
-				if (fileName.endsWith(".class")) {
-					fileName = fileName.substring(0, fileName.length() - 6); // 확장자 삭제
-				}
-				try {
-					Class c = Class.forName(packageName + "." + fileName); // Dynamic Loading
-					list.add(c); // List<Class> list 에 넣는다
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
+				addClassFileToList(fileName, list);
 			}
 		}
 
-		for (Class class1 : list) {
-			if (class1.isAnnotationPresent(Controller.class)) {
-				if (class1.isAnnotationPresent(RequestMapping.class)) {
-					RequestMapping requestMapping = (RequestMapping) class1.getAnnotation(RequestMapping.class);
-					System.out.println(requestMapping.value());
-					try {
-						controllers.put(requestMapping.value(),  class1.newInstance());
-					} catch (InstantiationException | IllegalAccessException e) {
-						e.printStackTrace();
-					}
-				}
+		for (Class<?> clazz : list) {
+			if (clazz.isAnnotationPresent(Controller.class)) {
+				addController(clazz);
 			}
 		}
+	}
 
-		// controllers.put(key, value)
-//		controllers.put("/user/list", new ListUserController());
+	public static void addClassFileToList(String fileName, List<Class<?>> list) {
+		if (fileName.endsWith(".class")) {
+			fileName = fileName.substring(0, fileName.length() - 6); 
+		}
+		try {
+			Class<?> clazz = Class.forName(CONTROLLER_PACKAGE_NAME + "." + fileName); // Dynamic Loading
+			list.add(clazz); 
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void addController(Class<?> clazz) {
+		if (clazz.isAnnotationPresent(RequestMapping.class)) {
+			log.debug("requestMapping url : {}", clazz.getAnnotation(RequestMapping.class).value());
+			try {
+				controllers.put(clazz.getAnnotation(RequestMapping.class).value(), clazz.newInstance());
+			} catch (InstantiationException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static Object getController(String requestUrl) {
-
 		Set<String> set = controllers.keySet();
-		System.out.println(requestUrl+" requestUrl");
 		for (String string : set) {
 			if (requestUrl.startsWith(string) && !requestUrl.contains(".")) {
 				return controllers.get(string);
 			}
 		}
-
 		return null;
 	}
 
