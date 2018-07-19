@@ -2,7 +2,7 @@ package webserver.controller;
 
 import org.junit.Before;
 import org.junit.Test;
-import support.MockOutputStream;
+import support.TestOutputStream;
 import webserver.support.controller.HandlerMapper;
 import webserver.HttpStatus;
 import webserver.request.Request;
@@ -22,7 +22,7 @@ public class UserControllerTest {
     @Before
     public void setUp() throws Exception {
         request = new Request(new FileInputStream(new File(getClass().getClassLoader().getResource("signUpRequest.txt").getFile())));
-        response = new Response(new MockOutputStream());
+        response = new Response(new TestOutputStream());
         controller = HandlerMapper.mapHandler(request);
     }
 

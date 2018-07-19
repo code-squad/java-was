@@ -1,7 +1,6 @@
 package webserver.controller;
 
 import model.User;
-import webserver.HttpMethod;
 import webserver.HttpStatus;
 import webserver.annotation.RequestMapping;
 import webserver.request.Request;
