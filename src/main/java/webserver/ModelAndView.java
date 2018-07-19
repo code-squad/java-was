@@ -26,6 +26,13 @@ public class ModelAndView {
         return model.get(key);
     }
 
+    public byte[] createView() throws Exception{
+        if (isEmpty()){
+            return Files.readAllBytes(new File("./webapp" + view).toPath());
+        }
+        return transfer().getBytes();
+    }
+
     public String transfer() throws Exception {
         byte[] body = Files.readAllBytes(new File("./webapp" + view).toPath());
         String beforeBody = new String(body);
@@ -48,6 +55,7 @@ public class ModelAndView {
         String keyStart = "";
         String keyFinsh = "";
         StringBuilder result = new StringBuilder();
+
         for (String key : keys) {
             Object value = getAttribute(key);
             keyStart = keyStart(key);
@@ -64,6 +72,12 @@ public class ModelAndView {
         return result.toString();
     }
 
+    public String parseTarget(String origin, String keyStart, String keyFinsh) {
+        String target = origin.substring(origin.indexOf(keyStart), origin.indexOf(keyFinsh) + keyFinsh.length());
+        target = target.replace(keyStart, "");
+        return target.replace(keyFinsh, "");
+    }
+
     public StringBuilder checkCollection(StringBuilder result, Object value, String target) throws Exception {
         if (!isCollection(value)) {
             return result.append(changeValue(target, value));
@@ -76,20 +90,6 @@ public class ModelAndView {
         return result;
     }
 
-    public String saveBefore(String origin, String keyStart) {
-        return origin.substring(0, origin.indexOf(keyStart));
-    }
-
-    public String saveAfter(String origin, String keyStart, String keyFinsh) {
-        return origin.substring(origin.indexOf(keyFinsh) + keyFinsh.length());
-    }
-
-    public String parseTarget(String origin, String keyStart, String keyFinsh) {
-        String target = origin.substring(origin.indexOf(keyStart), origin.indexOf(keyFinsh) + keyFinsh.length());
-        target = target.replace(keyStart, "");
-        return target.replace(keyFinsh, "");
-    }
-
     public String changeValue(String orginal, Object value) throws Exception {
         String param = "";
         String result = "";
@@ -99,6 +99,14 @@ public class ModelAndView {
             orginal = orginal.replace("{{" + param + "}}", result);
         }
         return orginal;
+    }
+
+    public String saveBefore(String origin, String keyStart) {
+        return origin.substring(0, origin.indexOf(keyStart));
+    }
+
+    public String saveAfter(String origin, String keyStart, String keyFinsh) {
+        return origin.substring(origin.indexOf(keyFinsh) + keyFinsh.length());
     }
 
     public String invoke(String taget, Object value) throws Exception {

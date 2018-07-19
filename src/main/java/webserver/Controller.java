@@ -15,7 +15,7 @@ public class Controller {
         User user = new User(request.getParams("userId"), request.getParams("password"), request.getParams("name"), request.getParams("email"));
         DataBase.addUser(user);
         log.debug("User : {}", user);
-        response.redirect("/index.html");
+        response.sendRedirect("/index.html");
     }
 
     public static void login(HttpRequest request, HttpResponse response) throws IOException {
@@ -29,15 +29,14 @@ public class Controller {
         response.redirectWithCookie("/index.html");
     }
 
-    public static void getStaticFile(HttpRequest request, HttpResponse response) throws IOException {
+    public static void forward(HttpRequest request, HttpResponse response) throws IOException {
         String accept = request.getHeader("Accept");
         log.debug("Stylesheet! : {}", accept);
         if (accept != null && accept.contains("text/css")) {
-//            response.getStylesheet(request.getUrl());
-            response.getResponse(request.getUrl(), ContentType.CSS);
+            response.forward(request.getUrl(), ContentType.CSS);
             return;
         }
-        response.getResponse(request.getUrl(), ContentType.HTML);
+        response.forward(request.getUrl(), ContentType.HTML);
     }
 
 
@@ -45,7 +44,7 @@ public class Controller {
         String cookie = request.getHeader("Cookie");
         log.debug("Cookies : {}", cookie);
         if (!cookie.contains("logined=true")) {
-            response.redirect("/login.html");
+            response.sendRedirect("/login.html");
             return;
         }
         ModelAndView modelAndView = new ModelAndView("/user/list.html");

@@ -3,9 +3,9 @@ package webserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.file.Files;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -21,15 +21,14 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest request = HttpFactory.init(in);
-            HttpResponse response = new  HttpResponse(out);
+            HttpResponse response = new HttpResponse(out);
             if (request.getUrl().equals("/user/create")) {
                 Controller.createUser(request, response);
                 return;
             }
             if (request.getUrl().equals("/user/login")) {
-                Controller.login(request,response);
+                Controller.login(request, response);
                 log.debug("Login finish");
                 return;
             }
@@ -39,27 +38,8 @@ public class RequestHandler extends Thread {
                 log.debug("User List");
                 return;
             }
-            Controller.getStaticFile(request, response);
+            Controller.forward(request, response);
         } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void responseHeader(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
