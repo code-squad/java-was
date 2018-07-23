@@ -17,39 +17,53 @@ import annotation.RequestMapping;
 public class ControllerFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ControllerFactory.class);
-	private static final String CONTROLLER_PACKAGE_NAME = "controller";
 	private static Map<String, Object> controllers = new HashMap<String, Object>();
+	private static String ROOT;
 
 	static {
 
-		String packageNameSlashed = "./" + CONTROLLER_PACKAGE_NAME.replace(".", "/");
-		URL packageDirURL = Thread.currentThread().getContextClassLoader().getResource(packageNameSlashed);
-		String directoryString = packageDirURL.getFile();
+		URL packageDirURL = Thread.currentThread().getContextClassLoader().getResource("./");
+		ROOT = packageDirURL.getFile();
+		log.debug("ROOT : "+ROOT);
 
-		File directory = new File(directoryString);
-		List<Class<?>> list = new ArrayList<>();
+		File directory = new File(ROOT);
+		List<Class<?>> classes = new ArrayList<>();
+
 		if (directory.exists()) {
-			String[] files = directory.list();
-			for (String fileName : files) {
-				addClassFileToList(fileName, list);
-			}
+			scan(directory.listFiles(), classes, ROOT);
 		}
 
-		for (Class<?> clazz : list) {
+		for (Class<?> clazz : classes) {
 			if (clazz.isAnnotationPresent(Controller.class)) {
 				addController(clazz);
 			}
 		}
 	}
 
-	public static void addClassFileToList(String fileName, List<Class<?>> list) {
-		if (fileName.endsWith(".class")) {
-			fileName = fileName.substring(0, fileName.length() - 6); 
+	public static void scan(File[] files, List<Class<?>> classes, String presentPath) {
+		for (File file : files) {
+			isFile(file, classes, presentPath);
 		}
+	}
+	
+	public static void isFile(File file, List<Class<?>> classes, String presentPath) {
+		if (file.isDirectory()) {
+			scan(file.listFiles(), classes, presentPath + file.getName());
+			return;
+		} 
+		if(file.getName().endsWith(".class")) {
+			addClassFileToList(file.getName(), presentPath, classes);
+		}
+	}
+
+	public static void addClassFileToList(String fileName, String directoryName, List<Class<?>> classes) {
 		try {
-			Class<?> clazz = Class.forName(CONTROLLER_PACKAGE_NAME + "." + fileName); // Dynamic Loading
-			list.add(clazz); 
+			Class<?> clazz = Class.forName(directoryName.substring(ROOT.length())+"." + fileName.substring(0, fileName.length() - 6)); // Dynamic Loading
+			classes.add(clazz);
+		    log.debug("Path ! : {}", directoryName);
+            log.debug("File Name! : {}", fileName);
 		} catch (ClassNotFoundException e) {
+			log.debug("addClassFileToList error");
 			e.printStackTrace();
 		}
 	}
@@ -60,6 +74,7 @@ public class ControllerFactory {
 			try {
 				controllers.put(clazz.getAnnotation(RequestMapping.class).value(), clazz.newInstance());
 			} catch (InstantiationException | IllegalAccessException e) {
+				log.debug("addController error");
 				e.printStackTrace();
 			}
 		}

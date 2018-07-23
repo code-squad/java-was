@@ -6,27 +6,26 @@ import org.slf4j.LoggerFactory;
 
 import annotation.Controller;
 import annotation.RequestMapping;
+import annotation.RequestParam;
 import db.DataBase;
-import model.HttpRequest;
-import model.HttpResponse;
 import model.User;
 
 @Controller
 @RequestMapping("/create")
-public class CreateUserController {
+public class CreateUserController{
 	private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
 
 	@RequestMapping("")
-	public void create(HttpRequest request, HttpResponse response) {
-		log.debug("requestUrl : {}",request.getUrl());
+	public String create(@RequestParam("userId") String userId, @RequestParam("password") String password,
+			@RequestParam("name") String name, @RequestParam("email") String email) {
 		
-			User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
-					request.getParameter("email"));
+			User user = new User(userId, password, name,
+					email);
 			log.debug("User : {}", user.toString());
 
 			DataBase.addUser(user);
-			response.sendRedirect();
+			return "redirect:/index.html";
 	}
 
 
