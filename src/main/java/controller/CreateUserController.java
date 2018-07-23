@@ -1,33 +1,24 @@
 package controller;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import annotation.Controller;
 import annotation.RequestMapping;
-import annotation.RequestParam;
 import db.DataBase;
-import model.User;
+import dto.UserDto;
 
 @Controller
 @RequestMapping("/create")
-public class CreateUserController{
+public class CreateUserController {
 	private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
-
 	@RequestMapping("")
-	public String create(@RequestParam("userId") String userId, @RequestParam("password") String password,
-			@RequestParam("name") String name, @RequestParam("email") String email) {
+	public String create(UserDto userDto) {
 		
-			User user = new User(userId, password, name,
-					email);
-			log.debug("User : {}", user.toString());
-
-			DataBase.addUser(user);
+			log.debug("UserDto :{}", userDto.toString());
+			DataBase.addUser(userDto.toUser());
 			return "redirect:/index.html";
 	}
-
-
 
 }
