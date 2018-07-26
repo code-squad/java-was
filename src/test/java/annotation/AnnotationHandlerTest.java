@@ -14,6 +14,7 @@ import org.junit.Test;
 import controller.CreateUserController;
 import controller.ListUserController;
 import controller.LoginController;
+import model.HandlerExecution;
 import model.HttpRequest;
 import model.HttpResponse;
 
@@ -30,7 +31,7 @@ public class AnnotationHandlerTest {
 		AnnotationHandler handler = AnnotationHandler.of(request, response);
 		Method[] methods = CreateUserController.class.getMethods();
 		
-		assertThat(handler.parameterHandle(methods[0], CreateUserController.class.newInstance()), is("redirect:/index.html"));
+		assertThat(handler.parameterHandle(new HandlerExecution(methods[0], CreateUserController.class.newInstance())), is("redirect:/index.html"));
 	}
 
 	@Test
@@ -43,7 +44,7 @@ public class AnnotationHandlerTest {
 		AnnotationHandler handler = AnnotationHandler.of(request, response);
 		Method[] methods = ListUserController.class.getMethods();
 		
-		assertThat(handler.parameterHandle(methods[0], ListUserController.class.newInstance())==null, is(true));
+		assertThat(handler.parameterHandle(new HandlerExecution(methods[0], ListUserController.class.newInstance()))==null, is(true));
 	}
 
 	@Test
@@ -56,7 +57,7 @@ public class AnnotationHandlerTest {
 		AnnotationHandler handler = AnnotationHandler.of(request, response);
 		Method[] methods = LoginController.class.getMethods();
 		
-		assertThat(handler.parameterHandle(methods[0], LoginController.class.newInstance()), is("redirect:/user/login_failed.html"));
+		assertThat(handler.parameterHandle(new HandlerExecution(methods[0], LoginController.class.newInstance())), is("redirect:/user/login_failed.html"));
 	}
 	
 }

@@ -1,12 +1,14 @@
 package model;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +19,7 @@ import annotation.RequestMapping;
 public class ControllerFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ControllerFactory.class);
-	private static Map<String, Object> controllers = new HashMap<String, Object>();
+	private static Map<String, HandlerExecution> controllers = new HashMap<String, HandlerExecution>();
 	private static String ROOT;
 
 	static {
@@ -72,22 +74,25 @@ public class ControllerFactory {
 		if (clazz.isAnnotationPresent(RequestMapping.class)) {
 			log.debug("requestMapping url : {}", clazz.getAnnotation(RequestMapping.class).value());
 			try {
-				controllers.put(clazz.getAnnotation(RequestMapping.class).value(), clazz.newInstance());
-			} catch (InstantiationException | IllegalAccessException e) {
+				Method[] methods = clazz.getMethods();
+				for (Method method : methods) {
+					HandlerExecution handleExecution = new HandlerExecution(method, clazz.newInstance());
+					controllers.put(handleExecution.pullMethodRequest(), handleExecution);
+ 				}
+			} catch (Exception e) {
 				log.debug("addController error");
 				e.printStackTrace();
 			}
 		}
 	}
 
-	public static Object getController(String requestUrl) {
+	public static HandlerExecution getController(String requestUrl) {
 		Set<String> set = controllers.keySet();
-		for (String string : set) {
-			if (requestUrl.startsWith(string) && !requestUrl.contains(".")) {
-				return controllers.get(string);
+		for (String key : set) {
+			if (requestUrl.equals(key)) {
+				return controllers.get(key);
 			}
 		}
 		return null;
 	}
-
 }
