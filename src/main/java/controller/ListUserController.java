@@ -1,4 +1,4 @@
-package Controller;
+package controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,23 +8,24 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import annotation.Controller;
+import annotation.RequestMapping;
 import db.DataBase;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
 
-public class ListUserController extends AbstractController {
+@Controller
+@RequestMapping("/user")
+public class ListUserController {
 	private static final Logger log = LoggerFactory.getLogger(ListUserController.class);
 	private static final int TEN = 10;
 
-	@Override
-	void doPost(HttpRequest request, HttpResponse response) {
-	}
-
-	@Override
-	void doGet(HttpRequest request, HttpResponse response) throws IOException {
-
+	
+	@RequestMapping("/list")
+	public void list(HttpRequest request, HttpResponse response) throws IOException {
 		if (!request.getHeader("Cookie").contains("true")) {
+			log.debug("/user/list no login");
 			response.sendRedirect("/user/login.html");
 			return;
 		}

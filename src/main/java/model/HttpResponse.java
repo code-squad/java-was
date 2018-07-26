@@ -14,10 +14,13 @@ import org.slf4j.LoggerFactory;
 
 public class HttpResponse {
 	private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
-	private static final String DEFAULT_PAGE = "/index.html";
 	private DataOutputStream dos = null;
 	private Map<String, String> headers = new HashMap<String, String>();
 
+	
+	public HttpResponse() {
+	}
+	
 	public HttpResponse(OutputStream out) {
 		dos = new DataOutputStream(out);
 	}
@@ -50,11 +53,10 @@ public class HttpResponse {
 	}
 
 	public void addHeader(String name, String value) throws IOException {
-		dos.writeBytes("HTTP/1.1 302 Found \r\n");
-		dos.writeBytes(name + ": " + value + "\r\n");
+		headers.put(name, value);
 	}
 
-	public void response200Header() {
+	private void response200Header() {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
 			processHeaders();
@@ -64,7 +66,7 @@ public class HttpResponse {
 		}
 	}
 
-	public void responseBody(byte[] body) {
+	private void responseBody(byte[] body) {
 		try {
 			dos.write(body, 0, body.length);
 			dos.flush();
@@ -78,17 +80,6 @@ public class HttpResponse {
 			dos.writeBytes("HTTP/1.1 302 Found \r\n");
 			processHeaders();
 			dos.writeBytes("Location: " + location + "\r\n");
-			dos.writeBytes("\r\n");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-	}
-
-	public void sendRedirect() {
-		try {
-			dos.writeBytes("HTTP/1.1 302 Found \r\n");
-			processHeaders();
-			dos.writeBytes("Location: " + DEFAULT_PAGE + "\r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
 			log.error(e.getMessage());
