@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static webserver.WebServer.DEFAULT_PORT;
-import static webserver.WebServer.HOST;
+import static webserver.Latty.DEFAULT_PORT;
+import static webserver.Latty.HOST;
 
 public class Response {
 

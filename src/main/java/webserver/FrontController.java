@@ -1,6 +1,6 @@
 package webserver;
 
-import web.HttpController;
+import webserver.annotations.Controller;
 import webserver.exceptions.ExceptionHandler;
 
 import java.io.IOException;
@@ -11,8 +11,8 @@ public class FrontController {
     public Response resolveRequest(Request request) throws IllegalAccessException, IOException, InstantiationException {
 
         try {
-            String viewFileName;
-            viewFileName = ControllerExecutor.execute(HttpController.class, request);
+            BeanPool beanPool = new ControllerPool(new BeanFinder("", Controller.class));
+            String viewFileName = MethodExecutor.execute(beanPool, request);
             byte[] viewBody = ViewResolver.resolve(viewFileName);
             return new Response(request, viewBody, viewFileName);
         } catch (InvocationTargetException e) {

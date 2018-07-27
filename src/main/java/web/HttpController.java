@@ -4,10 +4,13 @@ import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.RequestMapping;
+import webserver.annotations.Controller;
+import webserver.annotations.RequestMapping;
 
 import java.util.Map;
 
+@RequestMapping(path = "/ddd")
+@Controller
 public class HttpController {
 
     private final Logger log = LoggerFactory.getLogger(HttpController.class);
