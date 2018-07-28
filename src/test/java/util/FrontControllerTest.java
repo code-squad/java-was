@@ -1,10 +1,10 @@
 package util;
 
 import org.junit.Test;
-import webserver.FrontController;
-import webserver.HttpStatus;
-import webserver.Request;
-import webserver.Response;
+import com.larry.webserver.FrontController;
+import com.larry.webserver.HttpStatus;
+import com.larry.webserver.Request;
+import com.larry.webserver.Response;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static webserver.Response.DOMAIN;
+import static com.larry.webserver.Response.DOMAIN;
 
 public class FrontControllerTest {
 

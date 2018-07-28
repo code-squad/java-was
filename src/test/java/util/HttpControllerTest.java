@@ -1,9 +1,9 @@
 package util;
 
-import db.DataBase;
-import model.User;
+import com.larry.db.DataBase;
+import com.larry.model.User;
 import org.junit.Test;
-import web.HttpController;
+import com.larry.web.HttpController;
 
 import java.util.HashMap;
 import java.util.Map;
