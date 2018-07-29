@@ -2,7 +2,7 @@
 //
 //import org.junit.Test;
 //import HttpController;
-//import MethodExecutor;
+//import RequestExecutor;
 //import Request;
 //
 //import java.io.BufferedReader;
@@ -19,7 +19,7 @@
 //    public void getViewName_index() throws IOException, IllegalAccessException, InstantiationException, InvocationTargetException {
 //        BufferedReader br = new BufferedReader(new FileReader("/Users/chaegyunjung/Documents/codesquad/java-was/http-requests/indexGet.http"));
 //        Request request = new Request(br);
-//        String viewFileName = new MethodExecutor().execute(HttpController.class, request);
+//        String viewFileName = new RequestExecutor().execute(HttpController.class, request);
 //        assertThat(viewFileName, is("index.html"));
 //    }
 //
@@ -27,7 +27,7 @@
 //    public void getViewName_create_user() throws IOException, IllegalAccessException, InstantiationException, InvocationTargetException {
 //        BufferedReader br = new BufferedReader(new FileReader("/Users/chaegyunjung/Documents/codesquad/java-was/http-requests/userCreatePost.http"));
 //        Request request = new Request(br);
-//        String viewFileName = MethodExecutor.execute(HttpController.class, request);
+//        String viewFileName = RequestExecutor.execute(HttpController.class, request);
 //        assertThat(viewFileName, is("redirect:/index.html"));
 //    }
 //

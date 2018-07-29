@@ -7,10 +7,10 @@ import java.lang.reflect.InvocationTargetException;
 
 public class FrontController {
 
-    private BeanPool beanPool;
+    private ControllerExecutor controllerExecutor;
 
     private FrontController (BeanPool beanPool) {
-        this.beanPool = beanPool;
+        controllerExecutor = new ControllerExecutor(beanPool);
     }
 
     public static FrontController init(BeanPool beanPool) {
@@ -19,7 +19,7 @@ public class FrontController {
 
     public Response resolveRequest(Request request) throws IllegalAccessException, IOException, InstantiationException {
         try {
-            String viewFileName = new MethodExecutor().execute(beanPool, request);
+            String viewFileName = controllerExecutor.retrieveViewName(request);
             byte[] viewBody = ViewResolver.resolve(viewFileName);
             return new Response(request, viewBody, viewFileName);
         } catch (InvocationTargetException e) {

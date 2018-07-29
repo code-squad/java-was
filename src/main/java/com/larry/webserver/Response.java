@@ -57,7 +57,7 @@ public class Response {
         }
     }
 
-    public void send(DataOutputStream dos) throws IOException {
+    public void send(DataOutputStream dos) {
         responseHeader(dos, headers);
         responseBody(dos, body);
     }
