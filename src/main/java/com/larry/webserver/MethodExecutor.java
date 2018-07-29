@@ -41,7 +41,7 @@ public class MethodExecutor {
         return fullPath.equals(request.getPath()) && HttpMethod.valueOf(method.getAnnotation(RequestMapping.class).method()).equals(request.getHttpMethod());
     }
 
-    public Response getViewName(Request request) throws IllegalAccessException, InstantiationException, InvocationTargetException, IOException {
+    public Response getViewName(Request request) throws IllegalAccessException, InstantiationException, InvocationTargetException, IOException, NoSuchMethodException {
         Response response = new Response();
         ModelAndView modelAndView = (ModelAndView) executeMethod.invoke(controller.newInstance(), request, response);
         response.setHttpVersion(request.getHttpVersion());

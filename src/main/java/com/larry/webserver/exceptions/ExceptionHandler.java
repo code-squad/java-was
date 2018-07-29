@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ExceptionHandler {
 
-    public static Response handle(Request request, InvocationTargetException e) throws IOException {
+    public static Response handle(Request request, InvocationTargetException e) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         CustomError error = ((ControllerExecuteException)(e.getCause())).getError();
 
         Response response = new Response();

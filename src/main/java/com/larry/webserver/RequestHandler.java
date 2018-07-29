@@ -1,6 +1,7 @@
 package com.larry.webserver;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class RequestHandler extends Thread {
 
         } catch (IOException e) {
             log.error(e.getMessage());
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }

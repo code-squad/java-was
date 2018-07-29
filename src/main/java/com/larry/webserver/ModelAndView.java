@@ -1,21 +1,27 @@
 package com.larry.webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
-public class ModelAndView {
+public class ModelAndView<E> {
 
-    private Map<String, Object> model;
+    private final Logger log = LoggerFactory.getLogger(ModelAndView.class);
+
+    private List<Model> models = new ArrayList<>();
 
     private String viewName;
 
-    private ModelAndView(Map<String, Object> model, String viewName) {
-        this.model = model;
+    private ModelAndView(String viewName) {
         this.viewName = viewName;
     }
 
-    private ModelAndView(String viewName) {
-        this(null, viewName);
+    public void setModel(String name, List<E> elems) {
+        Model model = new Model(name, elems);
+        this.models.add(model);
     }
 
     public void setViewName(String viewName) {
@@ -30,7 +36,7 @@ public class ModelAndView {
         return viewName;
     }
 
-    public byte[] resolveBody() throws IOException {
-        return ViewResolver.resolve(viewName, model);
+    public byte[] resolveBody() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return new ViewResolver().resolve(viewName, models);
     }
 }

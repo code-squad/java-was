@@ -72,4 +72,8 @@ public class PathParams {
     public String getHttpVersion() {
         return httpVersion;
     }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
 }

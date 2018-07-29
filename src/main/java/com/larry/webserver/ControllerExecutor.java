@@ -16,7 +16,7 @@ public class ControllerExecutor {
         this.controllers = beanPool.getBeans();
     }
 
-    public Response retrieveViewName(Request request) throws IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
+    public Response retrieveViewName(Request request) throws IllegalAccessException, InvocationTargetException, InstantiationException, IOException, NoSuchMethodException {
         for (Class<?> controller : controllers) {
             MethodExecutor methodExecutor = new MethodExecutor(controller);
             if (methodExecutor.findMethod(request)) {

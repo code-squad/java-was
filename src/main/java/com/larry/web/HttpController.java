@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.larry.webserver.annotations.Controller;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.larry.webserver.HttpStatus.FOUND;
@@ -26,6 +27,18 @@ public class HttpController {
     @RequestMapping(method = "GET", path = "/index.html")
     public ModelAndView index(Request request, Response response) {
         return ModelAndView.viewOf("index.html");
+    }
+
+    @RequestMapping(method = "GET", path = "/user/list.html")
+    public ModelAndView getList(Request request, Response response) {
+        if (!request.getCookie()) {
+            return ModelAndView.viewOf("index.html");
+        }
+        List<User> users = DataBase.getInstance().findAll();
+        log.info("user list is : {}", users);
+        ModelAndView modelAndView = ModelAndView.viewOf("user/list.html");
+        modelAndView.setModel("users", users);
+        return modelAndView;
     }
 
     @RequestMapping(method = "GET", path = "/user/form.html")

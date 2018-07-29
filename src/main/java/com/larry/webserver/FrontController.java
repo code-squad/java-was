@@ -1,6 +1,5 @@
 package com.larry.webserver;
 
-import com.larry.webserver.exceptions.ControllerExecuteException;
 import com.larry.webserver.exceptions.ExceptionHandler;
 
 import java.io.IOException;
@@ -18,7 +17,7 @@ public class FrontController {
         return new FrontController(beanPool);
     }
 
-    public Response resolveRequest(Request request) throws InstantiationException, IllegalAccessException, IOException{
+    public Response resolveRequest(Request request) throws InstantiationException, IllegalAccessException, IOException, NoSuchMethodException, InvocationTargetException {
         try {
             return controllerExecutor.retrieveViewName(request);
         } catch (InvocationTargetException e) {

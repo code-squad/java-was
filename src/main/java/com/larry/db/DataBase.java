@@ -1,7 +1,9 @@
 package com.larry.db;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 
@@ -32,7 +34,7 @@ public class DataBase {
         return findUser;
     }
 
-    public Collection<User> findAll() {
-        return users.values();
+    public List<User> findAll() {
+        return new ArrayList<>(users.values());
     }
 }

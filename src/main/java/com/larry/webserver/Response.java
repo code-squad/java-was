@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,7 +93,7 @@ public class Response {
         log.info("http status changed : {}", HTTP_STATUS);
     }
 
-    public void setView(ModelAndView modelAndView) throws IOException {
+    public void setView(ModelAndView modelAndView) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         this.body = modelAndView.resolveBody();
         this.headers.put("Content-Length", String.valueOf(body.length));
         if (HTTP_STATUS.equals(HttpStatus.FOUND)) {
