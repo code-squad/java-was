@@ -17,7 +17,11 @@ public class Response {
     private String httpVersion;
     private HttpStatus HTTP_STATUS = HttpStatus.OK;
     private Map<String, String> headers = new HashMap<>();
-    byte[] body;
+    private byte[] body;
+
+    public Response() {
+        headers.put("Content-Type", "text/html;charset=utf-8\r\n");
+    }
 
     public Response(Request request, byte[] body, String viewFileName) {
         if (viewFileName.contains("redirect")) {
@@ -28,7 +32,7 @@ public class Response {
         }
         this.body = body;
         httpVersion = request.getHttpVersion();
-        headers.put("Content-Type", "text/html;charset=utf-8\r\n");
+
         headers.put("Content-Length", String.valueOf(body.length));
     }
 
@@ -37,6 +41,7 @@ public class Response {
             dos.writeBytes(String.format("%s %s\r\n", httpVersion, HTTP_STATUS.toString()));
             headers.forEach((String k, String v) -> {
                 try {
+                    log.info("write bytes : {}", k + ": " + v + "\r\n");
                     dos.writeBytes(k + ": " + v + "\r\n");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -80,5 +85,27 @@ public class Response {
 
     public byte[] getBody() {
         return body;
+    }
+
+    public void setStatue(HttpStatus statue) {
+        this.HTTP_STATUS = statue;
+        log.info("http status changed : {}", HTTP_STATUS);
+    }
+
+    public void setView(ModelAndView modelAndView) throws IOException {
+        this.body = modelAndView.resolveBody();
+        this.headers.put("Content-Length", String.valueOf(body.length));
+        if (HTTP_STATUS.equals(HttpStatus.FOUND)) {
+            log.info("아아아아아아아아아아아아아아아 : {}", DOMAIN+"/" + modelAndView.getViewName());
+            headers.put("Location", DOMAIN+"/" + modelAndView.getViewName());
+        }
+    }
+
+    public void setHttpVersion(String httpVersion) {
+        this.httpVersion = httpVersion;
+    }
+
+    public void loginSuccess() {
+        headers.put("Set-Cookie", "logined=true; Path=/");
     }
 }

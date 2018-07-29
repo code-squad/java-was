@@ -4,6 +4,7 @@ import com.larry.webserver.annotations.RequestMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -40,11 +41,12 @@ public class MethodExecutor {
         return fullPath.equals(request.getPath()) && HttpMethod.valueOf(method.getAnnotation(RequestMapping.class).method()).equals(request.getHttpMethod());
     }
 
-    public String getViewName(Request request) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        if (request.getParams() != null) {
-            return (String) executeMethod.invoke(controller.newInstance(), request.getParams());
-        }
-        return (String) executeMethod.invoke(controller.newInstance());
+    public Response getViewName(Request request) throws IllegalAccessException, InstantiationException, InvocationTargetException, IOException {
+        Response response = new Response();
+        ModelAndView modelAndView = (ModelAndView) executeMethod.invoke(controller.newInstance(), request, response);
+        response.setHttpVersion(request.getHttpVersion());
+        response.setView(modelAndView);
+        return response;
     }
 
     private String getControllerPath(Class<?> controller) {

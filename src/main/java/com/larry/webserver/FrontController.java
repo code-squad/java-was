@@ -1,5 +1,6 @@
 package com.larry.webserver;
 
+import com.larry.webserver.exceptions.ControllerExecuteException;
 import com.larry.webserver.exceptions.ExceptionHandler;
 
 import java.io.IOException;
@@ -9,7 +10,7 @@ public class FrontController {
 
     private ControllerExecutor controllerExecutor;
 
-    private FrontController (BeanPool beanPool) {
+    private FrontController(BeanPool beanPool) {
         controllerExecutor = new ControllerExecutor(beanPool);
     }
 
@@ -17,14 +18,11 @@ public class FrontController {
         return new FrontController(beanPool);
     }
 
-    public Response resolveRequest(Request request) throws IllegalAccessException, IOException, InstantiationException {
+    public Response resolveRequest(Request request) throws InstantiationException, IllegalAccessException, IOException{
         try {
-            String viewFileName = controllerExecutor.retrieveViewName(request);
-            byte[] viewBody = ViewResolver.resolve(viewFileName);
-            return new Response(request, viewBody, viewFileName);
+            return controllerExecutor.retrieveViewName(request);
         } catch (InvocationTargetException e) {
-            ExceptionHandler.handle(e);
+            return ExceptionHandler.handle(request, e);
         }
-        return null;
     }
 }

@@ -3,7 +3,8 @@ package com.larry.webserver;
 public enum HttpStatus {
 
     OK(200),
-    FOUND(302);
+    FOUND(302),
+    FORBIDDEN(404);
 
     private int code;
 

@@ -81,7 +81,7 @@ public class User {
 
     public void isPassword(String password) {
         if (!this.password.equals(password)) {
-            throw new UnAuthenticationException();
+            throw new UnAuthenticationException("비밀번호가 일치하지 않습니다.");
         }
     }
 }

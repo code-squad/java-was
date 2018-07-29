@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class RequestHandler extends Thread {
 
-    private FrontController frontController;
+    private final FrontController frontController;
 
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
@@ -36,9 +36,7 @@ public class RequestHandler extends Thread {
 
         } catch (IOException e) {
             log.error(e.getMessage());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }

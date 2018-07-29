@@ -1,5 +1,6 @@
 package com.larry.webserver;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
@@ -15,14 +16,14 @@ public class ControllerExecutor {
         this.controllers = beanPool.getBeans();
     }
 
-    public String retrieveViewName(Request request) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Response retrieveViewName(Request request) throws IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
         for (Class<?> controller : controllers) {
             MethodExecutor methodExecutor = new MethodExecutor(controller);
             if (methodExecutor.findMethod(request)) {
                 return methodExecutor.getViewName(request);
             }
         }
-        return "";
+        return null;
     }
 
 }
