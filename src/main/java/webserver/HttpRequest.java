@@ -29,26 +29,33 @@ public class HttpRequest {
         this.body = RequestBody.ofEmpty();
     }
 
-    String getPath() {
+    public String getPath() {
         return requestLine.getPath();
     }
 
-    RequestBody getBody() {
+    public RequestBody getBody() {
         return body;
     }
 
-    Map<String, String> getParameters() {
+    public String getParameter(String name) {
+        if (requestLine.isMethod(HttpMethod.GET)) {
+            return requestLine.getQueryParemeter(name);
+        }
+        return body.getParameter(name);
+    }
+
+    public Map<String, String> getParameters() {
         if (requestLine.isMethod(HttpMethod.GET)) {
             return requestLine.getQueryParameters();
         }
         return body.getParameters();
     }
 
-    String getCookie() {
+    public String getCookie() {
         return headers.getHeader(HttpHeader.COOKIE);
     }
 
-    boolean isMethod(HttpMethod method) {
+    public boolean isMethod(HttpMethod method) {
         return requestLine.isMethod(method);
     }
 }

@@ -32,4 +32,9 @@ public class RequestBody {
     public String toString() {
         return body;
     }
+
+    public String getParameter(String name) {
+        Map<String, String> parameters = getParameters();
+        return parameters.get(name);
+    }
 }

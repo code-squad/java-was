@@ -52,4 +52,9 @@ public class RequestLine {
     public String toString() {
         return method + " " + url;
     }
+
+    public String getQueryParemeter(String name) {
+        Map<String, String> parameters = getQueryParameters();
+        return parameters.get(name);
+    }
 }
