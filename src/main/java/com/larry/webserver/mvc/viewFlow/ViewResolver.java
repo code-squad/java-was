@@ -15,20 +15,24 @@ public class ViewResolver {
 
     private final Logger log = LoggerFactory.getLogger(ViewResolver.class);
 
-    public <E> byte[] resolve(String viewFileName, List<Model> models) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        String rightViewName = viewName(viewFileName);
+    public byte[] resolve(String viewFileName, List<Model> models) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         log.info("model : {}", models);
-        log.info("view file name is {}", rightViewName);
+        log.info("view file name is {}", viewFileName);
         if (models.isEmpty()) {
-            return Files.readAllBytes(new File("webapp/" + rightViewName).toPath());
+            return Files.readAllBytes(new File("webapp/" + viewFileName).toPath());
         }
-        Model model = models.get(0);
+        List<String> html = completeTemplate(Files.readAllLines(new File("webapp/" + viewFileName).toPath()), models);
+        return getByteArrayOutputStream(html);
+    }
+
+    private <E> List<String> completeTemplate(List<String> html, List<Model> models) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Model model = models.get(0); // users만 하기로 함..
         List<E> elems = model.getElems();
-        List<String> html = Files.readAllLines(new File("webapp/" + rightViewName).toPath());
+
         int a = 0;
         String line = null;
-        for (int i = 0; i < html.size()-2; i++) {
-            if (html.get(i).contains("id=\""+model.getModelName()+"\"")) {
+        for (int i = 0; i < html.size() - 2; i++) {
+            if (html.get(i).contains("id=\"" + model.getModelName() + "\"")) {
                 log.info("found html line {}", html.get(i));
                 html.remove(i);
                 a = i;
@@ -37,10 +41,10 @@ public class ViewResolver {
             }
         }
         html.addAll(a, genStrings(line, elems));
-        for (String s : html) {
-            System.out.println(s);
-        }
+        return html;
+    }
 
+    private byte[] getByteArrayOutputStream(List<String> html) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(baos);
         for (String element : html) {
@@ -95,10 +99,4 @@ public class ViewResolver {
         return elem.substring(0, 1).toUpperCase() + elem.substring(1);
     }
 
-    private String viewName(String viewName) {
-        if(viewName.startsWith("redirect:/")) {
-            return viewName.replace("redirect:/", "");
-        }
-        return viewName;
-    }
 }

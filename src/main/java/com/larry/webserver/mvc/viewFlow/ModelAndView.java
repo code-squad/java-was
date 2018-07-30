@@ -37,7 +37,7 @@ public class ModelAndView<E> {
     }
 
     public byte[] resolveBody() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return new ViewResolver().resolve(viewName, models);
+        return new ViewResolver().resolve(getRedirectUrl(), models);
     }
 
     public String getRedirectUrl() {
@@ -48,4 +48,5 @@ public class ModelAndView<E> {
     public boolean isRedirect() {
         return viewName.startsWith("redirect:/");
     }
+
 }
