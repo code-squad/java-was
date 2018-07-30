@@ -2,7 +2,7 @@ package com.larry.webserver;
 
 import com.larry.webserver.annotations.Controller;
 import com.larry.webserver.mvc.RequestHandler;
-import com.larry.webserver.mvc.controllerFlow.BeanFinder;
+import com.larry.webserver.mvc.controllerFlow.MethodFinder;
 import com.larry.webserver.mvc.controllerFlow.ControllerPool;
 import com.larry.webserver.mvc.controllerFlow.FrontController;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class Latty {
     public static void run(Class<?> mainClazz, String[] args) {
         for (Annotation annotation : mainClazz.getAnnotations()) {
             if (annotation instanceof LattyFramework) {
-                initFrontController(new ControllerPool(new BeanFinder(CONTROLLER_PATH, Controller.class)));
+                initFrontController(new ControllerPool(new MethodFinder(CONTROLLER_PATH, Controller.class)));
                 connectSocket(args);
             }
         }

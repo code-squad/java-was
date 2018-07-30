@@ -1,17 +1,18 @@
 package com.larry.webserver.mvc.controllerFlow;
 
-import java.util.Set;
+import com.larry.webserver.http.RequestHandlerKey;
+import com.larry.webserver.http.RequestHandlerValue;
 
-public class ControllerPool implements BeanPool {
+public class ControllerPool implements MethodPool {
 
-    private BeanFinder finder;
+    private MethodFinder finder;
 
-    public ControllerPool(BeanFinder finder) {
+    public ControllerPool(MethodFinder finder) {
         this.finder = finder;
     }
 
     @Override
-    public Set<Class<?>> getBeans() {
-        return finder.find();
+    public RequestHandlerValue getMethodValue(RequestHandlerKey httpMethodAndPath) {
+        return finder.findValue(httpMethodAndPath);
     }
 }

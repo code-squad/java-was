@@ -1,6 +1,6 @@
 package com.larry.webserver.exceptions;
 
-public class ControllerExecuteException extends RuntimeException{
+public class ControllerExecuteException extends RuntimeException {
 
     private CustomError error;
 

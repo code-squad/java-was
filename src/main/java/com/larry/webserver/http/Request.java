@@ -11,6 +11,7 @@ import java.util.Map;
 public class Request {
 
     private final Logger log = LoggerFactory.getLogger(Request.class);
+    private RequestHandlerKey httpMethodAndPath;
     private final String httpVersion;
     private HttpMethod httpMethod;
     private String path;
@@ -19,8 +20,9 @@ public class Request {
 
     public Request(BufferedReader br) throws IOException {
         PathParams pathParams = new PathParams(br);
-        httpMethod = pathParams.parseHttpMethod();
-        path = pathParams.parsePath();
+        httpMethodAndPath = new RequestHandlerKey(pathParams.parsePath(), pathParams.parseHttpMethod());
+//        httpMethod = pathParams.parseHttpMethod();
+//        path = pathParams.parsePath();
         params = pathParams.parseParams();
         httpVersion = pathParams.getHttpVersion();
         headers = pathParams.getHeaders();
@@ -42,8 +44,16 @@ public class Request {
         return params;
     }
 
+    public String getParam(String key) {
+        return params.get(key);
+    }
+
     public String getHttpVersion() {
         return httpVersion;
+    }
+
+    public RequestHandlerKey getHttpMethodAndPath() {
+        return httpMethodAndPath;
     }
 
     public boolean getCookie() {

@@ -39,6 +39,11 @@ public class Response {
         headers.put("Content-Length", String.valueOf(body.length));
     }
 
+    public void send(DataOutputStream dos) {
+        responseHeader(dos, headers);
+        responseBody(dos, body);
+    }
+
     private void responseHeader(DataOutputStream dos, Map<String, String> headers) {
         try {
             dos.writeBytes(String.format("%s %s\r\n", httpVersion, HTTP_STATUS.toString()));
@@ -63,11 +68,6 @@ public class Response {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-    }
-
-    public void send(DataOutputStream dos) {
-        responseHeader(dos, headers);
-        responseBody(dos, body);
     }
 
     public static String getDOMAIN() {
