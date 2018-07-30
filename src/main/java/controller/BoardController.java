@@ -3,6 +3,7 @@ package controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import annotation.Autowired;
 import annotation.Controller;
 import annotation.RequestMapping;
 import db.DataBase;
@@ -13,16 +14,19 @@ import dto.BoardDto;
 public class BoardController {
 	private static final Logger log = LoggerFactory.getLogger(BoardController.class);
 
+	@Autowired
+	private DataBase database;
+	
 	@RequestMapping("")
 	public String create(BoardDto boardDto) {
 			log.debug("BoardDto :{}", boardDto.toString());
-			DataBase.addBoard(boardDto.toBoard());
+			database.addBoard(boardDto.toBoard());
 			return "redirect:/index.html";
 	}
 	
 	@RequestMapping("/delete")
 	public String delete(Long id) {
-		DataBase.deleteBoard(id);
+		database.deleteBoard(id);
 		return "redirect:/index.html";
 	}
 	

@@ -27,10 +27,11 @@ public class HandlerExecution {
 	}
 
 	public String pullMethodRequest() throws Exception {
-		if (!method.isAnnotationPresent(RequestMapping.class)) {
-			throw new Exception("no mapping method error");
-		}
 		return pullClassRequest() + method.getAnnotation(RequestMapping.class).value();
+	}
+	
+	public Boolean hasRequestAnnotation() {
+		return method.isAnnotationPresent(RequestMapping.class);
 	}
 
 	public Parameter[] pullParameters() {

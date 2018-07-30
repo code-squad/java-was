@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import annotation.Autowired;
 import annotation.Controller;
 import annotation.RequestMapping;
 import db.DataBase;
@@ -21,6 +22,8 @@ public class ListUserController {
 	private static final Logger log = LoggerFactory.getLogger(ListUserController.class);
 	private static final int TEN = 10;
 
+	@Autowired
+	private DataBase database;
 	
 	@RequestMapping("/list")
 	public void list(HttpRequest request, HttpResponse response) throws IOException {
@@ -38,7 +41,7 @@ public class ListUserController {
 	}
 	
 	public String makeUserList() {
-		Collection<User> users = DataBase.findAll();
+		Collection<User> users = database.findAll();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("<table border='1' class='table table-hover\'>");

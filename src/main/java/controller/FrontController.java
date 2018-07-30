@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import annotation.AnnotationHandler;
-import model.ControllerFactory;
+import model.BeanFactory;
 import model.HandlerExecution;
 import model.HttpRequest;
 import model.HttpResponse;
@@ -15,7 +15,7 @@ public class FrontController {
 
 	public static void dispatch(HttpRequest request, HttpResponse response) throws Exception {
 
-		HandlerExecution controller = ControllerFactory.getController(request.getUrl());
+		HandlerExecution controller = BeanFactory.getController(request.getUrl());
 		if (controller == null) {
 			log.debug("controller null");
 			response.forward(getDefaultPath(request.getUrl()));
