@@ -1,4 +1,4 @@
-package com.larry.webserver;
+package com.larry.webserver.http;
 
 public enum HttpMethod {
 

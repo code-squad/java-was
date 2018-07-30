@@ -3,7 +3,6 @@ package util;
 import com.larry.db.DataBase;
 import com.larry.model.User;
 import org.junit.Test;
-import com.larry.web.HttpController;
 
 import java.util.HashMap;
 import java.util.Map;

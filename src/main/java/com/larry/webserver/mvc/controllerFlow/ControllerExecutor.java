@@ -1,4 +1,7 @@
-package com.larry.webserver;
+package com.larry.webserver.mvc.controllerFlow;
+
+import com.larry.webserver.http.Request;
+import com.larry.webserver.http.Response;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -7,10 +10,6 @@ import java.util.Set;
 public class ControllerExecutor {
 
     private final Set<Class<?>> controllers;
-
-    public ControllerExecutor(Set<Class<?>> controllers) {
-        this.controllers = controllers;
-    }
 
     public ControllerExecutor(BeanPool beanPool) {
         this.controllers = beanPool.getBeans();

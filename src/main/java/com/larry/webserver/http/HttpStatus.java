@@ -1,10 +1,10 @@
-package com.larry.webserver;
+package com.larry.webserver.http;
 
 public enum HttpStatus {
 
     OK(200),
     FOUND(302),
-    FORBIDDEN(404);
+    FORBIDDEN(403);
 
     private int code;
 

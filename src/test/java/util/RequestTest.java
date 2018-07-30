@@ -1,7 +1,7 @@
 package util;
 
 import org.junit.Test;
-import com.larry.webserver.Request;
+import com.larry.webserver.http.Request;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,8 +11,8 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static com.larry.webserver.HttpMethod.POST;
-import static com.larry.webserver.HttpMethod.GET;
+import static com.larry.webserver.http.HttpMethod.POST;
+import static com.larry.webserver.http.HttpMethod.GET;
 
 public class RequestTest {
 

@@ -1,66 +1,64 @@
 package com.larry.web;
 
 import com.larry.db.DataBase;
-import com.larry.webserver.ModelAndView;
-import com.larry.webserver.Request;
-import com.larry.webserver.Response;
-import com.larry.webserver.annotations.RequestMapping;
 import com.larry.model.User;
+import com.larry.webserver.annotations.Controller;
+import com.larry.webserver.annotations.RequestMapping;
 import com.larry.webserver.exceptions.ControllerExecuteException;
 import com.larry.webserver.exceptions.CustomError;
 import com.larry.webserver.exceptions.UnAuthenticationException;
+import com.larry.webserver.http.Request;
+import com.larry.webserver.http.Response;
+import com.larry.webserver.mvc.viewFlow.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.larry.webserver.annotations.Controller;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.larry.webserver.HttpStatus.FOUND;
+import static com.larry.webserver.http.HttpStatus.FOUND;
 
-@RequestMapping(path = "")
+@RequestMapping(path = "/user")
 @Controller
-public class HttpController {
+public class UserController {
 
-    private final Logger log = LoggerFactory.getLogger(HttpController.class);
+    private DataBase userRepository = DataBase.getInstance();
 
-    @RequestMapping(method = "GET", path = "/index.html")
-    public ModelAndView index(Request request, Response response) {
-        return ModelAndView.viewOf("index.html");
-    }
+    private final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @RequestMapping(method = "GET", path = "/user/list.html")
+    @RequestMapping(method = "GET", path = "/list.html")
     public ModelAndView getList(Request request, Response response) {
         if (!request.getCookie()) {
             return ModelAndView.viewOf("index.html");
         }
-        List<User> users = DataBase.getInstance().findAll();
-        log.info("user list is : {}", users);
+
+        List<User> users = userRepository.findAll();
         ModelAndView modelAndView = ModelAndView.viewOf("user/list.html");
         modelAndView.setModel("users", users);
+
         return modelAndView;
     }
 
-    @RequestMapping(method = "GET", path = "/user/form.html")
+    @RequestMapping(method = "GET", path = "/form.html")
     public ModelAndView userCreateForm(Request request, Response response) {
         return ModelAndView.viewOf("user/form.html");
     }
 
-    @RequestMapping(method = "GET", path = "/user/login.html")
+    @RequestMapping(method = "GET", path = "/login.html")
     public ModelAndView loginForm(Request request, Response response) {
         return ModelAndView.viewOf("user/login.html");
     }
 
-    @RequestMapping(method = "POST", path = "/user/login")
-    public ModelAndView login(Request request, Response response) { // 만약 이런 애들이 있으면 어떡할건데?
+    @RequestMapping(method = "POST", path = "/login")
+    public ModelAndView login(Request request, Response response) {
         try {
             Map<String, String> params = request.getParams();
             String userId = params.get("userId");
             String password = params.get("password");
-            User user = DataBase.getInstance().findUserById(userId);
+            User user = userRepository.findUserById(userId);
             user.isPassword(password);
 
-            response.setStatue(FOUND); // default는 OK로 하자
+            response.setStatue(FOUND);
             response.loginSuccess();
 
             return ModelAndView.viewOf("index.html");
@@ -70,7 +68,7 @@ public class HttpController {
         }
     }
 
-    @RequestMapping(method = "POST", path = "/user/create")
+    @RequestMapping(method = "POST", path = "/create")
     public ModelAndView userCreate(Request request, Response response) {
         Map<String, String> params = request.getParams();
         User user = new User()
@@ -78,9 +76,11 @@ public class HttpController {
                 .setPassword(params.get("password"))
                 .setName(params.get("name"))
                 .setEmail(params.get("email"));
-        response.setStatue(FOUND); // default는 OK로 하자
+        response.setStatue(FOUND);
+
         log.debug("created user {}", user.toString());
-        DataBase.getInstance().addUser(user);
+        userRepository.addUser(user);
+
         return ModelAndView.viewOf("index.html");
     }
 

@@ -1,5 +1,7 @@
-package com.larry.webserver;
+package com.larry.webserver.http;
 
+import com.larry.webserver.Latty;
+import com.larry.webserver.mvc.viewFlow.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +99,6 @@ public class Response {
         this.body = modelAndView.resolveBody();
         this.headers.put("Content-Length", String.valueOf(body.length));
         if (HTTP_STATUS.equals(HttpStatus.FOUND)) {
-            log.info("아아아아아아아아아아아아아아아 : {}", DOMAIN+"/" + modelAndView.getViewName());
             headers.put("Location", DOMAIN+"/" + modelAndView.getViewName());
         }
     }

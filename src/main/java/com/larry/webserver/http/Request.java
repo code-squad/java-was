@@ -1,8 +1,8 @@
-package com.larry.webserver;
+package com.larry.webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.larry.util.PathParams;
+import com.larry.webserver.util.PathParams;
 
 import java.io.BufferedReader;
 import java.io.IOException;

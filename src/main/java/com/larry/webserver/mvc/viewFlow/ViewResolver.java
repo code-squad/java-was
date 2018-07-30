@@ -1,4 +1,4 @@
-package com.larry.webserver;
+package com.larry.webserver.mvc.viewFlow;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,6 @@ public class ViewResolver {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(baos);
         for (String element : html) {
-//            out.writeUTF(element);
             out.writeBytes(element);
         }
         return baos.toByteArray();
@@ -88,7 +87,11 @@ public class ViewResolver {
     }
 
     private <E> String replaceOneElem(String line, String elem, E e) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return line.replace("{{" + elem + "}}", (CharSequence) e.getClass().getDeclaredMethod("get" + elem.substring(0, 1).toUpperCase() + elem.substring(1)).invoke(e));
+        return line.replace("{{" + elem + "}}", (CharSequence) e.getClass().getDeclaredMethod("get" + makeFirstletterUpperCase(elem)).invoke(e));
+    }
+
+    private String makeFirstletterUpperCase(String elem) {
+        return elem.substring(0, 1).toUpperCase() + elem.substring(1);
     }
 
 }
