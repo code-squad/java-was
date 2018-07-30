@@ -16,17 +16,19 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+import static com.larry.webserver.http.HttpMethod.GET;
+import static com.larry.webserver.http.HttpMethod.POST;
 import static com.larry.webserver.http.HttpStatus.FOUND;
 
 @RequestMapping(path = "/user")
 @Controller
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
     private DataBase userRepository = DataBase.getInstance();
 
-    private final Logger log = LoggerFactory.getLogger(UserController.class);
-
-    @RequestMapping(method = "GET", path = "/list.html")
+    @RequestMapping(method = GET, path = "/list.html")
     public ModelAndView getList(Request request, Response response) {
         if (!request.getCookie()) {
             return ModelAndView.viewOf("index.html");
@@ -39,17 +41,17 @@ public class UserController {
         return modelAndView;
     }
 
-    @RequestMapping(method = "GET", path = "/form.html")
+    @RequestMapping(method = GET, path = "/form.html")
     public ModelAndView userCreateForm(Request request, Response response) {
         return ModelAndView.viewOf("user/form.html");
     }
 
-    @RequestMapping(method = "GET", path = "/login.html")
+    @RequestMapping(method = GET, path = "/login.html")
     public ModelAndView loginForm(Request request, Response response) {
         return ModelAndView.viewOf("user/login.html");
     }
 
-    @RequestMapping(method = "POST", path = "/login")
+    @RequestMapping(method = POST, path = "/login")
     public ModelAndView login(Request request, Response response) {
         try {
             Map<String, String> params = request.getParams();
@@ -68,7 +70,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(method = "POST", path = "/create")
+    @RequestMapping(method = POST, path = "/create")
     public ModelAndView userCreate(Request request, Response response) {
         Map<String, String> params = request.getParams();
         User user = new User()
