@@ -14,7 +14,6 @@ public class ModelAndView<E> {
     private List<Model> models = new ArrayList<>();
 
     private String viewName;
-    private boolean redirect;
 
     private ModelAndView(String viewName) {
         this.viewName = viewName;

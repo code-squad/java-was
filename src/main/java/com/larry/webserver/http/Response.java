@@ -26,19 +26,6 @@ public class Response {
         headers.put("Content-Type", "text/html;charset=utf-8\r\n");
     }
 
-    public Response(Request request, byte[] body, String viewFileName) {
-        if (viewFileName.contains("redirect")) {
-            viewFileName = viewFileName.replace("redirect:/", "");
-            HTTP_STATUS = HttpStatus.FOUND;
-            headers.put("Location", DOMAIN+"/" + viewFileName);
-            log.debug("redirect location : {}", viewFileName);
-        }
-        this.body = body;
-        httpVersion = request.getHttpVersion();
-
-        headers.put("Content-Length", String.valueOf(body.length));
-    }
-
     public void send(DataOutputStream dos) {
         responseHeader(dos, headers);
         responseBody(dos, body);

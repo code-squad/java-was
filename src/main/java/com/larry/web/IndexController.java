@@ -9,6 +9,7 @@ import com.larry.webserver.mvc.viewFlow.ModelAndView;
 
 import static com.larry.webserver.http.HttpMethod.GET;
 
+@RequestMapping
 @Controller
 public class IndexController {
 

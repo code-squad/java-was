@@ -17,7 +17,7 @@ import java.net.Socket;
 public class Latty {
 
     private static FrontController frontController;
-    private static final String CONTROLLER_PATH = "com/larry/application";
+    private static final String CONTROLLER_PATH = "com/larry/web";
 
     private static final Logger log = LoggerFactory.getLogger(Latty.class);
 

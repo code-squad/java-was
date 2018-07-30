@@ -16,14 +16,15 @@ public class ViewResolver {
     private final Logger log = LoggerFactory.getLogger(ViewResolver.class);
 
     public <E> byte[] resolve(String viewFileName, List<Model> models) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        String rightViewName = viewName(viewFileName);
         log.info("model : {}", models);
-        log.info("view file name is {}", viewFileName);
+        log.info("view file name is {}", rightViewName);
         if (models.isEmpty()) {
-            return Files.readAllBytes(new File("webapp/" + viewFileName).toPath());
+            return Files.readAllBytes(new File("webapp/" + rightViewName).toPath());
         }
         Model model = models.get(0);
         List<E> elems = model.getElems();
-        List<String> html = Files.readAllLines(new File("webapp/" + viewFileName).toPath());
+        List<String> html = Files.readAllLines(new File("webapp/" + rightViewName).toPath());
         int a = 0;
         String line = null;
         for (int i = 0; i < html.size()-2; i++) {
@@ -94,4 +95,10 @@ public class ViewResolver {
         return elem.substring(0, 1).toUpperCase() + elem.substring(1);
     }
 
+    private String viewName(String viewName) {
+        if(viewName.startsWith("redirect:/")) {
+            return viewName.replace("redirect:/", "");
+        }
+        return viewName;
+    }
 }
