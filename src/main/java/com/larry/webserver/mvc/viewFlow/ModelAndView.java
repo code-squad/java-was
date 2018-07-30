@@ -14,6 +14,7 @@ public class ModelAndView<E> {
     private List<Model> models = new ArrayList<>();
 
     private String viewName;
+    private boolean redirect;
 
     private ModelAndView(String viewName) {
         this.viewName = viewName;
@@ -38,5 +39,14 @@ public class ModelAndView<E> {
 
     public byte[] resolveBody() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return new ViewResolver().resolve(viewName, models);
+    }
+
+    public String getRedirectUrl() {
+        viewName = viewName.replace("redirect:/", "");
+        return viewName;
+    }
+
+    public boolean isRedirect() {
+        return viewName.startsWith("redirect:/");
     }
 }

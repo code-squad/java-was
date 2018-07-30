@@ -59,11 +59,8 @@ public class UserController {
             String password = params.get("password");
             User user = userRepository.findUserById(userId);
             user.isPassword(password);
-
-            response.setStatue(FOUND);
             response.loginSuccess();
-
-            return ModelAndView.viewOf("index.html");
+            return ModelAndView.viewOf("redirect:/index.html");
         } catch (UnAuthenticationException e) {
             CustomError error = new CustomError(e.getMessage(),"/user/login_failed.html");
             throw new ControllerExecuteException(error);
@@ -83,7 +80,7 @@ public class UserController {
         log.debug("created user {}", user.toString());
         userRepository.addUser(user);
 
-        return ModelAndView.viewOf("index.html");
+        return ModelAndView.viewOf("redirect:/index.html");
     }
 
 }

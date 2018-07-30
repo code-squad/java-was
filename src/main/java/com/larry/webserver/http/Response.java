@@ -98,8 +98,9 @@ public class Response {
     public void setView(ModelAndView modelAndView) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         this.body = modelAndView.resolveBody();
         this.headers.put("Content-Length", String.valueOf(body.length));
-        if (HTTP_STATUS.equals(HttpStatus.FOUND)) {
-            headers.put("Location", DOMAIN+"/" + modelAndView.getViewName());
+        if (modelAndView.isRedirect()) {
+            HTTP_STATUS = HttpStatus.FOUND;
+            headers.put("Location", DOMAIN+"/" + modelAndView.getRedirectUrl());
         }
     }
 
