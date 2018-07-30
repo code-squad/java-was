@@ -11,5 +11,8 @@ repositories {
 dependencies {
     compile('com.google.guava:guava:23.0')
     compile('ch.qos.logback:logback-classic:1.2.3')
+    // https://mvnrepository.com/artifact/org.reflections/reflections
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
+
     testCompile('junit:junit:4.12')
 }
