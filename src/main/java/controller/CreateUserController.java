@@ -23,7 +23,6 @@ public class CreateUserController {
 			
 			log.debug("UserDto :{}", userDto.toString());
 			database.addUser(userDto.toUser());
-			System.out.println("오냐생성");
 			return "redirect:/index.html";
 	}
 

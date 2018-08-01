@@ -42,7 +42,6 @@ public class ListUserController {
 	
 	public String makeUserList() {
 		Collection<User> users = database.findAll();
-
 		StringBuilder sb = new StringBuilder();
 		sb.append("<table border='1' class='table table-hover\'>");
 		for (User user : users) {

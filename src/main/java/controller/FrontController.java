@@ -15,7 +15,9 @@ public class FrontController {
 
 	public static void dispatch(HttpRequest request, HttpResponse response) throws Exception {
 
-		HandlerExecution controller = BeanFactory.getController(request.getUrl());
+		BeanFactory beanFactory = BeanFactory.getInstance();
+		
+		HandlerExecution controller = beanFactory.getController(request.getUrl());
 		if (controller == null) {
 			log.debug("controller null");
 			response.forward(getDefaultPath(request.getUrl()));
