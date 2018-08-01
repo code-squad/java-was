@@ -8,7 +8,7 @@ public class Board {
 
 	public Board() {
 	}
-
+	
 	public Board(Long id, String userId, String contents, String name) {
 		this.id = id;
 		this.userId = userId;

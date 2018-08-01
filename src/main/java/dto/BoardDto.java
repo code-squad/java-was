@@ -1,7 +1,6 @@
 package dto;
 
 import model.Board;
-import model.User;
 
 public class BoardDto {
 	private Long id;

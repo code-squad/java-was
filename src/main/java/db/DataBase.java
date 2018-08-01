@@ -5,36 +5,45 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import annotation.Repository;
 import model.Board;
 import model.User;
 
-public class DataBase {
-    private static Map<String, User> users = Maps.newHashMap();
-    private static Map<Long, Board> boards = Maps.newHashMap();
 
-    public static void addUser(User user) {
+@Repository
+public class DataBase {
+    private Map<String, User> users = Maps.newHashMap();
+    private Map<Long, Board> boards = Maps.newHashMap();
+
+    public DataBase() {
+	}
+    
+    public void addUser(User user) {
         users.put(user.getUserId(), user);
     }
-    public static void addBoard(Board board) {
+    public void addBoard(Board board) {
     	boards.put(board.getId(), board);
     }
 
-    public static User findUserById(String userId) {
+    public User findUserById(String userId) {
         return users.get(userId);
     }
 
-    public static Collection<User> findAll() {
+    public Collection<User> findAll() {
         return users.values();
     }
     
-    public static Board findBoardById(Long id) {
+    public  Board findBoardById(Long id) {
     	return boards.get(id);
     }
     
-    public static Collection<Board> findAllBoards() {
+    public  Collection<Board> findAllBoards() {
     	return boards.values();
     }
-	public static void deleteBoard(Long id) {
+	public  void deleteBoard(Long id) {
 		boards.remove(id);
 	}
+	
+	
+	
 }
