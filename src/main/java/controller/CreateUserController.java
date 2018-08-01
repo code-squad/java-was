@@ -20,7 +20,6 @@ public class CreateUserController {
 	@RequestMapping("")
 	public String create(UserDto userDto) {
 		
-			
 			log.debug("UserDto :{}", userDto.toString());
 			database.addUser(userDto.toUser());
 			return "redirect:/index.html";
