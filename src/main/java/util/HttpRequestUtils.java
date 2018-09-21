@@ -53,6 +53,10 @@ public class HttpRequestUtils {
         return getKeyValue(header, ": ");
     }
 
+    public static String parseHeaderPath(String header) {
+        return header.split(" ")[1];
+    }
+
     public static class Pair {
         String key;
         String value;
