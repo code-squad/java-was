@@ -73,13 +73,6 @@ public class HttpRequestUtilsTest {
 
     @Test
     public void parseHeader_PATH() {
-        int SECOND_ELEMENT = 1;
-        String header = "GET /index.html HTTP/1.1";
-        String[] tokens = header.split(" ");
-        String path = tokens[SECOND_ELEMENT];
-        assertThat(path, is("/index.html"));
-
-        path = HttpRequestUtils.parseHeaderPath(header);
-        assertThat(path, is("/index.html"));
+        assertThat(HttpRequestUtils.parseHeaderPath("GET /index.html HTTP/1.1"), is("/index.html"));
     }
 }
