@@ -66,6 +66,10 @@ public class HttpRequestUtils {
         return Files.readAllBytes(Paths.get(ROOT_LOCATION + path));
     }
 
+    public static String parsePathFromUrl(String line) {
+        return line.split("\\?")[0].split(" ")[1];
+    }
+
     public static class Pair {
         String key;
         String value;

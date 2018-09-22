@@ -1,5 +1,6 @@
 package util;
 
+import model.User;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,5 +92,11 @@ public class HttpRequestUtilsTest {
 
         byte[] body = body = HttpRequestUtils.readFile(path);
         assertNotNull(body);
+    }
+
+    @Test
+    public void parsePath_URL() {
+        String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
+        assertThat(HttpRequestUtils.parsePathFromUrl(line), is("/user/create"));
     }
 }
