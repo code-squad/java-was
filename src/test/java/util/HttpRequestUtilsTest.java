@@ -1,15 +1,23 @@
 package util;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-import java.util.Map;
-
 import org.junit.Test;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 public class HttpRequestUtilsTest {
+    private static final Logger log = LoggerFactory.getLogger(HttpRequestUtilsTest.class);
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
@@ -74,5 +82,14 @@ public class HttpRequestUtilsTest {
     @Test
     public void parseHeader_PATH() {
         assertThat(HttpRequestUtils.parseHeaderPath("GET /index.html HTTP/1.1"), is("/index.html"));
+    }
+
+    @Test
+    public void readFile() throws IOException {
+        String rootLocation = "./webapp";
+        String path = HttpRequestUtils.parseHeaderPath("GET /index.html HTTP/1.1");
+
+        byte[] body = body = HttpRequestUtils.readFile(path);
+        assertNotNull(body);
     }
 }

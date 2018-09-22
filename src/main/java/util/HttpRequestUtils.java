@@ -1,5 +1,8 @@
 package util;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,6 +11,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
+    private static String ROOT_LOCATION = "./webapp";
+
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
@@ -55,6 +60,10 @@ public class HttpRequestUtils {
 
     public static String parseHeaderPath(String header) {
         return header.split(" ")[1];
+    }
+
+    public static byte[] readFile(String path) throws IOException {
+        return Files.readAllBytes(Paths.get(ROOT_LOCATION + path));
     }
 
     public static class Pair {

@@ -2,9 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,12 +26,17 @@ public class RequestHandler extends Thread {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
+            String path = null;
             while((line = reader.readLine()) != null && !"".equals(line)) {
+                if (!line.contains(":")) {
+                    path = HttpRequestUtils.parseHeaderPath(line);
+                }
                 log.debug("HTTP HEADER : {}", line);
+                log.debug("PATH IN HEADER : {}", path);
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+            byte[] body = HttpRequestUtils.readFile(path);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
