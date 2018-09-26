@@ -70,6 +70,10 @@ public class HttpRequestUtils {
         return line.split("\\?")[0].split(" ")[1];
     }
 
+    public static String readBody() {
+        return null;
+    }
+
     public static class Pair {
         String key;
         String value;
