@@ -9,8 +9,13 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpRequestUtils {
+
+    private static final Logger log =  LoggerFactory.getLogger(HttpRequestUtils.class);
+
     private static String ROOT_LOCATION = "./webapp";
 
     /**
@@ -58,16 +63,18 @@ public class HttpRequestUtils {
         return getKeyValue(header, ": ");
     }
 
-    public static String parseHeaderPath(String header) {
-        return header.split(" ")[1];
+    public static String parseUrl(String line) {
+        log.debug("parseUrl : {}", line);
+        return line.split(" ")[1];
     }
 
     public static byte[] readFile(String path) throws IOException {
         return Files.readAllBytes(Paths.get(ROOT_LOCATION + path));
     }
 
-    public static String parsePathFromUrl(String line) {
-        return line.split("\\?")[0].split(" ")[1];
+    public static String parsePath(String line) {
+        log.debug("parsePath : {}", line);
+        return parseUrl(line).split("\\?")[0];
     }
 
     public static String readBody() {

@@ -1,16 +1,11 @@
 package util;
 
-import com.sun.deploy.net.BasicHttpRequest;
-import com.sun.deploy.net.HttpRequest;
-import model.User;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -84,13 +79,13 @@ public class HttpRequestUtilsTest {
 
     @Test
     public void parseHeader_PATH() {
-        assertThat(HttpRequestUtils.parseHeaderPath("GET /index.html HTTP/1.1"), is("/index.html"));
+        assertThat(HttpRequestUtils.parseUrl("GET /index.html HTTP/1.1"), is("/index.html"));
     }
 
     @Test
     public void readFile() throws IOException {
         String rootLocation = "./webapp";
-        String path = HttpRequestUtils.parseHeaderPath("GET /index.html HTTP/1.1");
+        String path = HttpRequestUtils.parseUrl("GET /index.html HTTP/1.1");
 
         byte[] body = body = HttpRequestUtils.readFile(path);
         assertNotNull(body);
@@ -99,7 +94,7 @@ public class HttpRequestUtilsTest {
     @Test
     public void parsePath_URL() {
         String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
-        assertThat(HttpRequestUtils.parsePathFromUrl(line), is("/user/create"));
+        assertThat(HttpRequestUtils.parsePath(line), is("/user/create"));
     }
 
     @Test

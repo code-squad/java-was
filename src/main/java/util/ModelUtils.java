@@ -9,10 +9,8 @@ import java.util.Map;
 public class ModelUtils {
     private static final Logger log =  LoggerFactory.getLogger(ModelUtils.class);
 
-    public static User createUser(String requestLine) {
-        String queryString = requestLine.split(" ")[1];
-        log.debug("query string : {}", queryString);
-        Map<String, String> userData = HttpRequestUtils.parseQueryString(queryString.split("\\?")[1]);
+    public static User createUser(String line) {
+        Map<String, String> userData = HttpRequestUtils.parseQueryString(line);
         return new User(userData.get("userId"), userData.get("password"), userData.get("name"), userData.get("email"));
     }
 }
