@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -98,7 +100,18 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void readBody() {
+    public void parseCookie() {
+        String cookieQueryString = "Idea-d506421b=a23c0e80-12ac-450d-917b-8429ed0cde6f; logined=true";
+        Map<String, String> cookieData = HttpRequestUtils.parseCookies(cookieQueryString);
 
+        assertThat(cookieData.get("logined"), is("true"));
+    }
+
+    @Test
+    public void mapNull() {
+        Map<String, String> loginData = new HashMap<>();
+        if (loginData.get("loginUser") == null) {
+            System.out.println("yes is null");
+        }
     }
 }
