@@ -8,3 +8,18 @@
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 코드스쿼드의 온라인 코드 리뷰 과정](https://github.com/code-squad/codesquad-docs/blob/master/codereview/README.md)
 * [동영상으로 살펴보는 코드스쿼드의 온라인 코드 리뷰 과정](https://youtu.be/a5c9ku-_fok)
+
+## 해당 과정을 진행하면서 알게된 것
+* HTTP 요청 메세지의 구성
+    1. request Line
+    2. header for request
+    3. body
+* request line은 `Method SP Request-URI SP HTTP-Version CRLF`로 구성된다
+* header는 `general-header`, `request header`, `entity header`로 구성된다.
+    * 세 종류의 header 중 요청에 필요한 header만 사용한다.
+* HTTP 응답 메세지의 구성
+    1. status line
+    2. header for response
+    3. body
+    
+

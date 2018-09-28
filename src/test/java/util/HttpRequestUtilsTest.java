@@ -1,15 +1,23 @@
 package util;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-import java.util.Map;
-
 import org.junit.Test;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 public class HttpRequestUtilsTest {
+    private static final Logger log = LoggerFactory.getLogger(HttpRequestUtilsTest.class);
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
@@ -69,5 +77,49 @@ public class HttpRequestUtilsTest {
         String header = "Content-Length: 59";
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
+    }
+
+    @Test
+    public void parseHeader_PATH() {
+        assertThat(HttpRequestUtils.parseUrl("GET /index.html HTTP/1.1"), is("/index.html"));
+    }
+
+    @Test
+    public void readFile() throws IOException {
+        String rootLocation = "./webapp";
+        String path = HttpRequestUtils.parseUrl("GET /index.html HTTP/1.1");
+
+        byte[] body = body = HttpRequestUtils.readFile(path);
+        assertNotNull(body);
+    }
+
+    @Test
+    public void parsePath_URL() {
+        String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
+        assertThat(HttpRequestUtils.parsePath(line), is("/user/create"));
+    }
+
+    @Test
+    public void parseCookie() {
+        String cookieQueryString = "Idea-d506421b=a23c0e80-12ac-450d-917b-8429ed0cde6f; logined=true";
+        Map<String, String> cookieData = HttpRequestUtils.parseCookies(cookieQueryString);
+
+        assertThat(cookieData.get("logined"), is("true"));
+    }
+
+    @Test
+    public void mapNull() {
+        Map<String, String> loginData = new HashMap<>();
+        if (loginData.get("loginUser") == null) {
+            System.out.println("yes is null");
+        }
+    }
+
+    @Test
+    public void parseAccpet() {
+        String line = "Accept: text/css,image/apng,image/*,*/*;q=0.8";
+        String accpetValue = HttpRequestUtils.parseHeader(line).getValue();
+
+        assertThat(HttpRequestUtils.parseAccept(accpetValue)[0], is("text/css"));
     }
 }

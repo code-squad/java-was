@@ -1,13 +1,23 @@
 package util;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpRequestUtils {
+
+    private static final Logger log =  LoggerFactory.getLogger(HttpRequestUtils.class);
+
+    private static String ROOT_LOCATION = "./webapp";
+
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
@@ -51,6 +61,24 @@ public class HttpRequestUtils {
 
     public static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
+    }
+
+    public static String parseUrl(String line) {
+        log.debug("parseUrl : {}", line);
+        return line.split(" ")[1];
+    }
+
+    public static byte[] readFile(String path) throws IOException {
+        return Files.readAllBytes(Paths.get(ROOT_LOCATION + path));
+    }
+
+    public static String parsePath(String line) {
+        log.debug("parsePath : {}", line);
+        return parseUrl(line).split("\\?")[0];
+    }
+
+    public static String[] parseAccept(String line) {
+        return line.split(",");
     }
 
     public static class Pair {
