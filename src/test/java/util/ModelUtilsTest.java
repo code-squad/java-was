@@ -11,8 +11,8 @@ import static org.junit.Assert.assertThat;
 
 public class ModelUtilsTest {
 
-    @Ignore
     @Test
+    @Ignore
     public void createUser_GET() throws Exception {
         String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
         if (!HttpRequestUtils.parsePath(line).equals("/user/create")) {
