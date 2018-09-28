@@ -114,4 +114,15 @@ public class HttpRequestUtilsTest {
             System.out.println("yes is null");
         }
     }
+
+    @Test
+    public void parseAccpet() {
+        String line = "Accept: text/css,image/apng,image/*,*/*;q=0.8";
+        log.debug("accept value : {}", HttpRequestUtils.parseHeader(line).getValue());
+
+        String[] tokens = HttpRequestUtils.parseHeader(line).getValue().split(",");
+        log.debug("accept[0] : {}", tokens[0]);
+
+        assertThat(HttpRequestUtils.parseAccept(line)[0], is("text/css"));
+    }
 }

@@ -39,6 +39,7 @@ public class RequestHandler extends Thread {
             String path = null;
             String url = null;
             String cookie = null;
+            String contentType = "text/html";
             int contentLength = 0;
             int httpStatusCode = 200;
             Map<String, String> cookieData = new HashMap<>();
@@ -53,7 +54,7 @@ public class RequestHandler extends Thread {
                     log.debug("path : {}", path);
                 }
 
-                //content-length
+                // content-length
                 if (line.contains(":") && HttpRequestUtils.parseHeader(line).getKey().equals("Content-Length")) {
                     if (HttpRequestUtils.parseHeader(line).getValue() != null) {
                         contentLength = Integer.parseInt(HttpRequestUtils.parseHeader(line).getValue());
@@ -65,6 +66,16 @@ public class RequestHandler extends Thread {
                 if (line.contains(":") && HttpRequestUtils.parseHeader(line).getKey().equals("Cookie")) {
                     String cookieQueryString = HttpRequestUtils.parseHeader(line).getValue();
                     cookieData = HttpRequestUtils.parseCookies(cookieQueryString);
+                }
+
+                // content-type
+                if (line.contains(":") && HttpRequestUtils.parseHeader(line).getKey().equals("Accept")) {
+                    String acceptValue = HttpRequestUtils.parseHeader(line).getValue();
+                    log.debug("accept value : {}", acceptValue);
+                    if (HttpRequestUtils.parseAccept(acceptValue)[0].equals("text/css")) {
+                        log.debug("value : {}", HttpRequestUtils.parseAccept(acceptValue)[0]);
+                        contentType = "text/css";
+                    }
                 }
             }
 
@@ -130,7 +141,7 @@ public class RequestHandler extends Thread {
                 if (!path.equals("")) {
                     body = HttpRequestUtils.readFile(path);
                 }
-                response200Header(dos, body.length, cookie);
+                response200Header(dos, body.length, cookie, contentType);
                 responseBody(dos, body);
             }
         } catch (IOException e) {
@@ -138,10 +149,13 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String cookie) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String cookie, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            if (contentType != "text/css") {
+                dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            }
+            dos.writeBytes("Content-Type: " + contentType + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             if (cookie != null) {
                 dos.writeBytes("Set-Cookie: " + cookie + " Path=/" + "\r\n");

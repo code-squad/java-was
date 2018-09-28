@@ -77,8 +77,8 @@ public class HttpRequestUtils {
         return parseUrl(line).split("\\?")[0];
     }
 
-    public static String readBody() {
-        return null;
+    public static String[] parseAccept(String line) {
+        return line.split(",");
     }
 
     public static class Pair {
