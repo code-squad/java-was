@@ -1,11 +1,12 @@
 package util;
 
+import domain.HttpRequest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -121,5 +122,18 @@ public class HttpRequestUtilsTest {
         String accpetValue = HttpRequestUtils.parseHeader(line).getValue();
 
         assertThat(HttpRequestUtils.parseAccept(accpetValue)[0], is("text/css"));
+    }
+
+    @Test
+    public void getHttpRequest() {
+        String line = "GET /user/create?userId=javajigi&password=passwordHTTP/1.1\r\n"
+                + "Host: localhost:8080\r\n"
+                + "Content-Length: 345\r\n"
+                + "\r\n";
+
+        InputStream is = new ByteArrayInputStream(line.getBytes());
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+        HttpRequest request = HttpRequestUtils.getHttpRequest(reader);
     }
 }

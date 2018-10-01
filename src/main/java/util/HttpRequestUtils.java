@@ -1,5 +1,6 @@
 package util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import domain.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +81,10 @@ public class HttpRequestUtils {
 
     public static String[] parseAccept(String line) {
         return line.split(",");
+    }
+
+    public static HttpRequest getHttpRequest(BufferedReader reader) {
+        return null;
     }
 
     public static class Pair {
