@@ -125,8 +125,8 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void getHttpRequest() {
-        String line = "GET /user/create?userId=javajigi&password=passwordHTTP/1.1\r\n"
+    public void getHttpRequest_GET() {
+        String line = "GET /user/create?userId=javajigi&password=password HTTP/1.1\r\n"
                 + "Host: localhost:8080\r\n"
                 + "Content-Length: 345\r\n"
                 + "\r\n";
@@ -134,6 +134,14 @@ public class HttpRequestUtilsTest {
         InputStream is = new ByteArrayInputStream(line.getBytes());
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
-        HttpRequest request = HttpRequestUtils.getHttpRequest(reader);
+        HttpRequest request = null;
+        try {
+            request = HttpRequestUtils.getHttpRequest(reader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(request);
+        assertThat(request.getMethod(), is("GET"));
+        assertThat(request.getPath(), is("/user/create"));
     }
 }

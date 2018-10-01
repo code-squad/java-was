@@ -83,8 +83,24 @@ public class HttpRequestUtils {
         return line.split(",");
     }
 
-    public static HttpRequest getHttpRequest(BufferedReader reader) {
-        return null;
+    public static HttpRequest getHttpRequest(BufferedReader reader) throws IOException {
+        final String SPACE = " ";
+        String line = null;
+        String method = null;
+        String path = null; // user/create
+        String parameter = null; // userId=javajigi&password=password
+
+        // /user/create?userId=javajigi&password=password HTTP1.1
+        line = reader.readLine();
+        String[] tokens = line.split(SPACE);
+        method = tokens[0];
+
+//        while ((line = reader.readLine()) != null && !line.equals("")) {
+//            if (!line.contains(":") && method == null) {
+//
+//            }
+//        }
+        return new HttpRequest(method, null, null, null, null);
     }
 
     public static class Pair {

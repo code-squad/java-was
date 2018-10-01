@@ -1,11 +1,11 @@
 package domain;
 
 public class HttpRequest {
-    String method;
-    String host;
-    String path;
-    String parameter;
-    String header;
+    private String method;
+    private String host;
+    private String path;
+    private String parameter;
+    private String header;
 
     public HttpRequest(String method, String host, String path, String parameter, String header) {
         this.method = method;
@@ -13,5 +13,13 @@ public class HttpRequest {
         this.path = path;
         this.parameter = parameter;
         this.header = header;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getPath() {
+        return path;
     }
 }
