@@ -3,6 +3,7 @@ package webserver;
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
+import domain.HttpStatusCode;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,6 @@ public class RequestHandler extends Thread {
             String cookie = null;
             String contentType = "text/html";
             int contentLength = 0;
-            int httpStatusCode = 200;
             Map<String, String> cookieData = new HashMap<>();
 
             // Http Request 생성
@@ -48,15 +48,17 @@ public class RequestHandler extends Thread {
             log.debug("httpRequest : {}", httpRequest.toString());
 
             // Path
+            // httpRequest.matchPath();
             String path = httpRequest.getPath();
 
             // Reponse 생성
+            HttpResponse response = new HttpResponse(HttpStatusCode.OK);
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = null;
 
             if (path.equals("/user/create")) {
-                httpStatusCode = 302;
+                response = new HttpResponse(HttpStatusCode.FOUND);
                 User user = ModelUtils.createUser(IOUtils.readData(reader, contentLength));
                 DataBase.addUser(user);
                 log.debug("user : {}", user.toString());
@@ -64,7 +66,7 @@ public class RequestHandler extends Thread {
             }
 
             if (path.equals("/user/login")) {
-                httpStatusCode = 302;
+                response = new HttpResponse(HttpStatusCode.FOUND);
                 Map<String, String> loginData = HttpRequestUtils.parseQueryString(IOUtils.readData(reader, contentLength));
                 User loginUser = DataBase.findUserById(loginData.get("userId"));
                 log.debug("login user : {}", loginUser.toString());
@@ -73,7 +75,7 @@ public class RequestHandler extends Thread {
 
                 if (loginUser == null || !loginUser.getPassword().equals(loginData.get("password"))) {
                     // redirect failed
-                    httpStatusCode = 302;
+                    response = new HttpResponse(HttpStatusCode.FOUND);
                     cookie = "logined=false;";
                     url = LOGIN_FAIL;
                 }
@@ -82,15 +84,15 @@ public class RequestHandler extends Thread {
             StringBuilder sb = new StringBuilder();
             if (path.equals("/user/list")) {
                 // 회원가입도 없이 그냥 접근할 때
-                httpStatusCode = 302;
+                response = new HttpResponse(HttpStatusCode.FOUND);
                 url = HOME;
 
                 if (!cookieData.isEmpty() && cookieData.get("logined").equals("false")) {
-                    httpStatusCode = 302;
+                    response = new HttpResponse(HttpStatusCode.FOUND);
                     url = LOGIN_FAIL;
                 }
                 if (!cookieData.isEmpty() && cookieData.get("logined").equals("true")) {
-                    httpStatusCode = 200;
+                    response = new HttpResponse(HttpStatusCode.OK);
                     sb.append("<html>").append("<head>").append("<body>");
                     List<User> userData = new ArrayList<>(DataBase.findAll());
                     for (User user : userData) {
@@ -102,14 +104,12 @@ public class RequestHandler extends Thread {
                 }
             }
 
-            log.debug("httpStatusCode : {}", httpStatusCode);
-
-            if (httpStatusCode == 302) {
+            if (response.getStatus() == HttpStatusCode.FOUND) {
                 response302Header(dos, url, cookie);
                 responseBody(dos, new byte[0]);
             }
 
-            if (httpStatusCode == 200) {
+            if (response.getStatus() == HttpStatusCode.OK) {
                 if (!path.equals("")) {
                     body = HttpRequestUtils.readFile(path);
                 }
