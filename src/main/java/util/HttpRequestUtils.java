@@ -1,5 +1,12 @@
 package util;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import domain.Headers;
+import domain.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,21 +15,15 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import domain.HttpRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class HttpRequestUtils {
 
-    private static final Logger log =  LoggerFactory.getLogger(HttpRequestUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpRequestUtils.class);
 
     private static String ROOT_LOCATION = "./webapp";
+    private static String EMPTY = "";
 
     /**
-     * @param queryString은
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
     public static Map<String, String> parseQueryString(String queryString) {
@@ -30,8 +31,7 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param 쿠키
-     *            값은 name1=value1; name2=value2 형식임
+     * @param 쿠키 값은 name1=value1; name2=value2 형식임
      * @return
      */
     public static Map<String, String> parseCookies(String cookies) {
@@ -84,23 +84,43 @@ public class HttpRequestUtils {
     }
 
     public static HttpRequest getHttpRequest(BufferedReader reader) throws IOException {
-        final String SPACE = " ";
-        String line = null;
-        String method = null;
+        String line = null; // GET /user/create?userId=javajigi&password=password HTTP1.1
+        String method = null; // GET
         String path = null; // user/create
         String parameter = null; // userId=javajigi&password=password
 
-        // /user/create?userId=javajigi&password=password HTTP1.1
         line = reader.readLine();
-        String[] tokens = line.split(SPACE);
+        String[] tokens = line.split(" ");
         method = tokens[0];
 
-//        while ((line = reader.readLine()) != null && !line.equals("")) {
-//            if (!line.contains(":") && method == null) {
-//
-//            }
-//        }
-        return new HttpRequest(method, null, null, null, null);
+        // TODO request line으로부터 이미 쪼개진 tokens에서 url부분을 받아올 수 있게 한다.
+        path = HttpRequestUtils.parsePath(line);
+        parameter = HttpRequestUtils.parseParameter(line);
+
+        Headers headers = new Headers();
+
+        while ((line = reader.readLine()).contains(":")) {
+            log.debug("header line : {}", line);
+            headers.add(HttpRequestUtils.parseHeader(line));
+        }
+
+        log.debug("headers : {}", headers.toString());
+
+        return new HttpRequest(method, path, parameter, headers);
+    }
+
+    public static String parseParameter(String line) {
+//        return line.split(" ")[1].split("\\?")[1];
+        String[] tokens = line.split(" ")[1].split("\\?");
+        if (tokens.length == 0) {
+            throw new IllegalArgumentException("wrong parameter line");
+        }
+
+        if (tokens.length == 1) {
+            return EMPTY;
+        }
+
+        return tokens[1];
     }
 
     public static class Pair {

@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -95,7 +93,7 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void parsePath_URL() {
+    public void parsePath_requestLine() {
         String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
         assertThat(HttpRequestUtils.parsePath(line), is("/user/create"));
     }
@@ -125,6 +123,12 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
+    public void parseParameter() {
+        String line = "GET /user/create?userId=javajigi&password=password HTTP/1.1\r\n";
+        assertThat(HttpRequestUtils.parseParameter(line), is("userId=javajigi&password=password"));
+    }
+
+    @Test
     public void getHttpRequest_GET() {
         String line = "GET /user/create?userId=javajigi&password=password HTTP/1.1\r\n"
                 + "Host: localhost:8080\r\n"
@@ -133,15 +137,28 @@ public class HttpRequestUtilsTest {
 
         InputStream is = new ByteArrayInputStream(line.getBytes());
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
         HttpRequest request = null;
+
         try {
             request = HttpRequestUtils.getHttpRequest(reader);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         assertNotNull(request);
         assertThat(request.getMethod(), is("GET"));
         assertThat(request.getPath(), is("/user/create"));
+        assertThat(request.getParameter(), is("userId=javajigi&password=password"));
+        assertThat(request.getValueOfParameter("userId"), is("javajigi"));
+    }
+
+    @Test
+    public void saveHeader() {
+        String contentLength = "Content-Length: 87";
+        List<Pair> headers = new ArrayList<>();
+        headers.add(HttpRequestUtils.parseHeader(contentLength));
+
+        assertThat(headers.get(0).getKey(), is("Content-Length"));
+        assertThat(headers.get(0).getValue(), is("87"));
     }
 }

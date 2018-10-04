@@ -1,6 +1,8 @@
 package webserver;
 
 import db.DataBase;
+import domain.HttpRequest;
+import domain.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +35,7 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            String line = null;
-            String path = null;
+
             String url = null;
             String cookie = null;
             String contentType = "text/html";
@@ -42,40 +43,14 @@ public class RequestHandler extends Thread {
             int httpStatusCode = 200;
             Map<String, String> cookieData = new HashMap<>();
 
-            // for header
-            while ((line = reader.readLine()) != null && !line.equals("")) {
-                log.debug("line : {}", line);
+            // Http Request 생성
+            HttpRequest httpRequest = HttpRequestUtils.getHttpRequest(reader);
+            log.debug("httpRequest : {}", httpRequest.toString());
 
-                // request line
-                if (!line.contains(":")) {
-                    path = HttpRequestUtils.parsePath(line);
-                    log.debug("path : {}", path);
-                }
+            // Path
+            String path = httpRequest.getPath();
 
-                // content-length
-                if (line.contains(":") && HttpRequestUtils.parseHeader(line).getKey().equals("Content-Length")) {
-                    if (HttpRequestUtils.parseHeader(line).getValue() != null) {
-                        contentLength = Integer.parseInt(HttpRequestUtils.parseHeader(line).getValue());
-                        log.debug("content-length : {}", contentLength);
-                    }
-                }
-
-                // cookie
-                if (line.contains(":") && HttpRequestUtils.parseHeader(line).getKey().equals("Cookie")) {
-                    String cookieQueryString = HttpRequestUtils.parseHeader(line).getValue();
-                    cookieData = HttpRequestUtils.parseCookies(cookieQueryString);
-                }
-
-                // content-type
-                if (line.contains(":") && HttpRequestUtils.parseHeader(line).getKey().equals("Accept")) {
-                    String acceptValue = HttpRequestUtils.parseHeader(line).getValue();
-                    log.debug("accept value : {}", acceptValue);
-                    if (HttpRequestUtils.parseAccept(acceptValue)[0].equals("text/css")) {
-                        log.debug("value : {}", HttpRequestUtils.parseAccept(acceptValue)[0]);
-                        contentType = "text/css";
-                    }
-                }
-            }
+            // Reponse 생성
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = null;
