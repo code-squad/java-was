@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 import service.UserService;
 import util.HttpRequestUtils;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class RequestHandler extends Thread {
@@ -19,8 +21,6 @@ public class RequestHandler extends Thread {
 
     private static final String HOME = "http://localhost:8080/index.html";
     private static final String LOGIN_FAIL = "http://localhost:8080/user/login_failed.html";
-
-    private static final byte[] EMPTY_BODY = new byte[0];
 
     private Socket connection;
 
@@ -33,73 +33,58 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
             UserService userService = new UserService();
 
             // Http Request 생성
-//            HttpRequest request = HttpRequestUtils.getHttpRequest(reader);
             HttpRequest request = new HttpRequest(in);
 
-            // Path
-            // String path = request.getPath();
-
-            DataOutputStream dos = new DataOutputStream(out);
-            String url = null;
-            byte[] body = EMPTY_BODY;
-
-//            Cookies requestCookies = request.getCookies();
-            Cookies responseCookies = new Cookies(new HashMap<>());
-            log.debug("httpRequest : {}", request.toString());
-
             // Reponse 생성
-            HttpResponse response = new HttpResponse(dos, HttpStatusCode.OK);
+            DataOutputStream dos = new DataOutputStream(out);
+            HttpResponse response = new HttpResponse(dos);
 
+            // 분기
             if (request.matchPath("/user/create")) {
-                response = new HttpResponse(dos, HttpStatusCode.FOUND);
                 userService.save(userService.create(String.valueOf(request.getBody())));
-                response.response302Header(HOME, responseCookies);
+                response.sendRedirect(HOME);
             }
 
             if (request.matchPath("/user/login")) {
-                response = new HttpResponse(dos, HttpStatusCode.FOUND);
-                url = HOME;
-                responseCookies.add("logined", "true");
+                response.addCookie("logined", "true");
+                response.sendRedirect(HOME);
                 if (!userService.login(String.valueOf(request.getBody()))) {
-                    url = LOGIN_FAIL;
-                    responseCookies.add("logined", "false");
+                    response.addCookie("logined", "false");
+                    response.sendRedirect(LOGIN_FAIL);
                 }
             }
 
             if (request.matchPath("/user/list")) {
-                response = new HttpResponse(dos, HttpStatusCode.FOUND);
-                url = HOME;
-
-                // TODO isLogined()로 체크할 수 있게
                 if (request.matchCookieValue("logined", "false")) {
-                    response = new HttpResponse(dos, HttpStatusCode.FOUND);
-                    url = LOGIN_FAIL;
+                    response.sendRedirect(HOME);
                 }
 
                 if (request.matchCookieValue("logined", "true")) {
-                    response = new HttpResponse(dos, HttpStatusCode.OK);
-                    body = userService.list().getBytes();
+                    byte[] body = userService.list().getBytes();
+                    response.response200Header(body.length).responseBody(body);
                 }
             }
 
-            // response 완성
-            if (response.matchStatusCode(HttpStatusCode.OK)) {
-//                if (!path.equals("")) {
-//                    body = HttpRequestUtils.readFile(request.getPath());
-//                }
-                body = HttpRequestUtils.readFile(request.getPath());
-                response.response200Header(body.length, responseCookies).responseBody(body);
+            // TODO path가 기준이 되어 컨트롤러가 만들어져야 한다
+            // path를 split하는데, 구분자는 /(slash)이다
+            if (request.matchPath("/index.html")) {
+                byte[] body = HttpRequestUtils.readFile(request.getPath());
+                response.response200Header(body.length).responseBody(body);
             }
 
-            if (response.matchStatusCode(HttpStatusCode.FOUND)) {
-                response.response302Header(url, responseCookies).responseBody(body);
+            if (request.matchPath("/user/form.html")) {
+                byte[] body = HttpRequestUtils.readFile(request.getPath());
+                response.response200Header(body.length).responseBody(body);
             }
 
+            if (request.matchPath("/user/login.html")) {
+                byte[] body = HttpRequestUtils.readFile(request.getPath());
+                response.response200Header(body.length).responseBody(body);
+            }
         } catch (IOException e) {
             log.error(e.getMessage());
         }

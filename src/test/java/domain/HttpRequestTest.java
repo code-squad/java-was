@@ -1,6 +1,5 @@
 package domain;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +25,6 @@ public class HttpRequestTest {
 
     @Test
     public void canCreate() throws IOException {
-//        HttpRequest request = new HttpRequest(null, null, null, null, null);
         Socket socket = new Socket();
         HttpRequest request = new HttpRequest(socket.getInputStream());
     }
@@ -51,14 +49,4 @@ public class HttpRequestTest {
         HttpRequest request = new HttpRequest(in);
         assertThat(request.matchCookieValue("logined", "false"), is(false));
     }
-
-    //    @Test
-//    public void getter() {
-//        // TODO factory method pattern
-//        HttpRequest request = new HttpRequest("GET", "/user/create", "userId=javajigi&password=password", null, null);
-//        assertThat(request.getMethod(), is("GET"));
-//        assertThat(request.getPath(), is("/user/create"));
-//        assertThat(request.getParameter(), is("userId=javajigi&password=password"));
-//        assertThat(request.getParameter("userId"), is("javajigi"));
-//    }
 }

@@ -6,8 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -128,29 +133,20 @@ public class HttpRequestUtilsTest {
         assertThat(HttpRequestUtils.parseParameter(line), is("userId=javajigi&password=password"));
     }
 
-//    @Test
-//    public void getHttpRequest_GET() {
-//        String line = "GET /user/create?userId=javajigi&password=password HTTP/1.1\r\n"
-//                + "Host: localhost:8080\r\n"
-//                + "Content-Length: 345\r\n"
-//                + "\r\n";
-//
-//        InputStream is = new ByteArrayInputStream(line.getBytes());
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-//        HttpRequest request = null;
-//
-//        try {
-//            request = HttpRequestUtils.getHttpRequest(reader);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        assertNotNull(request);
-//        assertThat(request.getMethod(), is("GET"));
-//        assertThat(request.getPath(), is("/user/create"));
-//        assertThat(request.getParameter(), is("userId=javajigi&password=password"));
-//        assertThat(request.getParameter("userId"), is("javajigi"));
-//    }
+    @Test
+    public void getHttpRequest_GET() throws IOException {
+        String line = "GET /user/create?userId=javajigi&password=password HTTP/1.1\r\n"
+                + "Host: localhost:8080\r\n"
+                + "Content-Length: 345\r\n"
+                + "\r\n";
+
+        InputStream in = new ByteArrayInputStream(line.getBytes());
+        HttpRequest request = new HttpRequest(in);
+        assertThat(request.getPath(), is("/user/create"));
+        assertThat(request.getParameter(), is("userId=javajigi&password=password"));
+        assertThat(request.getParameter("userId"), is("javajigi"));
+        assertThat(request.getMethod(), is("GET"));
+    }
 
     @Test
     public void saveHeader() {

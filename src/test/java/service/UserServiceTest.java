@@ -2,15 +2,10 @@ package service;
 
 import db.DataBase;
 import model.User;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.sql.DatabaseMetaData;
-
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class UserServiceTest {
     private UserService userService = new UserService();
