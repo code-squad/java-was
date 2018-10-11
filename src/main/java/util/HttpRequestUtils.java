@@ -83,31 +83,41 @@ public class HttpRequestUtils {
         return line.split(",");
     }
 
-    public static HttpRequest getHttpRequest(BufferedReader reader) throws IOException {
-        String line = null; // GET /user/create?userId=javajigi&password=password HTTP1.1
-        String method = null; // GET
-        String path = null; // user/create
-        String parameter = null; // userId=javajigi&password=password
-
-        line = reader.readLine();
-        String[] tokens = line.split(" ");
-        method = tokens[0];
-
-        // TODO request line으로부터 이미 쪼개진 tokens에서 url부분을 받아올 수 있게 한다.
-        path = HttpRequestUtils.parsePath(line);
-        parameter = HttpRequestUtils.parseParameter(line);
-
-        Headers headers = new Headers();
-
-        while ((line = reader.readLine()).contains(":")) {
-            log.debug("header line : {}", line);
-            headers.add(HttpRequestUtils.parseHeader(line));
-        }
-
-        log.debug("headers : {}", headers.toString());
-
-        return new HttpRequest(method, path, parameter, headers);
-    }
+//    public static HttpRequest getHttpRequest(BufferedReader reader) throws IOException {
+//        String line = null; // GET /user/create?userId=javajigi&password=password HTTP1.1
+//        String method = null; // GET
+//        String path = null; // user/create
+//        String parameter = null; // userId=javajigi&password=password
+//        String body = null;
+//
+//        // request line
+//        line = reader.readLine();
+//        String[] tokens = line.split(" ");
+//        method = tokens[0];
+//
+//        // TODO request line으로부터 이미 쪼개진 tokens에서 url부분을 받아올 수 있게 한다.
+//        path = HttpRequestUtils.parsePath(line);
+//        parameter = HttpRequestUtils.parseParameter(line);
+//
+//        // headers
+//        Headers headers = new Headers();
+//        while ((line = reader.readLine()).contains(":")) {
+//            log.debug("header line : {}", line);
+//            headers.add(HttpRequestUtils.parseHeader(line));
+//        }
+//
+//        // read body
+//        String value = "";
+//        char[] buffer;
+//        if (!(value = headers.getValue("Content-Length")).equals("")) {
+//            log.debug("buffer size : {}", Integer.valueOf(value));
+//            buffer = new char[Integer.valueOf(value)];
+//            reader.read(buffer, 0, Integer.valueOf(value));
+//            body = String.valueOf(buffer);
+//        }
+//
+//        return new HttpRequest(method, path, parameter, headers, body);
+//    }
 
     public static String parseParameter(String line) {
 //        return line.split(" ")[1].split("\\?")[1];
