@@ -1,9 +1,7 @@
 package webserver;
 
-import domain.Cookies;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import domain.HttpStatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
@@ -14,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.HashMap;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -34,14 +31,16 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            UserService userService = new UserService();
 
-            // Http Request 생성
+            // Request 생성
             HttpRequest request = new HttpRequest(in);
 
             // Reponse 생성
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse response = new HttpResponse(dos);
+
+            // 서비스
+            UserService userService = new UserService();
 
             // 분기
             if (request.matchPath("/user/create")) {

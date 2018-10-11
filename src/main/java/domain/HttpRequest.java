@@ -15,34 +15,14 @@ import java.util.Map;
 public class HttpRequest {
     private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
 
-    //    private InputStream in;
-    private BufferedReader br;
     private Map<String, String> requestLineData = new HashMap<>();
-
-    //    private String method;
-//    private String path = "";
-//    private String parameter;
     private Headers headers = new Headers();
     private char[] body;
 
-//    public HttpRequest(String method, String path, String parameter, Headers headers, String body) {
-//        this.method = method;
-//        this.path = path;
-//        this.parameter = parameter;
-//        this.headers = headers;
-//        this.body = body;
-//    }
-
     public HttpRequest(InputStream in) throws IOException {
-        this.br = new BufferedReader(new InputStreamReader(in));
-
-        // parse request line
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
         parseRequestLine(br);
-
-        // parse headers
         parseHeader(br);
-
-        // parse body
         parseBody(br);
     }
 
@@ -77,8 +57,6 @@ public class HttpRequest {
         if (!(value = headers.getValue("Content-Length")).equals("")) {
             log.debug("buffer size : {}", Integer.valueOf(value));
             buffer = new char[Integer.valueOf(value)];
-            // WHY : bufferedReader의 read는 char array로 읽어올 수 있게 만들어졌다.
-            // 만약 byte array로 받고 싶다면 InputStream, BufferedInputStream을 사용해야 한다.
             br.read(buffer, 0, Integer.valueOf(value));
         }
 
@@ -114,16 +92,6 @@ public class HttpRequest {
         return this.headers.getValue(name);
     }
 
-//    @Override
-//    public String toString() {
-//        return "HttpRequest{" +
-//                "method='" + method + '\'' +
-//                ", path='" + path + '\'' +
-//                ", parameter='" + parameter + '\'' +
-//                ", headers=" + headers.toString() +
-//                '}';
-//    }
-
     public Cookies getCookies() {
         return headers.getCookies();
     }
@@ -133,6 +101,6 @@ public class HttpRequest {
     }
 
     public boolean matchCookieValue(String key, String value) {
-        return headers.getValue(key).equals(value);
+        return headers.getCookies().get(key).equals(value);
     }
 }

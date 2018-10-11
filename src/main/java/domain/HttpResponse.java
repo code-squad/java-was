@@ -35,7 +35,7 @@ public class HttpResponse {
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 
             if (cookies != null) {
-                dos.writeBytes("Set-Cookie: " + cookies.toString() + " Path=/" + "\r\n");
+                dos.writeBytes("Set-Cookie: " + cookies.toString() + "; Path=/" + "\r\n");
             }
 
             dos.writeBytes("\r\n");
@@ -60,7 +60,8 @@ public class HttpResponse {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             if (cookies != null) {
-                dos.writeBytes("Set-Cookie: " + cookies.toString() + " Path=/" + "\r\n");
+                log.debug("Set-Cookie: {}", cookies.toString());
+                dos.writeBytes("Set-Cookie: " + cookies.toString() + "; Path=/" + "\r\n");
             }
             dos.writeBytes("Location: " + url + "\r\n");
             dos.writeBytes("\r\n");
@@ -74,5 +75,6 @@ public class HttpResponse {
             cookies = new Cookies(new HashMap<>());
         }
         cookies.add(key, value);
+        log.debug("Cookie Data : {}", cookies.toString());
     }
 }
