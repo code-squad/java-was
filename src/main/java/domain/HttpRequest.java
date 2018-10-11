@@ -100,7 +100,10 @@ public class HttpRequest {
         return this.requestLineData.get("path").equals(path);
     }
 
-    public boolean matchCookieValue(String key, String value) {
-        return headers.getCookies().get(key).equals(value);
+    public boolean matchCookieValue(String key, String value) throws NullPointerException{
+        if (headers.getCookies().contains(key)) {
+            return headers.getCookies().get(key).equals(value);
+        }
+        return false;
     }
 }

@@ -24,6 +24,10 @@ public class Cookies {
         return cookies.get(key);
     }
 
+    public boolean contains(String key) {
+        return cookies.containsKey(key);
+    }
+
     public boolean isEmpty() {
         return cookies.isEmpty();
     }
