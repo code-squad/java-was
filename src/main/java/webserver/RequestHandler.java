@@ -1,5 +1,7 @@
 package webserver;
 
+import domain.Controller;
+import domain.CreateUserController;
 import domain.HttpRequest;
 import domain.HttpResponse;
 import org.slf4j.Logger;
@@ -12,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -20,9 +24,16 @@ public class RequestHandler extends Thread {
     private static final String LOGIN_FAIL = "http://localhost:8080/user/login_failed.html";
 
     private Socket connection;
+    private Map<String, Controller> controllers = new HashMap<>();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        initControllers();
+
+    }
+
+    private void initControllers() {
+        controllers.put("/user/create", new CreateUserController());
     }
 
     public void run() {
@@ -30,8 +41,6 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-
-
             // Request 생성
             HttpRequest request = new HttpRequest(in);
 
@@ -43,9 +52,12 @@ public class RequestHandler extends Thread {
             UserService userService = new UserService();
 
             // 분기
+//            if (request.matchPath("/user/create")) {
+//                userService.save(userService.create(String.valueOf(request.getBody())));
+//                response.sendRedirect(HOME);
+//            }
             if (request.matchPath("/user/create")) {
-                userService.save(userService.create(String.valueOf(request.getBody())));
-                response.sendRedirect(HOME);
+                controllers.get(request.getPath()).service(request, response);
             }
 
             if (request.matchPath("/user/login")) {
