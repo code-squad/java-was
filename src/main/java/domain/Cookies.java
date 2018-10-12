@@ -1,12 +1,11 @@
 package domain;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
 
 public class Cookies {
-    Map<String, String> cookies;
+    private Map<String, String> cookies;
 
     public Cookies(Map<String, String> cookies) {
         this.cookies = cookies;
@@ -36,7 +35,7 @@ public class Cookies {
     public String toString() {
         return cookies.entrySet()
                 .stream()
-                .map(e -> e.getKey()+"="+e.getValue())
+                .map(e -> e.getKey() + "=" + e.getValue())
                 .collect(joining(";"));
     }
 

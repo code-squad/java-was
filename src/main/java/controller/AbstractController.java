@@ -3,18 +3,22 @@ package controller;
 import domain.HttpRequest;
 import domain.HttpResponse;
 
-public class AbstractController implements Controller {
+abstract class AbstractController implements Controller {
 
     @Override
     public void service(HttpRequest request, HttpResponse response) {
+        if (request.getHeader("method").equals("GET")) {
+            doGet(request, response);
+            return;
+        }
+        doPost(request, response);
+    }
+
+    protected void doGet(HttpRequest request, HttpResponse response) {
 
     }
 
-    public void doGet(HttpRequest request, HttpResponse response) {
-
-    }
-
-    public void doPost(HttpRequest request, HttpResponse response) {
+    protected void doPost(HttpRequest request, HttpResponse response) {
 
     }
 }

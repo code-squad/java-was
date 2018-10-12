@@ -25,7 +25,6 @@ public class ResourceController extends AbstractController {
             e.printStackTrace();
         }
         String contentType = request.getHeader("Accept").split(" ")[0];
-        log.debug("Content Type : {}", contentType);
         response.response200Header(body.length, contentType).responseBody(body);
     }
 }
