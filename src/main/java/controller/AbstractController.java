@@ -4,10 +4,9 @@ import domain.HttpRequest;
 import domain.HttpResponse;
 
 abstract class AbstractController implements Controller {
-
     @Override
     public void service(HttpRequest request, HttpResponse response) {
-        if (request.getHeader("method").equals("GET")) {
+        if (request.getRequestLine("method").equals("GET")) {
             doGet(request, response);
             return;
         }

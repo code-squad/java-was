@@ -7,11 +7,6 @@ import service.UserService;
 
 public class ListUserController extends AbstractController {
     @Override
-    public void service(HttpRequest request, HttpResponse response) {
-        doGet(request, response);
-    }
-
-    @Override
     public void doGet(HttpRequest request, HttpResponse response) {
         if (!isLogined(request)) {
             response.sendRedirect(Url.LOGIN_FAIL);

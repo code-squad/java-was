@@ -9,13 +9,6 @@ import util.HttpRequestUtils;
 import java.io.IOException;
 
 public class ResourceController extends AbstractController {
-    private static final Logger log =  LoggerFactory.getLogger(ResourceController.class);
-
-    @Override
-    public void service(HttpRequest request, HttpResponse response) {
-        doGet(request, response);
-    }
-
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
         byte[] body = new byte[0];

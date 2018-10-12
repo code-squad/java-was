@@ -105,4 +105,8 @@ public class HttpRequest {
         }
         return false;
     }
+
+    public String getRequestLine(String key) {
+        return requestLineData.get(key);
+    }
 }

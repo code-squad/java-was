@@ -7,11 +7,6 @@ import service.UserService;
 
 public class LoginController extends AbstractController {
     @Override
-    public void service(HttpRequest request, HttpResponse response) {
-        doPost(request, response);
-    }
-
-    @Override
     public void doPost(HttpRequest request, HttpResponse response) {
         UserService userService = new UserService();
 
