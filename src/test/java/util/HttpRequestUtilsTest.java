@@ -1,13 +1,17 @@
 package util;
 
+import domain.HttpRequest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils.Pair;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -94,7 +98,7 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void parsePath_URL() {
+    public void parsePath_requestLine() {
         String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
         assertThat(HttpRequestUtils.parsePath(line), is("/user/create"));
     }
@@ -121,5 +125,36 @@ public class HttpRequestUtilsTest {
         String accpetValue = HttpRequestUtils.parseHeader(line).getValue();
 
         assertThat(HttpRequestUtils.parseAccept(accpetValue)[0], is("text/css"));
+    }
+
+    @Test
+    public void parseParameter() {
+        String line = "GET /user/create?userId=javajigi&password=password HTTP/1.1\r\n";
+        assertThat(HttpRequestUtils.parseParameter(line), is("userId=javajigi&password=password"));
+    }
+
+    @Test
+    public void getHttpRequest_GET() throws IOException {
+        String line = "GET /user/create?userId=javajigi&password=password HTTP/1.1\r\n"
+                + "Host: localhost:8080\r\n"
+                + "Content-Length: 345\r\n"
+                + "\r\n";
+
+        InputStream in = new ByteArrayInputStream(line.getBytes());
+        HttpRequest request = new HttpRequest(in);
+        assertThat(request.getPath(), is("/user/create"));
+        assertThat(request.getParameter(), is("userId=javajigi&password=password"));
+        assertThat(request.getParameter("userId"), is("javajigi"));
+        assertThat(request.getMethod(), is("GET"));
+    }
+
+    @Test
+    public void saveHeader() {
+        String contentLength = "Content-Length: 87";
+        List<Pair> headers = new ArrayList<>();
+        headers.add(HttpRequestUtils.parseHeader(contentLength));
+
+        assertThat(headers.get(0).getKey(), is("Content-Length"));
+        assertThat(headers.get(0).getValue(), is("87"));
     }
 }
