@@ -1,5 +1,8 @@
-package domain;
+package controller;
 
+import domain.HttpRequest;
+import domain.HttpResponse;
+import domain.Url;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;

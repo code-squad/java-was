@@ -3,9 +3,7 @@ package domain;
 import util.HttpRequestUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static util.HttpRequestUtils.Pair;
 
@@ -15,11 +13,6 @@ public class Headers {
 
     public String getValue(String key) {
         // TODO 빈 객체를 리턴하던가, Optional객체를 리턴하던가
-        // TODO Optional 덕분에 NullObjectPattern
-//        if(pairs.stream()
-//                .anyMatch(pair -> pair.getKey().equals(key))) {
-//
-//        }
         return pairs.stream().filter(pair -> pair.getKey().equals(key)).findAny().map(Pair::getValue).orElse("");
     }
 

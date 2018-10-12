@@ -1,4 +1,7 @@
-package domain;
+package controller;
+
+import domain.HttpRequest;
+import domain.HttpResponse;
 
 public class AbstractController implements Controller {
 

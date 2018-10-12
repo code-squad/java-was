@@ -1,10 +1,9 @@
 package webserver;
 
+import controller.*;
 import domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.UserService;
-import util.HttpRequestUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -30,10 +29,12 @@ public class RequestHandler extends Thread {
         controllers.put("/user/create", new CreateUserController());
         controllers.put("/user/login", new LoginController());
         controllers.put("/user/list", new ListUserController());
-        controllers.put("/user/form.html", new UserController());
-        controllers.put("/user/login.html", new UserController());
-        controllers.put("/user/login_failed.html", new UserController());
-        controllers.put("/index.html", new UserController());
+        controllers.put("/user/form.html", new ResourceController());
+        controllers.put("/user/login.html", new ResourceController());
+        controllers.put("/user/login_failed.html", new ResourceController());
+        controllers.put("/css/styles.css", new ResourceController());
+        controllers.put("/css/bootstrap.min.css", new ResourceController());
+        controllers.put("/index.html", new ResourceController());
     }
 
     public void run() {
@@ -42,8 +43,7 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest request = new HttpRequest(in);
-            DataOutputStream dos = new DataOutputStream(out);
-            HttpResponse response = new HttpResponse(dos);
+            HttpResponse response = new HttpResponse(out);
             controllers.get(request.getPath()).service(request, response);
         } catch (IOException e) {
             log.error(e.getMessage());

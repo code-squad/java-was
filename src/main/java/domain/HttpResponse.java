@@ -5,33 +5,29 @@ import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 
 public class HttpResponse {
     private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
 
-    private HttpStatusCode status;
-
-    private String contentType = "text/html";
+    private final String DEFAULT_CONTENT_TYPE = "text/html;charset=utf-8";
     private DataOutputStream dos;
     private Cookies cookies;
 
-    public HttpResponse(DataOutputStream dos) {
-        this.dos = dos;
-    }
-
-    public HttpStatusCode getStatus() {
-        return status;
+    public HttpResponse(OutputStream out) {
+        this.dos = new DataOutputStream(out);
     }
 
     public HttpResponse response200Header(int lengthOfBodyContent) {
+        return response200Header(lengthOfBodyContent, DEFAULT_CONTENT_TYPE);
+    }
+
+    public HttpResponse response200Header(int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-
-            if (!contentType.equals("text/css")) {
-                dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            }
             dos.writeBytes("Content-Type: " + contentType + "\r\n");
+            log.debug("Content-Type: " + contentType + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 
             if (cookies != null) {

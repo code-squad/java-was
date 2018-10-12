@@ -72,7 +72,6 @@ public class HttpRequest {
     }
 
     public String getPath() {
-//        return path;
         return requestLineData.get("path");
     }
 

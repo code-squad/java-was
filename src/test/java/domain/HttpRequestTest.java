@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Socket;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -18,15 +17,18 @@ public class HttpRequestTest {
     public void setUp() {
         StringBuilder sb = new StringBuilder();
         sb.append("GET /user/form.html?name=learner HTTP/1.1").append("\r\n")
-                .append("Cookie: logined=false").append("\r\n")
+                .append("Cookie: logined=true").append("\r\n")
                 .append("\r\n");
         in = new ByteArrayInputStream(sb.toString().getBytes());
     }
 
     @Test
     public void canCreate() throws IOException {
-        Socket socket = new Socket();
-        HttpRequest request = new HttpRequest(socket.getInputStream());
+        String requestMessage = "GET /user/create?userId=javajigi&password=password HTTP/1.1\r\n"
+                + "Host: localhost:8080\r\n"
+                + "Content-Length: 345\r\n"
+                + "\r\n";
+        HttpRequest request = new HttpRequest(new ByteArrayInputStream(requestMessage.getBytes()));
     }
 
     @Test
@@ -47,6 +49,6 @@ public class HttpRequestTest {
     @Test
     public void matchCookieValue() throws IOException {
         HttpRequest request = new HttpRequest(in);
-        assertThat(request.matchCookieValue("logined", "false"), is(false));
+        assertThat(request.matchCookieValue("logined", "true"), is(true));
     }
 }
