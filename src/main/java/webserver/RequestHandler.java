@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 
 import model.RequestMethod;
 import org.slf4j.Logger;
@@ -27,17 +28,17 @@ public class RequestHandler extends Thread {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = null;
+            byte[] body = new byte[0];
             while (!EMPTY.equals(line)) {
                 line = br.readLine();
                 String[] tokens = line.split(BLANK);
                 if(RequestMethod.isRequestMethod(tokens[0])) {
-                    log.debug("method : {}", tokens[1]);
+                    body = Files.readAllBytes(new File("./webapp" + tokens[1]).toPath());
                 }
                 log.debug(line);
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
