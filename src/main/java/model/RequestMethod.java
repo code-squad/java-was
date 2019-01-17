@@ -1,16 +1,16 @@
 package model;
 
-public enum RequestMethod {
+import java.util.Arrays;
 
+public enum RequestMethod {
     POST,
     GET,
     PUT,
     DELETE;
 
-    public static boolean isRequestMethod(String method) {
-        for (RequestMethod value : RequestMethod.values()) {
-            if(String.valueOf(value).equals(method)) return true;
-        }
-        return false;
+    static RequestMethod of(String requestMethod) {
+        return Arrays.stream(RequestMethod.values())
+                .filter(request -> request.toString().equals(requestMethod))
+                .findFirst().get();
     }
 }

@@ -8,6 +8,7 @@ import model.RequestMethod;
 import model.Url;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -27,18 +28,14 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String line = null;
-            byte[] body = new byte[0];
+            String line = br.readLine();
+            Url url = Url.of(line);
+
             while (!EMPTY.equals(line)) {
                 line = br.readLine();
-                String[] tokens = line.split(BLANK);
-                String mayRequestMethod = tokens[0];
-                if(RequestMethod.isRequestMethod(mayRequestMethod)) {
-                    Url url = Url.of(tokens[1]);
-                    body = Files.readAllBytes(new File(url.generate()).toPath());
-                }
                 log.debug(line);
             }
+            byte[] body = Files.readAllBytes(new File(url.generate()).toPath());
 
             DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, body.length);
