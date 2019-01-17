@@ -2,14 +2,19 @@ package util;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.Map;
 
+import model.Url;
 import org.junit.Test;
 
+import org.slf4j.Logger;
 import util.HttpRequestUtils.Pair;
 
 public class HttpRequestUtilsTest {
+    private static final Logger log = getLogger(HttpRequestUtilsTest.class);
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
