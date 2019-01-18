@@ -41,6 +41,8 @@ public class RequestHandler extends Thread {
                 log.debug(line);
             }
 
+            DataOutputStream dos = new DataOutputStream(out);
+
             String bodyText = IOUtils.readData(br, contentLength);
             if(url.getAccessPath().equals("/user/create")) {
                 Map<String, String> bodyVal = HttpRequestUtils.parseQueryString(bodyText);
@@ -49,10 +51,11 @@ public class RequestHandler extends Thread {
                         bodyVal.get("name"),
                         bodyVal.get("email"));
                 log.debug(user.toString());
+                response300Header(dos);
+                return;
             }
             byte[] body = Files.readAllBytes(new File(url.generate()).toPath());
 
-            DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -66,6 +69,17 @@ public class RequestHandler extends Thread {
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response300Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Location: http://localhost:" + WebServer.DEFAULT_PORT + "/index.html\r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
         } catch (IOException e) {
             log.error(e.getMessage());
         }
