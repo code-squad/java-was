@@ -41,9 +41,9 @@ public class RequestHandler extends Thread {
 
             DataOutputStream dos = new DataOutputStream(out);
 
-            String bodyText = IOUtils.readData(br, contentLength);
+            url.setQueryString(IOUtils.readData(br, contentLength));
             if(MappingHandler.hasMappingPath(url)) {
-                MappingHandler.invoke(url, bodyText);
+                MappingHandler.invoke(url);
                 response300Header(dos);
                 return;
             }

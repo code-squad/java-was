@@ -42,9 +42,9 @@ public class MappingHandler {
         return mappingHandler.containsKey(url);
     }
 
-    public static void invoke(Url url, String bodyText) throws Exception {
+    public static void invoke(Url url) throws Exception {
         Method thisMethod = mappingHandler.get(url);
         Object thisObject = mappingHandler.get(url).getDeclaringClass().newInstance();
-        thisMethod.invoke(thisObject, bodyText);
+        thisMethod.invoke(thisObject, url.getQueryString());
     }
 }
