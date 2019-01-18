@@ -16,12 +16,12 @@ public class UserController {
     private static final Logger log = getLogger(UserController.class);
 
     @RequestMapping(value = "/user/create", method = RequestMethod.POST)
-    public User create(String bodyText) {
-        Map<String, String> bodyVal = HttpRequestUtils.parseQueryString(bodyText);
-        User user = new User(bodyVal.get("userId"),
-                bodyVal.get("password"),
-                bodyVal.get("name"),
-                bodyVal.get("email"));
+    public User create(User user) {
+//        Map<String, String> bodyVal = HttpRequestUtils.parseQueryString(bodyText);
+//        User user = new User(bodyVal.get("userId"),
+//                bodyVal.get("password"),
+//                bodyVal.get("name"),
+//                bodyVal.get("email"));
         log.debug(user.toString());
         return user;
     }

@@ -3,10 +3,12 @@ package codesquad.webserver;
 import codesquad.Controller;
 import codesquad.RequestMapping;
 import codesquad.model.Url;
+import codesquad.model.User;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +47,11 @@ public class MappingHandler {
     public static void invoke(Url url) throws Exception {
         Method thisMethod = mappingHandler.get(url);
         Object thisObject = mappingHandler.get(url).getDeclaringClass().newInstance();
-        thisMethod.invoke(thisObject, url.getQueryString());
+//        thisMethod.invoke(thisObject, url.getQueryValue());
+
+        Object[] args = ParameterBinder.bind(thisMethod, url);
+//        User user = new User("brad903", "password", "brad", "brad903@naver.com");
+//        Object[] args = {user};
+        thisMethod.invoke(thisObject, args);
     }
 }
