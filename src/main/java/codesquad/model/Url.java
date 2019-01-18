@@ -1,9 +1,10 @@
-package model;
+package codesquad.model;
 
 import com.google.common.collect.Maps;
-import util.HttpRequestUtils;
+import codesquad.util.HttpRequestUtils;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class Url {
     public static final String ROOT_STATIC_PATH = "./webapp";
@@ -15,6 +16,11 @@ public class Url {
     private String accessPath;
 
     private Map<String, String> queryString;
+
+    public Url(RequestMethod requestMethod, String accessPath) {
+        this.requestMethod = requestMethod;
+        this.accessPath = accessPath;
+    }
 
     private Url(RequestMethod requestMethod, String accessPath, Map<String, String> queryString) {
         this.requestMethod = requestMethod;
@@ -45,5 +51,19 @@ public class Url {
     @Override
     public String toString() {
         return "Url[requestMethod=" + requestMethod + ", accessPath=" + accessPath + ", queryString=" + queryString + ']';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Url url = (Url) o;
+        return requestMethod == url.requestMethod &&
+                accessPath.equals(url.accessPath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(requestMethod, accessPath);
     }
 }

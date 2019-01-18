@@ -1,4 +1,4 @@
-package util;
+package codesquad.util;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import model.Url;
 
 public class HttpRequestUtils {
     /**

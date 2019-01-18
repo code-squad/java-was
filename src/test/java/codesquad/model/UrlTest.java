@@ -1,4 +1,4 @@
-package model;
+package codesquad.model;
 
 import org.junit.Test;
 import org.slf4j.Logger;
