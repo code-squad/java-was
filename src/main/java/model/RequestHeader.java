@@ -5,7 +5,7 @@ import util.ParameterConverter;
 import java.util.Map;
 import java.util.Objects;
 
-public class URLInfo {
+public class RequestHeader {
 
     private static final String SPLIT_BLANK = " ";
     private static final String SPLIT_QUESTION = "\\?";
@@ -16,10 +16,16 @@ public class URLInfo {
     private Map<String, String> params;
     private String method;
 
-    public URLInfo(String path, String method) {
+    public RequestHeader(String path, String method, String param) {
         this.path = path;
         this.method = method;
 
+        /* POST Method Parameter 존재할 경우에만 동작 */
+        if(param != null) {
+           this.params = HttpRequestUtils.parseQueryString(param);
+        }
+
+        /* GET Method Parameter 존재할 경우에만 동작! */
         if(path.contains(QUESTION_MARK)) {
             initParams(path);
         }
@@ -59,7 +65,7 @@ public class URLInfo {
 
     @Override
     public String toString() {
-        return "URLInfo{" +
+        return "RequestHeader{" +
                 "path='" + path + '\'' +
                 ", params=" + params +
                 '}';
@@ -69,7 +75,7 @@ public class URLInfo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        URLInfo urlInfo = (URLInfo) o;
+        RequestHeader urlInfo = (RequestHeader) o;
         return Objects.equals(path, urlInfo.path) &&
                 Objects.equals(method, urlInfo.method);
     }

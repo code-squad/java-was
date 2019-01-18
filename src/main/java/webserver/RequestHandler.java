@@ -3,11 +3,12 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
-import model.URLInfo;
+import model.RequestHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HandlerMapping;
 import util.IOUtils;
+import util.RequestHeaderFactory;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -23,18 +24,12 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 요구조건1)
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String headerLine = br.readLine();
-
-            while(!(headerLine = br.readLine()).equals("")) {
-                log.debug("Request Header Line : {}", headerLine);
-            }
-            URLInfo urlInfo = new URLInfo(URLInfo.obtainURL(headerLine), URLInfo.obtainMethod(headerLine));
-            HandlerMapping.saveData(urlInfo).toString();
+            RequestHeader requestHeader = RequestHeaderFactory.of(in);
+            log.debug("RequestHeader : {}", requestHeader.toString());
+            Object savedObject = HandlerMapping.saveData(requestHeader);
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = IOUtils.obtainBody(urlInfo);
+            byte[] body = IOUtils.obtainBody(requestHeader);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {

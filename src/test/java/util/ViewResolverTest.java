@@ -1,6 +1,6 @@
 package util;
 
-import model.URLInfo;
+import model.RequestHeader;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,6 +8,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ViewResolverTest {
     @Test
     public void obtainReturnViewTest() {
-        assertThat(ViewResolver.obtainReturnView(new URLInfo("/index.html", "GET"))).isEqualTo("./webapp/index.html");
+        assertThat(ViewResolver.obtainReturnView(new RequestHeader("/index.html", "GET", null))).isEqualTo("./webapp/index.html");
     }
 }

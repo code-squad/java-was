@@ -1,13 +1,10 @@
 package util;
 
-import model.URLInfo;
+import model.RequestHeader;
 import org.slf4j.Logger;
 
 import java.io.*;
-import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -31,7 +28,7 @@ public class IOUtils {
        @param
        @return 리턴하는 페이지의 HTML 태그를 읽어서 반환
     */
-    public static byte[] obtainBody(URLInfo urlInfo) throws IOException {
+    public static byte[] obtainBody(RequestHeader urlInfo) throws IOException {
         return Files.readAllBytes(new File(ViewResolver.obtainReturnView(urlInfo)).toPath());
     }
 }

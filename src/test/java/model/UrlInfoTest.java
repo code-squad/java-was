@@ -3,10 +3,7 @@ package model;
 import org.junit.Test;
 import org.slf4j.Logger;
 import util.HttpRequestUtils;
-import util.IOUtils;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -22,7 +19,7 @@ public class UrlInfoTest {
 
     @Test
     public void obtainURL() {
-        assertThat(URLInfo.obtainURL("GET /api/url HTTP1.1")).isEqualTo("/api/url");
+        assertThat(RequestHeader.obtainURL("GET /api/url HTTP1.1")).isEqualTo("/api/url");
     }
 
     @Test
@@ -39,19 +36,19 @@ public class UrlInfoTest {
 
     @Test
     public void urlInfo생성자_적용_테스트() {
-        assertThat(new URLInfo(path, "GET")).isEqualTo(new URLInfo("/user/create", "GET"));
+        assertThat(new RequestHeader(path, "GET")).isEqualTo(new RequestHeader("/user/create", "GET"));
     }
 
     @Test
     public void obtainParameterTest() {
-        URLInfo urlInfo = new URLInfo(path, "GET");
+        RequestHeader urlInfo = new RequestHeader(path, "GET");
         assertThat(urlInfo.obtainParamElement("userId")).isEqualTo("javajigi");
         assertThat(urlInfo.obtainParamElement("blank")).isEqualTo("");
     }
 
     @Test
     public void obtainURLTest() {
-        assertThat(URLInfo.obtainURL("GET /user/create?userId=javajigi HTTP/1.1"))
+        assertThat(RequestHeader.obtainURL("GET /user/create?userId=javajigi HTTP/1.1"))
                 .isEqualTo("/user/create?userId=javajigi");
 
     }

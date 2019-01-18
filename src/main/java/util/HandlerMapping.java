@@ -1,6 +1,6 @@
 package util;
 
-import model.URLInfo;
+import model.RequestHeader;
 import model.User;
 import org.slf4j.Logger;
 
@@ -16,18 +16,21 @@ public class HandlerMapping {
 
     private static final Logger logger = getLogger(HandlerMapping.class);
 
-    private static Map<URLInfo, UnaryOperator> parameterHandlerMap = new HashMap<>();
+    private static Map<RequestHeader, UnaryOperator> parameterHandlerMap = new HashMap<>();
 
     static {
-        parameterHandlerMap.put(new URLInfo("/users/create", "GET"), urlInfo -> createConstructor(User.class, (URLInfo) urlInfo));
-        parameterHandlerMap.put(new URLInfo("/index.htnl", "GET"), null);
+        parameterHandlerMap.put(new RequestHeader("/users/create", "GET", null)
+                , requestHeader -> createConstructor(User.class, (RequestHeader) requestHeader));
+        parameterHandlerMap.put(new RequestHeader("/index.htnl", "GET", null), null);
+        parameterHandlerMap.put(new RequestHeader("/users/create", "POST", null)
+                , requestHeader -> createConstructor(User.class, (RequestHeader) requestHeader));
     }
 
     /*
        @param  리턴하는 클래스 타입, URL 객체
        @return 리플랙션으로 URL path 필드에 해당하는 setter 메소드를 호출하여 객체 반환 (단, 자바빈 규약 준수)
     */
-    public static <T> T createConstructor(Class clazz, URLInfo urlInfo) {
+    public static <T> T createConstructor(Class clazz, RequestHeader requestHeader) {
         T obj = null;
         try {
             obj = (T) clazz.newInstance();
@@ -35,7 +38,7 @@ public class HandlerMapping {
             for (Method method : methods) {
                 if(method.getName().startsWith("set")) {
                     String field = obtainField(method.getName());
-                    method.invoke(obj, urlInfo.obtainParamElement(field));
+                    method.invoke(obj, requestHeader.obtainParamElement(field));
                 }
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -54,7 +57,10 @@ public class HandlerMapping {
         return sb.toString();
     }
 
-    public static Object saveData(URLInfo urlInfo) {
-        return parameterHandlerMap.get(urlInfo).apply(urlInfo);
+    public static Object saveData(RequestHeader requestHeader) {
+        if(parameterHandlerMap.get(requestHeader) != null) {
+            return parameterHandlerMap.get(requestHeader).apply(requestHeader);
+        }
+        return null;
     }
 }
