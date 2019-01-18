@@ -27,16 +27,11 @@ public class IOUtils {
         return String.copyValueOf(body);
     }
 
-    public static byte[] obtainBody(URLInfo urlInfo) throws IOException {
-        return Files.readAllBytes(new File(urlInfo.obtainReturnFilePath()).toPath());
-    }
-
     /*
-        java.lang.IllegalArgumentException: Missing scheme 발생
-            -> 원인은 'file:///' 없어서! --> 사용불가!
-     */
-    public static Path obtainPath(String path) {
-        return Paths.get(URI.create(path));
+       @param
+       @return 리턴하는 페이지의 HTML 태그를 읽어서 반환
+    */
+    public static byte[] obtainBody(URLInfo urlInfo) throws IOException {
+        return Files.readAllBytes(new File(ViewResolver.obtainReturnView(urlInfo)).toPath());
     }
-
 }

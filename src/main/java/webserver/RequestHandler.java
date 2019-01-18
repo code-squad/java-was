@@ -6,6 +6,7 @@ import java.net.Socket;
 import model.URLInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HandlerMapping;
 import util.IOUtils;
 
 public class RequestHandler extends Thread {
@@ -24,13 +25,13 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 요구조건1)
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String header = br.readLine();
-            URLInfo urlInfo = new URLInfo(URLInfo.obtainURL(header), URLInfo.obtainMethod(header));
+            String headerLine = br.readLine();
 
-            String input = null;
-            while(!(input = br.readLine()).equals("")) {
-                log.debug("Request Header Line : {}", input);
+            while(!(headerLine = br.readLine()).equals("")) {
+                log.debug("Request Header Line : {}", headerLine);
             }
+            URLInfo urlInfo = new URLInfo(URLInfo.obtainURL(headerLine), URLInfo.obtainMethod(headerLine));
+            HandlerMapping.saveData(urlInfo).toString();
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = IOUtils.obtainBody(urlInfo);

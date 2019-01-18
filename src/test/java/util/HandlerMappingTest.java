@@ -1,6 +1,7 @@
 package util;
 
 import model.URLInfo;
+import model.User;
 import org.junit.Test;
 import org.slf4j.Logger;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,9 +13,9 @@ public class HandlerMappingTest {
 
     @Test
     public void saveDataTest() {
-        String path = "/create?name=doby";
+        String path = "/users/create?name=doby&userId=lee&password=password&email=lkhlkh09@gmail.com";
         Object user = HandlerMapping.saveData(new URLInfo(path, "GET"));
-        logger.debug(user.toString());
+        assertThat(user).isEqualTo(new User("lee", "password", "doby", "lkhlkh09@gmail.com"));
     }
 
     @Test

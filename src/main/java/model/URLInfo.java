@@ -1,6 +1,7 @@
 package model;
 
 import util.HttpRequestUtils;
+import util.ParameterConverter;
 import java.util.Map;
 import java.util.Objects;
 
@@ -29,18 +30,31 @@ public class URLInfo {
         this.params = HttpRequestUtils.parseQueryString(path.split(SPLIT_QUESTION)[1]);
     }
 
-    /* HttpHeader 에서 URL 추출 */
+    /*
+       @param  Header의 첫 라인
+       @return HttpHeader 에서 URL 추출
+    */
     public static String obtainURL(String line) {
         return line.split(SPLIT_BLANK)[1];
     }
 
-    /* HttpHeader 에서 Method 추출 */
+    /*
+       @param  Header의 첫 라인
+       @return HttpHeader 에서 Method 추출
+    */
     public static String obtainMethod(String line) {
         return line.split(SPLIT_BLANK)[0];
     }
 
-    public String obtainReturnFilePath() {
-        return (ROOT + this.path);
+    /*
+       @param
+       @return 파라미터의 필드값 반환 (URL Encoding 처리된 문자는 URL Decoding)
+    */
+    public String obtainParamElement(String field) {
+        if(!params.containsKey(field)) {
+            return "";
+        }
+        return ParameterConverter.urlDecoding(params.get(field));
     }
 
     @Override
@@ -63,12 +77,5 @@ public class URLInfo {
     @Override
     public int hashCode() {
         return Objects.hash(path, method);
-    }
-
-    public String obtainParamElement(String field) {
-        if(!params.containsKey(field)) {
-            return "";
-        }
-        return params.get(field);
     }
 }

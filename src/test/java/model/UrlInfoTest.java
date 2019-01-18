@@ -6,6 +6,7 @@ import util.HttpRequestUtils;
 import util.IOUtils;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -15,6 +16,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class UrlInfoTest {
 
     private static final Logger logger = getLogger(UrlInfoTest.class);
+
+    private static final String path
+            = "/user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
 
     @Test
     public void obtainURL() {
@@ -33,14 +37,22 @@ public class UrlInfoTest {
         }
     }
 
-    /*@Test(expected = IOException.class)
-    public void obtainBody_존재하지않는파일_실패() throws IOException {
-        IOUtils.obtainBody(new URLInfo("/api/users"));
+    @Test
+    public void urlInfo생성자_적용_테스트() {
+        assertThat(new URLInfo(path, "GET")).isEqualTo(new URLInfo("/user/create", "GET"));
     }
 
     @Test
-    public void urlInfo생성자_적용_테스트() {
-        URLInfo urlInfo = new URLInfo("/create?userId=javajigi&password=password&email=javajigi%40slipp.net");
-        logger.debug("URLINFO : {}", urlInfo.toString());
-    }*/
+    public void obtainParameterTest() {
+        URLInfo urlInfo = new URLInfo(path, "GET");
+        assertThat(urlInfo.obtainParamElement("userId")).isEqualTo("javajigi");
+        assertThat(urlInfo.obtainParamElement("blank")).isEqualTo("");
+    }
+
+    @Test
+    public void obtainURLTest() {
+        assertThat(URLInfo.obtainURL("GET /user/create?userId=javajigi HTTP/1.1"))
+                .isEqualTo("/user/create?userId=javajigi");
+
+    }
 }
