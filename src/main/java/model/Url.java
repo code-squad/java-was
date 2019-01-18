@@ -30,6 +30,10 @@ public class Url {
         return new Url(requestMethod, parsedPath[0], HttpRequestUtils.parseQueryString(parsedUrl[1]));
     }
 
+    public RequestMethod getRequestMethod() {
+        return requestMethod;
+    }
+
     public String getAccessPath() {
         return accessPath;
     }
