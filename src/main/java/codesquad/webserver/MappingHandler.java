@@ -41,4 +41,10 @@ public class MappingHandler {
     public static boolean hasMappingPath(Url url) {
         return mappingHandler.containsKey(url);
     }
+
+    public static void invoke(Url url, String bodyText) throws Exception {
+        Method thisMethod = mappingHandler.get(url);
+        Object thisObject = mappingHandler.get(url).getDeclaringClass().newInstance();
+        thisMethod.invoke(thisObject, bodyText);
+    }
 }

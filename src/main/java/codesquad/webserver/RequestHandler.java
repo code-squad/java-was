@@ -43,6 +43,7 @@ public class RequestHandler extends Thread {
 
             String bodyText = IOUtils.readData(br, contentLength);
             if(MappingHandler.hasMappingPath(url)) {
+                MappingHandler.invoke(url, bodyText);
                 response300Header(dos);
                 return;
             }
@@ -50,7 +51,7 @@ public class RequestHandler extends Thread {
 
             response200Header(dos, body.length);
             responseBody(dos, body);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
