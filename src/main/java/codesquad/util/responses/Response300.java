@@ -18,7 +18,9 @@ public class Response300 implements Response {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
             dos.writeBytes("Location: " + url.generateAccessPath() + "\r\n");
-//            dos.writeBytes(header.writeCookie());
+            if(header.isCookieModified()) {
+                dos.writeBytes(header.writeCookie());
+            }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());

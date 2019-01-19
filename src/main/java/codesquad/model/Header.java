@@ -19,6 +19,8 @@ public class Header {
 
     private Map<String, String> cookie = Maps.newHashMap();
 
+    private boolean cookieModified = false;
+
     private ResponseCode responseCode = ResponseCode.OK;
 
     public Header() {
@@ -39,6 +41,7 @@ public class Header {
     }
 
     public void addCookie(HttpSession httpSession) {
+        cookieModified = true;
         httpSession.putCookie(cookie);
     }
 
@@ -68,6 +71,10 @@ public class Header {
         }
         sb.append(" Path=/");
         return sb.toString();
+    }
+
+    public boolean isCookieModified() {
+        return cookieModified;
     }
 
     public byte[] writeBody() throws IOException {
