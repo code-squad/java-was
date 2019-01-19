@@ -7,6 +7,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import static codesquad.fixture.UrlFixture.URL;
+
 public class UrlTest {
     private static final Logger log = getLogger(UrlTest.class);
 
@@ -24,4 +26,11 @@ public class UrlTest {
         assertThat(url.getAccessPath(), is("/user/create"));
     }
 
+    @Test
+    public void hasSameFieldName_통과() {
+        String[] fieldNames = {"userId", "password", "name", "email"};
+        for (String fieldName : fieldNames) {
+            assertThat(URL.hasSameFieldName(fieldName), is(true));
+        }
+    }
 }

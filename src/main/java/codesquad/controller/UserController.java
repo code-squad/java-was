@@ -5,9 +5,6 @@ import codesquad.RequestMapping;
 import codesquad.model.RequestMethod;
 import codesquad.model.User;
 import org.slf4j.Logger;
-import codesquad.util.HttpRequestUtils;
-
-import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -17,11 +14,6 @@ public class UserController {
 
     @RequestMapping(value = "/user/create", method = RequestMethod.POST)
     public User create(User user) {
-//        Map<String, String> bodyVal = HttpRequestUtils.parseQueryString(bodyText);
-//        User user = new User(bodyVal.get("userId"),
-//                bodyVal.get("password"),
-//                bodyVal.get("name"),
-//                bodyVal.get("email"));
         log.debug(user.toString());
         return user;
     }

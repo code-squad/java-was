@@ -4,6 +4,7 @@ import codesquad.util.HttpRequestUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,7 +24,7 @@ public class Url {
         this.accessPath = accessPath;
     }
 
-    private Url(RequestMethod requestMethod, String accessPath, Map<String, String> queryString) {
+    public Url(RequestMethod requestMethod, String accessPath, Map<String, String> queryString) {
         this.requestMethod = requestMethod;
         this.accessPath = accessPath;
         this.queryValue = queryString;
@@ -33,7 +34,7 @@ public class Url {
         String[] parsedUrl = url.split(BLANK);
         String[] parsedPath = parsedUrl[1].split(QUESTION_MARK);
         RequestMethod requestMethod = RequestMethod.of(parsedUrl[0]);
-        if(parsedPath.length == 1) return new Url(requestMethod, parsedPath[0], Maps.newHashMap());
+        if (parsedPath.length == 1) return new Url(requestMethod, parsedPath[0], Maps.newHashMap());
         return new Url(requestMethod, parsedPath[0], HttpRequestUtils.parseQueryString(parsedUrl[1]));
     }
 
@@ -50,8 +51,23 @@ public class Url {
     }
 
     public void setQueryValue(String bodyText) {
-        if(!Strings.isNullOrEmpty(bodyText)) this.queryValue = HttpRequestUtils.parseQueryString(bodyText);
+        if (!Strings.isNullOrEmpty(bodyText)) this.queryValue = HttpRequestUtils.parseQueryString(bodyText);
     }
+
+    public boolean hasSameFieldName(String fieldName) {
+        return this.queryValue.containsKey(fieldName);
+    }
+
+    public void injectValue(Object aInstance, Method method) {
+        String setterName = method.getName().substring(3);
+        String fieldName = setterName.substring(0, 1).toLowerCase() + setterName.substring(1);
+        try {
+            method.invoke(aInstance, this.queryValue.get(fieldName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public String toString() {
         return "Url[requestMethod=" + requestMethod + ", accessPath=" + accessPath + ", queryValue=" + queryValue + ']';
