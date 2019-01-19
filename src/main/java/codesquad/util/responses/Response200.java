@@ -1,5 +1,6 @@
 package codesquad.util.responses;
 
+import codesquad.model.Request;
 import codesquad.model.Url;
 import org.slf4j.Logger;
 
@@ -16,7 +17,8 @@ public class Response200 implements Response {
     private byte[] body;
 
     @Override
-    public void header(DataOutputStream dos, Url url) {
+    public void header(DataOutputStream dos, Request request) {
+        Url url = request.getUrl();
         try {
             body = Files.readAllBytes(new File(url.generateFilePath()).toPath());
             dos.writeBytes("HTTP/1.1 200 OK \r\n");

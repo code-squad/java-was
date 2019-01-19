@@ -1,5 +1,6 @@
 package codesquad.fixture;
 
+import codesquad.model.Request;
 import codesquad.model.RequestMethod;
 import codesquad.model.Url;
 
@@ -17,6 +18,6 @@ public class UrlFixture {
         queryValue.put("password", USER.getPassword());
         queryValue.put("name", USER.getName());
         queryValue.put("email", USER.getEmail());
-        URL = new Url(RequestMethod.POST, "/user/create",queryValue);
+        URL = new Url(RequestMethod.POST, "/user/create", queryValue);
     }
 }

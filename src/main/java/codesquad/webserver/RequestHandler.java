@@ -1,5 +1,6 @@
 package codesquad.webserver;
 
+import codesquad.model.Request;
 import codesquad.model.Url;
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
@@ -29,6 +30,7 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
+            Request request = new Request();
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
             Url url = Url.of(line);
@@ -38,19 +40,21 @@ public class RequestHandler extends Thread {
                 line = br.readLine();
                 if (line.contains("Content-Length")) {
                     contentLength = Integer.parseInt(HttpRequestUtils.parseHeader(line).getValue());
+                    request.setContentLength(contentLength);
                 }
                 log.debug(line);
             }
 
             ViewHandler viewHandler = new ViewHandler(out);
-            ResponseCode responseCode = ResponseCode.OK;
 
             url.setQueryValue(IOUtils.readData(br, contentLength));
+            request.setUrl(url);
             if(MappingHandler.hasMappingPath(url)) {
-                responseCode = MappingHandler.invoke(url);
+                MappingHandler.invoke(request);
             }
 
-            viewHandler.resolve(url, responseCode);
+            log.debug(request.toString());
+            viewHandler.resolve(request);
 
         } catch (Exception e) {
             log.error(e.getMessage());

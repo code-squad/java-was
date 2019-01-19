@@ -2,6 +2,8 @@ package codesquad.webserver;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
+import codesquad.model.Cookie;
+import codesquad.model.Request;
 import codesquad.model.Url;
 import codesquad.util.responses.ResponseCode;
 import org.reflections.Reflections;
@@ -43,21 +45,22 @@ public class MappingHandler {
         return mappingHandler.containsKey(url);
     }
 
-    public static ResponseCode invoke(Url url) throws Exception {
+    public static void invoke(Request request) throws Exception {
+        Url url = request.getUrl();
         Method thisMethod = mappingHandler.get(url);
         Object thisObject = mappingHandler.get(url).getDeclaringClass().newInstance();
         Object[] args = ParameterBinder.bind(thisMethod, url);
         Object result = thisMethod.invoke(thisObject, args);
-        return generateResponseCode(url, result);
+
+        Arrays.stream(args)
+                .filter(arg -> arg.getClass().getName().equals("codesquad.model.Cookie"))
+                .forEach(arg -> {
+                    Cookie cookie = (Cookie)arg;
+                    request.setCookie(cookie);
+                });
+        log.debug(request.toString());
+
+        request.generateResponseCode(result);
     }
 
-    public static ResponseCode generateResponseCode(Url url, Object result) {
-        String newAccessPath = (String) result;
-        if(newAccessPath.contains("redirect")) {
-            url.renewAccessPath(newAccessPath.split(":")[1]);
-            return ResponseCode.FOUND;
-        }
-        url.renewAccessPath(newAccessPath);
-        return ResponseCode.OK;
-    }
 }

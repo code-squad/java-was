@@ -1,6 +1,6 @@
 package codesquad.webserver;
 
-import codesquad.model.Url;
+import codesquad.model.Request;
 import codesquad.util.responses.Response;
 import codesquad.util.responses.Response200;
 import codesquad.util.responses.Response300;
@@ -28,12 +28,9 @@ public class ViewHandler {
         this.dos = new DataOutputStream(out);
     }
 
-    public void resolve(Url url, ResponseCode responseCode) {
-        log.debug("responseCode : {}", responseCode);
-        log.debug("url : {}", url);
-
-        Response response = responses.get(responseCode);
-        response.header(dos, url);
+    public void resolve(Request request) {
+        Response response = responses.get(request.getResponseCode());
+        response.header(dos, request);
         response.body(dos);
     }
 }
