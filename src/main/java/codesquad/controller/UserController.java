@@ -13,8 +13,8 @@ public class UserController {
     private static final Logger log = getLogger(UserController.class);
 
     @RequestMapping(value = "/user/create", method = RequestMethod.POST)
-    public User create(User user) {
+    public String create(User user) {
         log.debug(user.toString());
-        return user;
+        return "redirect:/index.html";
     }
 }

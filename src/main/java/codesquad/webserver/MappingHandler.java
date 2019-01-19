@@ -3,6 +3,7 @@ package codesquad.webserver;
 import codesquad.Controller;
 import codesquad.RequestMapping;
 import codesquad.model.Url;
+import codesquad.util.responses.ResponseCode;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 
@@ -42,10 +43,21 @@ public class MappingHandler {
         return mappingHandler.containsKey(url);
     }
 
-    public static void invoke(Url url) throws Exception {
+    public static ResponseCode invoke(Url url) throws Exception {
         Method thisMethod = mappingHandler.get(url);
         Object thisObject = mappingHandler.get(url).getDeclaringClass().newInstance();
         Object[] args = ParameterBinder.bind(thisMethod, url);
-        thisMethod.invoke(thisObject, args);
+        Object result = thisMethod.invoke(thisObject, args);
+        return generateResponseCode(url, result);
+    }
+
+    public static ResponseCode generateResponseCode(Url url, Object result) {
+        String newAccessPath = (String) result;
+        if(newAccessPath.contains("redirect")) {
+            url.renewAccessPath(newAccessPath.split(":")[1]);
+            return ResponseCode.FOUND;
+        }
+        url.renewAccessPath(newAccessPath);
+        return ResponseCode.OK;
     }
 }

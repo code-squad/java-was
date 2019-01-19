@@ -1,14 +1,17 @@
 package codesquad.webserver;
 
 import codesquad.model.Url;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
+import codesquad.util.responses.ResponseCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.file.Files;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -39,50 +42,17 @@ public class RequestHandler extends Thread {
                 log.debug(line);
             }
 
-            DataOutputStream dos = new DataOutputStream(out);
+            ViewHandler viewHandler = new ViewHandler(out);
+            ResponseCode responseCode = ResponseCode.OK;
 
             url.setQueryValue(IOUtils.readData(br, contentLength));
             if(MappingHandler.hasMappingPath(url)) {
-                MappingHandler.invoke(url);
-                response300Header(dos);
-                return;
+                responseCode = MappingHandler.invoke(url);
             }
-            byte[] body = Files.readAllBytes(new File(url.generate()).toPath());
 
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            viewHandler.resolve(url, responseCode);
+
         } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response300Header(DataOutputStream dos) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: http://localhost:" + WebServer.DEFAULT_PORT + "/index.html\r\n");
-            dos.writeBytes("\r\n");
-            dos.flush();
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
             log.error(e.getMessage());
         }
     }

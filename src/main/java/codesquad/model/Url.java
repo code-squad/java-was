@@ -68,6 +68,10 @@ public class Url {
         }
     }
 
+    public void renewAccessPath(String newAccessPath) {
+        this.accessPath = newAccessPath;
+    }
+
     @Override
     public String toString() {
         return "Url[requestMethod=" + requestMethod + ", accessPath=" + accessPath + ", queryValue=" + queryValue + ']';

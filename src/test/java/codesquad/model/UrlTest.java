@@ -33,4 +33,10 @@ public class UrlTest {
             assertThat(URL.hasSameFieldName(fieldName), is(true));
         }
     }
+
+    @Test
+    public void renewAccessPath() {
+        URL.renewAccessPath("/index.html");
+        assertThat(URL.getAccessPath(), is("/index.html"));
+    }
 }
