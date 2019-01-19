@@ -1,6 +1,7 @@
 package codesquad.model;
 
 import codesquad.util.HttpRequestUtils;
+import codesquad.webserver.WebServer;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
@@ -42,11 +43,14 @@ public class Url {
         return accessPath;
     }
 
-    public Map<String, String> getQueryValue() {
-        return queryValue;
+    public String generateAccessPath() {
+        StringBuilder sb = new StringBuilder("http://");
+        return sb.append(WebServer.SERVER_IP)
+                .append(WebServer.DEFAULT_PORT)
+                .append(this.accessPath).toString();
     }
 
-    public String generate() {
+    public String generateFilePath() {
         return ROOT_STATIC_PATH + this.accessPath;
     }
 

@@ -18,7 +18,7 @@ public class Response200 implements Response {
     @Override
     public void header(DataOutputStream dos, Url url) {
         try {
-            body = Files.readAllBytes(new File(url.generate()).toPath());
+            body = Files.readAllBytes(new File(url.generateFilePath()).toPath());
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + body.length + "\r\n");

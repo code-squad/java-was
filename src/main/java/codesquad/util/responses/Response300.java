@@ -1,7 +1,6 @@
 package codesquad.util.responses;
 
 import codesquad.model.Url;
-import codesquad.webserver.WebServer;
 import org.slf4j.Logger;
 
 import java.io.DataOutputStream;
@@ -16,7 +15,7 @@ public class Response300 implements Response {
     public void header(DataOutputStream dos, Url url) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: http://localhost:" + WebServer.DEFAULT_PORT + url.getAccessPath() + "\r\n");
+            dos.writeBytes("Location: " + url.generateAccessPath() + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
