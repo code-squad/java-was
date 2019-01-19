@@ -36,14 +36,14 @@ public class MappingHandlerTest {
     @Test
     public void redirect() {
         Object result = "redirect:/index.html";
-        request.generateResponseCode(URL, result);
+        request.generateResponseCode(result);
         assertThat(request.getResponseCode()).isEqualTo(ResponseCode.FOUND);
     }
 
     @Test
     public void ok() {
         Object result = "/index.html";
-        request.generateResponseCode(URL, result);
+        request.generateResponseCode(result);
         assertThat(request.getResponseCode()).isEqualTo(ResponseCode.OK);
     }
 }

@@ -8,7 +8,7 @@ public class Request {
 
     private int contentLength;
 
-    private Cookie cookie;
+    private Cookie cookie = new Cookie();
 
     private ResponseCode responseCode = ResponseCode.OK;
 
@@ -23,16 +23,8 @@ public class Request {
         this.url = url;
     }
 
-    public int getContentLength() {
-        return contentLength;
-    }
-
     public void setContentLength(int contentLength) {
         this.contentLength = contentLength;
-    }
-
-    public Cookie getCookie() {
-        return cookie;
     }
 
     public void setCookie(Cookie cookie) {
@@ -53,6 +45,14 @@ public class Request {
         responseCode = ResponseCode.FOUND;
     }
 
+    public boolean hasCookieVal() {
+        return cookie.hasValue();
+    }
+
+    public String writeCookie() {
+        return cookie.writeCookie() + " Path=/";
+    }
+
     @Override
     public String toString() {
         return "Request{" +
@@ -62,9 +62,9 @@ public class Request {
                 ", responseCode=" + responseCode +
                 '}';
     }
-
     @Override
     public Request clone() throws CloneNotSupportedException {
         return (Request) super.clone();
     }
+
 }
