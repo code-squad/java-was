@@ -1,13 +1,12 @@
 package codesquad.util.responses;
 
-import codesquad.model.Request;
-import codesquad.model.Url;
+import codesquad.model.Header;
 
 import java.io.DataOutputStream;
 
 public interface Response {
 
-    void header(DataOutputStream dos, Request request);
+    void header(DataOutputStream dos, Header header);
 
     void body(DataOutputStream dos);
 

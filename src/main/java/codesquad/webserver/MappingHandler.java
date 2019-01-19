@@ -2,10 +2,9 @@ package codesquad.webserver;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
-import codesquad.model.Cookie;
-import codesquad.model.Request;
+import codesquad.model.HttpSession;
+import codesquad.model.Header;
 import codesquad.model.Url;
-import codesquad.util.responses.ResponseCode;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 
@@ -45,22 +44,22 @@ public class MappingHandler {
         return mappingHandler.containsKey(url);
     }
 
-    public static void invoke(Request request) throws Exception {
-        Url url = request.getUrl();
+    public static void invoke(Header header) throws Exception {
+        Url url = header.getUrl();
         Method thisMethod = mappingHandler.get(url);
         Object thisObject = mappingHandler.get(url).getDeclaringClass().newInstance();
         Object[] args = ParameterBinder.bind(thisMethod, url);
         Object result = thisMethod.invoke(thisObject, args);
 
         Arrays.stream(args)
-                .filter(arg -> arg.getClass().getName().equals("codesquad.model.Cookie"))
+                .filter(arg -> arg.getClass().getName().equals("codesquad.model.HttpSession"))
                 .forEach(arg -> {
-                    Cookie cookie = (Cookie)arg;
-                    request.setCookie(cookie);
+                    HttpSession httpSession = (HttpSession)arg;
+                    header.addCookie(httpSession);
                 });
-        log.debug(request.toString());
+        log.debug(header.toString());
 
-        request.generateResponseCode(result);
+        header.generateResponseCode(result);
     }
 
 }

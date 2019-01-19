@@ -1,7 +1,7 @@
 package codesquad.webserver;
 
 import codesquad.Controller;
-import codesquad.model.Request;
+import codesquad.model.Header;
 import codesquad.util.responses.ResponseCode;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,12 +16,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MappingHandlerTest {
     private static final Logger log = getLogger(MappingHandlerTest.class);
-    private Request request;
+    private Header header;
 
     @Before
     public void setUp() throws Exception {
-        request = new Request();
-        request.setUrl(URL);
+        header = new Header();
+        header.setUrl(URL);
     }
 
     @Test
@@ -36,14 +36,14 @@ public class MappingHandlerTest {
     @Test
     public void redirect() {
         Object result = "redirect:/index.html";
-        request.generateResponseCode(result);
-        assertThat(request.getResponseCode()).isEqualTo(ResponseCode.FOUND);
+        header.generateResponseCode(result);
+        assertThat(header.getResponseCode()).isEqualTo(ResponseCode.FOUND);
     }
 
     @Test
     public void ok() {
         Object result = "/index.html";
-        request.generateResponseCode(result);
-        assertThat(request.getResponseCode()).isEqualTo(ResponseCode.OK);
+        header.generateResponseCode(result);
+        assertThat(header.getResponseCode()).isEqualTo(ResponseCode.OK);
     }
 }

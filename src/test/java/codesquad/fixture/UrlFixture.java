@@ -1,6 +1,5 @@
 package codesquad.fixture;
 
-import codesquad.model.Request;
 import codesquad.model.RequestMethod;
 import codesquad.model.Url;
 

@@ -1,13 +1,10 @@
 package codesquad.util.responses;
 
-import codesquad.model.Request;
-import codesquad.model.Url;
+import codesquad.model.Header;
 import org.slf4j.Logger;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -17,17 +14,13 @@ public class Response200 implements Response {
     private byte[] body;
 
     @Override
-    public void header(DataOutputStream dos, Request request) {
-        Url url = request.getUrl();
+    public void header(DataOutputStream dos, Header header) {
         try {
-            body = Files.readAllBytes(new File(url.generateFilePath()).toPath());
+            body = header.writeBody();
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + body.length + "\r\n");
-            if(request.hasCookieVal()) {
-                dos.writeBytes("Set-Cookie: " + request.writeCookie());
-                log.debug("cookie write : {}", request.writeCookie());
-            }
+//            dos.writeBytes(header.writeCookie());
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());

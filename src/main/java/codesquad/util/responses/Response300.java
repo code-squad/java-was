@@ -1,6 +1,6 @@
 package codesquad.util.responses;
 
-import codesquad.model.Request;
+import codesquad.model.Header;
 import codesquad.model.Url;
 import org.slf4j.Logger;
 
@@ -13,14 +13,12 @@ public class Response300 implements Response {
     private static final Logger log = getLogger(Response300.class);
 
     @Override
-    public void header(DataOutputStream dos, Request request) {
-        Url url = request.getUrl();
+    public void header(DataOutputStream dos, Header header) {
+        Url url = header.getUrl();
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
             dos.writeBytes("Location: " + url.generateAccessPath() + "\r\n");
-            if(request.hasCookieVal()) {
-                dos.writeBytes("Set-Cookie: " + request.writeCookie());
-            }
+//            dos.writeBytes(header.writeCookie());
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());

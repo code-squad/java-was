@@ -1,10 +1,8 @@
 package codesquad.webserver;
 
-import codesquad.model.Request;
+import codesquad.model.Header;
 import codesquad.model.Url;
 import codesquad.util.HttpRequestUtils;
-import codesquad.util.IOUtils;
-import codesquad.util.responses.ResponseCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -30,31 +30,27 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
-            Request request = new Request();
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
             Url url = Url.of(line);
 
-            int contentLength = 0;
-            while (!EMPTY.equals(line)) {
-                line = br.readLine();
-                if (line.contains("Content-Length")) {
-                    contentLength = Integer.parseInt(HttpRequestUtils.parseHeader(line).getValue());
-                    request.setContentLength(contentLength);
-                }
+            Map<String, String> headers = new HashMap<>();
+            while (!EMPTY.equals(line = br.readLine())) {
+                HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+                headers.put(pair.getKey(), pair.getValue());
                 log.debug(line);
             }
 
-            ViewHandler viewHandler = new ViewHandler(out);
+            Header header = new Header(url, headers);
+            header.setQueryValue(br);
 
-            url.setQueryValue(IOUtils.readData(br, contentLength));
-            request.setUrl(url);
             if(MappingHandler.hasMappingPath(url)) {
-                MappingHandler.invoke(request);
+                MappingHandler.invoke(header);
             }
 
-            log.debug(request.toString());
-            viewHandler.resolve(request);
+            log.debug(header.toString());
+            ViewHandler viewHandler = new ViewHandler(out);
+            viewHandler.resolve(header);
 
         } catch (Exception e) {
             log.error(e.getMessage());

@@ -2,7 +2,7 @@ package codesquad.controller;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
-import codesquad.model.Cookie;
+import codesquad.model.HttpSession;
 import codesquad.model.RequestMethod;
 import codesquad.model.User;
 import org.slf4j.Logger;
@@ -20,9 +20,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-    public String login(User user, Cookie cookie) {
+    public String login(User user, HttpSession httpSession) {
         log.debug(user.toString());
-        cookie.setAttribute("logined", true);
+        httpSession.setAttribute("logined", true);
         return "redirect:/index.html";
     }
 }

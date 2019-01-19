@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import codesquad.util.HttpRequestUtils.Pair;
 
-public class HttpRequestUtilsTest {
-    private static final Logger log = getLogger(HttpRequestUtilsTest.class);
+public class HttpHeaderUtilsTest {
+    private static final Logger log = getLogger(HttpHeaderUtilsTest.class);
 
     @Test
     public void parseQueryString() {
