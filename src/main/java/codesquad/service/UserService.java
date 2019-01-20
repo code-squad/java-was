@@ -9,7 +9,7 @@ public class UserService {
         UserRepository.addUser(user);
     }
 
-    public static void login(User user) throws IllegalStateException {
+    public static void login(User user) throws Exception {
         User dbUser = UserRepository.findUserById(user.getUserId());
         if(!dbUser.equals(user)) throw new IllegalStateException();
     }

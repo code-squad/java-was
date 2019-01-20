@@ -28,7 +28,8 @@ public class UserController {
             UserService.login(user);
             httpSession.setAttribute("logined", true);
             return "redirect:/index.html";
-        } catch(IllegalStateException e) {
+        } catch(Exception e) {
+            log.error(e.getMessage());
             return "redirect:/user/login_failed.html";
         }
     }
