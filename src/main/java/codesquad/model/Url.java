@@ -4,12 +4,20 @@ import codesquad.util.HttpRequestUtils;
 import codesquad.webserver.WebServer;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class Url {
+    private static final Logger log = getLogger(Url.class);
+
     public static final String ROOT_STATIC_PATH = "./webapp";
     public static final String QUESTION_MARK = "\\?";
     public static final String BLANK = " ";
@@ -76,6 +84,19 @@ public class Url {
         this.accessPath = newAccessPath;
     }
 
+    public Object bindingQeury(Object aInstance) {
+        Arrays.stream(aInstance.getClass().getDeclaredMethods())
+                .filter(method -> method.getName().startsWith("set"))
+                .filter(method -> queryValue.containsKey(getFieldName(method.getName())))
+                .forEach(method -> injectValue(aInstance, method));
+        return aInstance;
+    }
+
+    private String getFieldName(String methodName) {
+        String setterName = methodName.substring(3);
+        return setterName.substring(0, 1).toLowerCase() + setterName.substring(1);
+    }
+
     @Override
     public String toString() {
         return "Url[requestMethod=" + requestMethod + ", accessPath=" + accessPath + ", queryValue=" + queryValue + ']';
@@ -95,4 +116,10 @@ public class Url {
         return Objects.hash(requestMethod, accessPath);
     }
 
+    public boolean hasAllThoseFields(List<String> fields) {
+        for (String key : queryValue.keySet()) {
+            if(!fields.contains(key)) return false;
+        }
+        return true;
+    }
 }

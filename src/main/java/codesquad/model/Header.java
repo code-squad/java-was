@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -84,12 +85,12 @@ public class Header {
         this.url.setQueryValue(IOUtils.readData(br, contentLength));
     }
 
-    public boolean hasSameFieldName(String name) {
-        return url.hasSameFieldName(name);
+    public boolean hasAllThoseFields(List<String> fields) {
+        return url.hasAllThoseFields(fields);
     }
 
-    public void injectValue(Object aInstance, Method method) {
-        url.injectValue(aInstance, method);
+    public Object bindingQuery(Object aInstance) {
+        return url.bindingQeury(aInstance);
     }
 
     public void putCookie(Map<String, Object> newCookie) {

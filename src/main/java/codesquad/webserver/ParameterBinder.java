@@ -4,11 +4,11 @@ import codesquad.model.Header;
 import codesquad.model.HttpSession;
 import org.slf4j.Logger;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -20,7 +20,7 @@ public class ParameterBinder {
         for (Class<?> parameterType : thisMethod.getParameterTypes()) {
             Object aInstance = parameterType.newInstance();
             if (isValidForQuery(parameterType, header)) {
-                args.add(bindingQeury(aInstance, header));
+                args.add(bindingQuery(aInstance, header));
                 continue;
             }
             if (isValidForCookie(aInstance)) {
@@ -37,17 +37,13 @@ public class ParameterBinder {
     }
 
     static boolean isValidForQuery(Class<?> parameterType, Header header) {
-        for (Field declaredField : parameterType.getDeclaredFields()) {
-            if (!header.hasSameFieldName(declaredField.getName())) return false;
-        }
-        return true;
+        List<String> fields = Arrays.stream(parameterType.getDeclaredFields())
+                .map(field -> field.getName()).collect(Collectors.toList());
+        return header.hasAllThoseFields(fields);
     }
 
-    static Object bindingQeury(Object aInstance, Header header) {
-        Arrays.stream(aInstance.getClass().getDeclaredMethods())
-                .filter(method -> method.getName().startsWith("set"))
-                .forEach(method -> header.injectValue(aInstance, method));
-        return aInstance;
+    static Object bindingQuery(Object aInstance, Header header) {
+        return header.bindingQuery(aInstance);
     }
 
     public static Object bindingCookie(Object aInstance, Header header) {
