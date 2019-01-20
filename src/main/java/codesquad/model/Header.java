@@ -26,10 +26,11 @@ public class Header {
     public Header() {
     }
 
-    public Header(Url url, Map<String, String> headers) {
-        this.url = url;
+    public Header(BufferedReader br, Url url, Map<String, String> headers) throws IOException {
         if (headers.containsKey("Content-Length")) contentLength = Integer.parseInt(headers.get("Content-Length"));
         if (headers.containsKey("Cookie")) cookie = HttpRequestUtils.parseCookies(headers.get("Cookie"));
+        this.url = url;
+        this.url.setQueryValue(IOUtils.readData(br, contentLength));
     }
 
     public Url getUrl() {
@@ -59,10 +60,6 @@ public class Header {
         responseCode = ResponseCode.FOUND;
     }
 
-    public void setQueryValue(BufferedReader br) throws IOException {
-        url.setQueryValue(IOUtils.readData(br, contentLength));
-    }
-
     public String writeCookie() {
         if (cookie.isEmpty()) return "";
         StringBuilder sb = new StringBuilder("Set-Cookie: ");
@@ -87,8 +84,8 @@ public class Header {
                 "url=" + url +
                 ", contentLength=" + contentLength +
                 ", cookie=" + cookie +
+                ", cookieModified=" + cookieModified +
                 ", responseCode=" + responseCode +
                 '}';
     }
-
 }

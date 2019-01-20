@@ -2,6 +2,7 @@ package codesquad.controller;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
+import codesquad.db.DataBase;
 import codesquad.model.HttpSession;
 import codesquad.model.RequestMethod;
 import codesquad.model.User;
@@ -16,6 +17,7 @@ public class UserController {
     @RequestMapping(value = "/user/create", method = RequestMethod.POST)
     public String create(User user) {
         log.debug(user.toString());
+        DataBase.addUser(user);
         return "redirect:/index.html";
     }
 
