@@ -29,7 +29,7 @@ public class Header {
 
     private ResponseCode responseCode = ResponseCode.OK;
 
-    public Header(Url url, Map<String, String> headers) throws IOException {
+    public Header(Url url, Map<String, String> headers) {
         this.url = url;
         if (headers.containsKey("Content-Length")) contentLength = Integer.parseInt(headers.get("Content-Length"));
         if (headers.containsKey("Cookie")) cookie = HttpRequestUtils.parseCookies(headers.get("Cookie"));

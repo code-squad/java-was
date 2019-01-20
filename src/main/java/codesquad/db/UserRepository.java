@@ -7,7 +7,7 @@ import com.google.common.collect.Maps;
 
 import codesquad.model.User;
 
-public class DataBase {
+public class UserRepository {
     private static Map<String, User> users = Maps.newHashMap();
 
     public static void addUser(User user) {
