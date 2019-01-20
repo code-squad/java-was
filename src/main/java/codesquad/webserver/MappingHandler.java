@@ -4,6 +4,7 @@ import codesquad.Controller;
 import codesquad.RequestMapping;
 import codesquad.model.Header;
 import codesquad.model.HttpSession;
+import codesquad.model.RequestMethod;
 import codesquad.model.Url;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
