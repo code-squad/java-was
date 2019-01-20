@@ -1,6 +1,6 @@
 package util;
 
-import model.RequestHeader;
+import model.RequestEntity;
 import model.User;
 import org.slf4j.Logger;
 
@@ -16,21 +16,30 @@ public class HandlerMapping {
 
     private static final Logger logger = getLogger(HandlerMapping.class);
 
-    private static Map<RequestHeader, UnaryOperator> parameterHandlerMap = new HashMap<>();
+    private static Map<RequestEntity, UnaryOperator> parameterHandlerMap = new HashMap<>();
 
     static {
-        parameterHandlerMap.put(new RequestHeader("/users/create", "GET", null)
-                , requestHeader -> createConstructor(User.class, (RequestHeader) requestHeader));
-        parameterHandlerMap.put(new RequestHeader("/index.htnl", "GET", null), null);
-        parameterHandlerMap.put(new RequestHeader("/users/create", "POST", null)
-                , requestHeader -> createConstructor(User.class, (RequestHeader) requestHeader));
+        /* 회원가입 GET */
+        parameterHandlerMap.put(new RequestEntity("/users/create", "GET", "")
+                , requestHeader -> createConstructor(User.class, (RequestEntity) requestHeader));
+        /* 메인화면 이동 */
+        parameterHandlerMap.put(new RequestEntity("/index.html", "GET", ""), null);
+        /* 회원가입 POST */
+        parameterHandlerMap.put(new RequestEntity("/users/create", "POST", "")
+                , requestHeader -> createConstructor(User.class, (RequestEntity) requestHeader));
+        /* 회원가입 이동 */
+        parameterHandlerMap.put(new RequestEntity("/users/form", "GET", ""), null);
+        /* 로그인 이동 */
+        parameterHandlerMap.put(new RequestEntity("/users/login", "GET", ""), null);
+        /* 로그인 POST */
+        parameterHandlerMap.put(new RequestEntity("/users/login", "POST", ""), null);
     }
 
     /*
        @param  리턴하는 클래스 타입, URL 객체
        @return 리플랙션으로 URL path 필드에 해당하는 setter 메소드를 호출하여 객체 반환 (단, 자바빈 규약 준수)
     */
-    public static <T> T createConstructor(Class clazz, RequestHeader requestHeader) {
+    public static <T> T createConstructor(Class clazz, RequestEntity requestEntity) {
         T obj = null;
         try {
             obj = (T) clazz.newInstance();
@@ -38,7 +47,7 @@ public class HandlerMapping {
             for (Method method : methods) {
                 if(method.getName().startsWith("set")) {
                     String field = obtainField(method.getName());
-                    method.invoke(obj, requestHeader.obtainParamElement(field));
+                    method.invoke(obj, requestEntity.obtainParamElement(field));
                 }
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -57,7 +66,7 @@ public class HandlerMapping {
         return sb.toString();
     }
 
-    public static Object saveData(RequestHeader requestHeader) {
+    public static Object saveData(RequestEntity requestHeader) {
         if(parameterHandlerMap.get(requestHeader) != null) {
             return parameterHandlerMap.get(requestHeader).apply(requestHeader);
         }

@@ -3,15 +3,18 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
-import model.RequestHeader;
+import db.DataBase;
+import model.RequestEntity;
+import model.ResponseEntity;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HandlerMapping;
-import util.IOUtils;
-import util.RequestHeaderFactory;
+import util.RequestEntityFactory;
+import util.ResponseEntityHeaderFactory;
 
-public class RequestHandler extends Thread {
-    private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+public class RequestHandler extends Thread implements AutoCloseable {
+    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
 
@@ -20,40 +23,29 @@ public class RequestHandler extends Thread {
     }
 
     public void run() {
-        log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
+        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            RequestHeader requestHeader = RequestHeaderFactory.of(in);
-            log.debug("RequestHeader : {}", requestHeader.toString());
-            Object savedObject = HandlerMapping.saveData(requestHeader);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                DataOutputStream dos = new DataOutputStream(connection.getOutputStream())) {
+            RequestEntity requestEntity = RequestEntityFactory.of(br);
+            logger.debug("Request Entity : {}", requestEntity.toString());
 
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = IOUtils.obtainBody(requestHeader);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            Object savedObject = HandlerMapping.saveData(requestEntity);
+            if(savedObject instanceof User) {
+                User user = (User) savedObject;
+                logger.debug("Saved User : {}", user.toString());
+                DataBase.addUser(user);
+            }
+
+            ResponseEntity responseHeader = ResponseEntityHeaderFactory.of(requestEntity).responseHeader(dos).responseBody(dos);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
+    @Override
+    public void close() throws Exception {
+        logger.debug("소켓 종료!");
     }
 }

@@ -10,16 +10,16 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class UrlInfoTest {
+public class RequestEntityTest {
 
-    private static final Logger logger = getLogger(UrlInfoTest.class);
+    private static final Logger logger = getLogger(RequestEntityTest.class);
 
     private static final String path
             = "/user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
 
     @Test
     public void obtainURL() {
-        assertThat(RequestHeader.obtainURL("GET /api/url HTTP1.1")).isEqualTo("/api/url");
+        assertThat(RequestEntity.obtainURL("GET /api/url HTTP1.1")).isEqualTo("/api/url");
     }
 
     @Test
@@ -35,20 +35,15 @@ public class UrlInfoTest {
     }
 
     @Test
-    public void urlInfo생성자_적용_테스트() {
-        assertThat(new RequestHeader(path, "GET")).isEqualTo(new RequestHeader("/user/create", "GET"));
-    }
-
-    @Test
     public void obtainParameterTest() {
-        RequestHeader urlInfo = new RequestHeader(path, "GET");
-        assertThat(urlInfo.obtainParamElement("userId")).isEqualTo("javajigi");
-        assertThat(urlInfo.obtainParamElement("blank")).isEqualTo("");
+        RequestEntity requestEntity = new RequestEntity(path, "GET", "");
+        assertThat(requestEntity.obtainParamElement("userId")).isEqualTo("javajigi");
+        assertThat(requestEntity.obtainParamElement("blank")).isEqualTo("");
     }
 
     @Test
     public void obtainURLTest() {
-        assertThat(RequestHeader.obtainURL("GET /user/create?userId=javajigi HTTP/1.1"))
+        assertThat(RequestEntity.obtainURL("GET /user/create?userId=javajigi HTTP/1.1"))
                 .isEqualTo("/user/create?userId=javajigi");
 
     }

@@ -5,7 +5,7 @@ import util.ParameterConverter;
 import java.util.Map;
 import java.util.Objects;
 
-public class RequestHeader {
+public class RequestEntity {
 
     private static final String SPLIT_BLANK = " ";
     private static final String SPLIT_QUESTION = "\\?";
@@ -13,16 +13,16 @@ public class RequestHeader {
     private static final String ROOT = "./webapp";
 
     private String path;
-    private Map<String, String> params;
+    private Map<String, String> body;
     private String method;
 
-    public RequestHeader(String path, String method, String param) {
+    public RequestEntity(String path, String method, String param) {
         this.path = path;
         this.method = method;
 
         /* POST Method Parameter 존재할 경우에만 동작 */
         if(param != null) {
-           this.params = HttpRequestUtils.parseQueryString(param);
+           this.body = HttpRequestUtils.parseQueryString(param);
         }
 
         /* GET Method Parameter 존재할 경우에만 동작! */
@@ -33,7 +33,7 @@ public class RequestHeader {
 
     private void initParams(String path) {
         this.path = path.split(SPLIT_QUESTION)[0];
-        this.params = HttpRequestUtils.parseQueryString(path.split(SPLIT_QUESTION)[1]);
+        this.body = HttpRequestUtils.parseQueryString(path.split(SPLIT_QUESTION)[1]);
     }
 
     /*
@@ -57,17 +57,17 @@ public class RequestHeader {
        @return 파라미터의 필드값 반환 (URL Encoding 처리된 문자는 URL Decoding)
     */
     public String obtainParamElement(String field) {
-        if(!params.containsKey(field)) {
+        if(!body.containsKey(field)) {
             return "";
         }
-        return ParameterConverter.urlDecoding(params.get(field));
+        return ParameterConverter.urlDecoding(body.get(field));
     }
 
     @Override
     public String toString() {
-        return "RequestHeader{" +
+        return "RequestEntity{" +
                 "path='" + path + '\'' +
-                ", params=" + params +
+                ", method='" + method + '\'' +
                 '}';
     }
 
@@ -75,7 +75,7 @@ public class RequestHeader {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RequestHeader urlInfo = (RequestHeader) o;
+        RequestEntity urlInfo = (RequestEntity) o;
         return Objects.equals(path, urlInfo.path) &&
                 Objects.equals(method, urlInfo.method);
     }

@@ -1,6 +1,6 @@
 package util;
 
-import model.RequestHeader;
+import model.RequestEntity;
 import model.User;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ public class HandlerMappingTest {
     @Test
     public void saveDataTest() {
         String path = "/users/create?name=doby&userId=lee&password=password&email=lkhlkh09@gmail.com";
-        Object user = HandlerMapping.saveData(new RequestHeader(path, "GET", null));
+        Object user = HandlerMapping.saveData(new RequestEntity(path, "GET", null));
         assertThat(user).isEqualTo(new User("lee", "password", "doby", "lkhlkh09@gmail.com"));
     }
 
