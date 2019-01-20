@@ -18,12 +18,10 @@ public class Response200 implements Response {
         try {
             body = header.writeBody();
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            if(header.isCookieModified()) {
-                dos.writeBytes(header.writeCookie());
-            } else {
-                dos.writeBytes("Content-Length: " + body.length + "\r\n");
-            }
+            if(header.isCssFile()) { dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n"); }
+            else { dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n"); }
+            if(header.isCookieModified()) { dos.writeBytes(header.writeCookie()); }
+            else { dos.writeBytes("Content-Length: " + body.length + "\r\n"); }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());

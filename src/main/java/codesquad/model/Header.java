@@ -1,6 +1,5 @@
 package codesquad.model;
 
-import codesquad.controller.UserController;
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
 import codesquad.util.responses.Response;
@@ -14,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +30,13 @@ public class Header {
 
     private boolean cookieModified = false;
 
+    private List<String> accept;
+
     private ResponseCode responseCode = ResponseCode.OK;
 
     public Header(Url url, Map<String, String> headers) {
         this.url = url;
+        this.accept = Arrays.asList(headers.get("Accept").split(","));
         if (headers.containsKey("Content-Length")) contentLength = Integer.parseInt(headers.get("Content-Length"));
         if (headers.containsKey("Cookie")) cookie = HttpRequestUtils.parseCookies(headers.get("Cookie"));
     }
@@ -109,7 +112,12 @@ public class Header {
                 ", contentLength=" + contentLength +
                 ", cookie=" + cookie +
                 ", cookieModified=" + cookieModified +
+                ", accept=" + accept +
                 ", responseCode=" + responseCode +
                 '}';
+    }
+
+    public boolean isCssFile() {
+        return this.accept.contains("text/css");
     }
 }
