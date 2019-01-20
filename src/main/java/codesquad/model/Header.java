@@ -5,6 +5,7 @@ import codesquad.util.IOUtils;
 import codesquad.util.responses.Response;
 import codesquad.util.responses.ResponseCode;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,7 +14,10 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.Map;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class Header {
+    private static final Logger log = getLogger(Header.class);
 
     private Url url;
 
@@ -86,6 +90,12 @@ public class Header {
 
     public void injectValue(Object aInstance, Method method) {
         url.injectValue(aInstance, method);
+    }
+
+    public void putCookie(Map<String, Object> newCookie) {
+        for (String key : cookie.keySet()) {
+            newCookie.put(key, cookie.get(key));
+        }
     }
 
     @Override

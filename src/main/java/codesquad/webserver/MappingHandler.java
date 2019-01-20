@@ -49,16 +49,18 @@ public class MappingHandler {
         Object thisObject = header.findMappingMethod(mappingHandler).getDeclaringClass().newInstance();
         Object[] args = ParameterBinder.bind(thisMethod, header);
         Object result = thisMethod.invoke(thisObject, args);
+        reflectCookie(args, header);
+        header.generateResponseCode(result);
+        log.debug(header.toString());
+    }
 
+    private static void reflectCookie(Object[] args, Header header) {
         Arrays.stream(args)
                 .filter(arg -> (arg instanceof HttpSession))
                 .forEach(arg -> {
                     HttpSession httpSession = (HttpSession)arg;
                     header.addCookie(httpSession);
                 });
-        log.debug(header.toString());
-
-        header.generateResponseCode(result);
     }
 
 }

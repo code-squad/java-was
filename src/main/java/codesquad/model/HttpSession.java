@@ -16,6 +16,8 @@ public class HttpSession {
         newCookie.put(key, value);
     }
 
+    public Object getAttribute(String key) { return newCookie.get(key); }
+
     public boolean hasValue() {
         return !newCookie.isEmpty();
     }
@@ -24,6 +26,11 @@ public class HttpSession {
         for (String key : newCookie.keySet()) {
             cookie.put(key, newCookie.get(key).toString());
         }
+    }
+
+    public Object addCookie(Header header) {
+        header.putCookie(newCookie);
+        return this;
     }
 
     @Override
