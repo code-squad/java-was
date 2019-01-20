@@ -14,10 +14,9 @@ public class Response300 implements Response {
 
     @Override
     public void header(DataOutputStream dos, Header header) {
-        Url url = header.getUrl();
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: " + url.generateAccessPath() + "\r\n");
+            dos.writeBytes("Location: " + header.generateAccessPath() + "\r\n");
             if(header.isCookieModified()) {
                 dos.writeBytes(header.writeCookie());
             }

@@ -41,7 +41,8 @@ public class RequestHandler extends Thread {
                 log.debug(line);
             }
 
-            Header header = new Header(br, url, headers);
+            Header header = new Header(url, headers);
+            header.setBodyValue(br);
 
             if(MappingHandler.hasMappingPath(url)) {
                 MappingHandler.invoke(header);

@@ -2,8 +2,8 @@ package codesquad.webserver;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
-import codesquad.model.HttpSession;
 import codesquad.model.Header;
+import codesquad.model.HttpSession;
 import codesquad.model.Url;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -45,14 +45,13 @@ public class MappingHandler {
     }
 
     public static void invoke(Header header) throws Exception {
-        Url url = header.getUrl();
-        Method thisMethod = mappingHandler.get(url);
-        Object thisObject = mappingHandler.get(url).getDeclaringClass().newInstance();
-        Object[] args = ParameterBinder.bind(thisMethod, url);
+        Method thisMethod = header.findMappingMethod(mappingHandler);
+        Object thisObject = header.findMappingMethod(mappingHandler).getDeclaringClass().newInstance();
+        Object[] args = ParameterBinder.bind(thisMethod, header);
         Object result = thisMethod.invoke(thisObject, args);
 
         Arrays.stream(args)
-                .filter(arg -> arg.getClass().getName().equals("codesquad.model.HttpSession"))
+                .filter(arg -> (arg instanceof HttpSession))
                 .forEach(arg -> {
                     HttpSession httpSession = (HttpSession)arg;
                     header.addCookie(httpSession);

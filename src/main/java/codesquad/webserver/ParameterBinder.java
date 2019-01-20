@@ -1,6 +1,6 @@
 package codesquad.webserver;
 
-import codesquad.model.Url;
+import codesquad.model.Header;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
@@ -14,12 +14,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class ParameterBinder {
     private static final Logger log = getLogger(ParameterBinder.class);
 
-    public static Object[] bind(Method thisMethod, Url url) throws Exception {
+    public static Object[] bind(Method thisMethod, Header header) throws Exception {
         List<Object> args = new ArrayList<>();
         for (Class<?> parameterType : thisMethod.getParameterTypes()) {
             Object aInstance = parameterType.newInstance();
-            if (isValid(parameterType, url)) {
-                args.add(binding(aInstance, url));
+            if (isValid(parameterType, header)) {
+                args.add(binding(aInstance, header));
                 continue;
             }
             args.add(aInstance);
@@ -27,17 +27,17 @@ public class ParameterBinder {
         return args.toArray();
     }
 
-    public static boolean isValid(Class<?> parameterType, Url url) {
+    public static boolean isValid(Class<?> parameterType, Header header) {
         for (Field declaredField : parameterType.getDeclaredFields()) {
-            if (!url.hasSameFieldName(declaredField.getName())) return false;
+            if (!header.hasSameFieldName(declaredField.getName())) return false;
         }
         return true;
     }
 
-    public static Object binding(Object aInstance, Url url) {
+    public static Object binding(Object aInstance, Header header) {
         Arrays.stream(aInstance.getClass().getDeclaredMethods())
                 .filter(method -> method.getName().startsWith("set"))
-                .forEach(method -> url.injectValue(aInstance, method));
+                .forEach(method -> header.injectValue(aInstance, method));
         return aInstance;
     }
 }

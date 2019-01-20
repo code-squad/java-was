@@ -29,7 +29,7 @@ public class ViewHandler {
     }
 
     public void resolve(Header header) {
-        Response response = responses.get(header.getResponseCode());
+        Response response = header.getResponse(responses);
         response.header(dos, header);
         response.body(dos);
     }
