@@ -19,7 +19,7 @@ public class Response200 implements Response {
             body = header.writeBody();
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+//            dos.writeBytes("Content-Length: " + body.length + "\r\n");
             if(header.isCookieModified()) {
                 dos.writeBytes(header.writeCookie());
             }

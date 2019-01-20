@@ -40,6 +40,7 @@ public class RequestHandler extends Thread {
                 headers.put(pair.getKey(), pair.getValue());
                 log.debug(line);
             }
+            log.debug(url.toString());
 
             Header header = new Header(url, headers);
             header.setBodyValue(br);

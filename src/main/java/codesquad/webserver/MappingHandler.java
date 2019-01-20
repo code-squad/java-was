@@ -41,6 +41,7 @@ public class MappingHandler {
     }
 
     public static boolean hasMappingPath(Url url) {
+        for (Url url1 : mappingHandler.keySet()) { log.debug(url1.toString()); }
         return mappingHandler.containsKey(url);
     }
 

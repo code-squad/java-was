@@ -117,6 +117,7 @@ public class Url {
     }
 
     public boolean hasAllThoseFields(List<String> fields) {
+        if(queryValue.isEmpty()) return false;
         for (String key : queryValue.keySet()) {
             if(!fields.contains(key)) return false;
         }

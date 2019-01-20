@@ -22,15 +22,22 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-    public String login(User user, HttpSession httpSession) {
+    public String login(User user, HttpSession session) {
         log.debug(user.toString());
         try {
             UserService.login(user);
-            httpSession.setAttribute("logined", true);
+            session.setAttribute("logined", true);
             return "redirect:/index.html";
         } catch(Exception e) {
             log.error(e.getMessage());
-            return "redirect:/user/login_failed.html";
+            return "/user/login_failed.html";
         }
+    }
+
+    @RequestMapping(value = "/user/list", method = RequestMethod.GET)
+    public String list(HttpSession session) {
+        log.debug(session.toString());
+        if(!session.getAttribute("logined").equals("true")) return "/user/login.html";
+        return "/user/list.html";
     }
 }

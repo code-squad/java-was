@@ -16,7 +16,9 @@ public class HttpSession {
         newCookie.put(key, value);
     }
 
-    public Object getAttribute(String key) { return newCookie.get(key); }
+    public Object getAttribute(String key) {
+        return newCookie.getOrDefault(key, new Object());
+    }
 
     public boolean hasValue() {
         return !newCookie.isEmpty();
