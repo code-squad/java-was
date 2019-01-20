@@ -26,5 +26,7 @@ public class UserRepository {
     static {
         // test data
         users.put("brad903", new User("brad903", "1234", "brad", "brad903@naver.com"));
+        users.put("alex407", new User("alex407", "1234", "alex", "alex@naver.com"));
+        users.put("leejh903", new User("leejh903", "1234", "leejunghyun", "junghyun@naver.com"));
     }
 }

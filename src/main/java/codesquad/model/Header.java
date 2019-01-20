@@ -1,9 +1,11 @@
 package codesquad.model;
 
+import codesquad.controller.UserController;
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
 import codesquad.util.responses.Response;
 import codesquad.util.responses.ResponseCode;
+import codesquad.webserver.ViewResolver;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 
@@ -70,6 +72,7 @@ public class Header {
     }
 
     public byte[] writeBody() throws IOException {
+        if(url.getAccessPath().equals("/user/list.html")) return ViewResolver.renewUserList();
         return Files.readAllBytes(new File(url.generateFilePath()).toPath());
     }
 
