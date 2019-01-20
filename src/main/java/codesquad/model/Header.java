@@ -36,7 +36,7 @@ public class Header {
 
     public Header(Url url, Map<String, String> headers) {
         this.url = url;
-        this.accept = Arrays.asList(headers.get("Accept").split(","));
+        if (headers.containsKey("Accept")) this.accept = Arrays.asList(headers.get("Accept").split(","));
         if (headers.containsKey("Content-Length")) contentLength = Integer.parseInt(headers.get("Content-Length"));
         if (headers.containsKey("Cookie")) cookie = HttpRequestUtils.parseCookies(headers.get("Cookie"));
     }
@@ -75,7 +75,7 @@ public class Header {
     }
 
     public byte[] writeBody() throws IOException {
-        if(url.getAccessPath().equals("/user/list.html")) return ViewResolver.renewUserList();
+        if (url.getAccessPath().equals("/user/list.html")) return ViewResolver.renewUserList();
         return Files.readAllBytes(new File(url.generateFilePath()).toPath());
     }
 
