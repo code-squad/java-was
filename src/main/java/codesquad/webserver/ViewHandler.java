@@ -1,10 +1,10 @@
 package codesquad.webserver;
 
 import codesquad.model.Header;
-import codesquad.util.responses.Response;
-import codesquad.util.responses.Response200;
-import codesquad.util.responses.Response300;
-import codesquad.util.responses.ResponseCode;
+import codesquad.model.responses.Response;
+import codesquad.model.responses.Response200;
+import codesquad.model.responses.Response300;
+import codesquad.model.responses.ResponseCode;
 import org.slf4j.Logger;
 
 import java.io.DataOutputStream;

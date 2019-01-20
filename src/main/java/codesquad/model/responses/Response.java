@@ -1,4 +1,4 @@
-package codesquad.util.responses;
+package codesquad.model.responses;
 
 import codesquad.model.Header;
 

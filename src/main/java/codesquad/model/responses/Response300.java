@@ -1,7 +1,6 @@
-package codesquad.util.responses;
+package codesquad.model.responses;
 
 import codesquad.model.Header;
-import codesquad.model.Url;
 import org.slf4j.Logger;
 
 import java.io.DataOutputStream;

@@ -1,4 +1,4 @@
-package codesquad.util.responses;
+package codesquad.model.responses;
 
 public enum ResponseCode {
 

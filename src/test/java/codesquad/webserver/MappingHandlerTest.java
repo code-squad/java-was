@@ -2,10 +2,10 @@ package codesquad.webserver;
 
 import codesquad.Controller;
 import codesquad.model.Header;
-import codesquad.util.responses.Response;
-import codesquad.util.responses.Response200;
-import codesquad.util.responses.Response300;
-import codesquad.util.responses.ResponseCode;
+import codesquad.model.responses.Response;
+import codesquad.model.responses.Response200;
+import codesquad.model.responses.Response300;
+import codesquad.model.responses.ResponseCode;
 import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;

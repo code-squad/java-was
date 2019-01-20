@@ -2,8 +2,8 @@ package codesquad.model;
 
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
-import codesquad.util.responses.Response;
-import codesquad.util.responses.ResponseCode;
+import codesquad.model.responses.Response;
+import codesquad.model.responses.ResponseCode;
 import codesquad.webserver.ViewResolver;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;

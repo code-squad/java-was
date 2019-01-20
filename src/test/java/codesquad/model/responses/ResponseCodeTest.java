@@ -1,9 +1,8 @@
-package codesquad.util.responses;
+package codesquad.model.responses;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 
-import static org.junit.Assert.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class ResponseCodeTest {
