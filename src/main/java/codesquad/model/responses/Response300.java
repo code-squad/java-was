@@ -12,7 +12,7 @@ public class Response300 implements Response {
     private static final Logger log = getLogger(Response300.class);
 
     @Override
-    public void header(DataOutputStream dos, Header header) {
+    public byte[] header(DataOutputStream dos, Header header) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
             dos.writeBytes("Location: " + header.generateAccessPath() + "\r\n");
@@ -23,10 +23,11 @@ public class Response300 implements Response {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+        return null;
     }
 
     @Override
-    public void body(DataOutputStream dos) {
+    public void body(DataOutputStream dos, byte[] body) {
         try {
             dos.flush();
         } catch (IOException e) {

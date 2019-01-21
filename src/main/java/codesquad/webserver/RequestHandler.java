@@ -50,8 +50,7 @@ public class RequestHandler extends Thread {
             }
 
             log.debug(header.toString());
-            ViewHandler viewHandler = new ViewHandler(out);
-            viewHandler.resolve(header);
+            ViewHandler.resolve(out, header);
 
         } catch (Exception e) {
             log.error(e.getMessage());

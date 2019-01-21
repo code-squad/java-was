@@ -6,8 +6,8 @@ import java.io.DataOutputStream;
 
 public interface Response {
 
-    void header(DataOutputStream dos, Header header);
+    byte[] header(DataOutputStream dos, Header header) throws Exception;
 
-    void body(DataOutputStream dos);
+    void body(DataOutputStream dos, byte[] body);
 
 }
