@@ -1,4 +1,4 @@
-package webserver;
+package codesquad.webserver;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 
 public class WebServer {
     private static final Logger log = LoggerFactory.getLogger(WebServer.class);
-    private static final int DEFAULT_PORT = 8080;
+    public static final int DEFAULT_PORT = 8080;
+    public static final String SERVER_IP = "127.0.0.1:";
 
     public static void main(String args[]) throws Exception {
         int port = 0;
@@ -19,7 +20,6 @@ public class WebServer {
         }
 
         // 서버소켓을 생성한다. 웹서버는 기본적으로 8080번 포트를 사용한다.
-
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             log.info("Web Application Server started {} port.", port);
 

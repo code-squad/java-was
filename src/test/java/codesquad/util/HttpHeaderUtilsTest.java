@@ -1,15 +1,19 @@
-package util;
+package codesquad.util;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.Map;
 
 import org.junit.Test;
 
-import util.HttpRequestUtils.Pair;
+import org.slf4j.Logger;
+import codesquad.util.HttpRequestUtils.Pair;
 
-public class HttpRequestUtilsTest {
+public class HttpHeaderUtilsTest {
+    private static final Logger log = getLogger(HttpHeaderUtilsTest.class);
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
