@@ -8,8 +8,8 @@ import java.io.IOException;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class Response200 implements Response {
-    private static final Logger log = getLogger(Response200.class);
+public class ResponseTemplate200 implements ResponseTemplate {
+    private static final Logger log = getLogger(ResponseTemplate200.class);
 
     @Override
     public byte[] header(DataOutputStream dos, Header header) {
@@ -23,8 +23,9 @@ public class Response200 implements Response {
             else {
                 dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             }
-            if(header.isCookieModified()) {
-                dos.writeBytes(header.writeCookie());
+            if(header.hasCookie()) {
+                dos.writeBytes(header.writeCookie() + "\r\n");
+                log.debug("쿠키값 입력 : " + header.writeCookie());
             }
             dos.writeBytes("Content-Length: " + body.length + "\r\n");
             dos.writeBytes("\r\n");

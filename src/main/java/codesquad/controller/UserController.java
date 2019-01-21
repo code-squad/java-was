@@ -27,7 +27,7 @@ public class UserController {
         try {
             UserService.login(user);
             session.setAttribute("logined", true);
-            return "redirect:/index.html";
+            return "/index.html";
         } catch(Exception e) {
             log.error(e.getMessage());
             return "/user/login_failed.html";

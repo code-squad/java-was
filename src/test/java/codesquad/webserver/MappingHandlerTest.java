@@ -2,9 +2,9 @@ package codesquad.webserver;
 
 import codesquad.Controller;
 import codesquad.model.Header;
-import codesquad.model.responses.Response;
-import codesquad.model.responses.Response200;
-import codesquad.model.responses.Response300;
+import codesquad.model.responses.ResponseTemplate;
+import codesquad.model.responses.ResponseTemplate200;
+import codesquad.model.responses.ResponseTemplate300;
 import codesquad.model.responses.ResponseCode;
 import com.google.common.collect.Maps;
 import org.junit.Before;
@@ -22,11 +22,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MappingHandlerTest {
     private static final Logger log = getLogger(MappingHandlerTest.class);
     private Header header;
-    private static Map<ResponseCode, Response> responses = Maps.newHashMap();
+    private static Map<ResponseCode, ResponseTemplate> responses = Maps.newHashMap();
 
     static {
-        responses.put(ResponseCode.OK, new Response200());
-        responses.put(ResponseCode.FOUND, new Response300());
+        responses.put(ResponseCode.OK, new ResponseTemplate200());
+        responses.put(ResponseCode.FOUND, new ResponseTemplate300());
     }
 
     @Before
@@ -48,15 +48,15 @@ public class MappingHandlerTest {
     public void redirect() {
         Object result = "redirect:/index.html";
         header.generateResponseCode(result);
-        Response response = header.getResponse(responses);
-        assertThat(response instanceof Response300).isTrue();
+        ResponseTemplate responseTemplate = header.getResponse(responses);
+        assertThat(responseTemplate instanceof ResponseTemplate300).isTrue();
     }
 
     @Test
     public void ok() {
         Object result = "/index.html";
         header.generateResponseCode(result);
-        Response response = header.getResponse(responses);
-        assertThat(response instanceof Response200).isTrue();
+        ResponseTemplate responseTemplate = header.getResponse(responses);
+        assertThat(responseTemplate instanceof ResponseTemplate200).isTrue();
     }
 }

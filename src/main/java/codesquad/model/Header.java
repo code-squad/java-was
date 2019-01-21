@@ -2,7 +2,7 @@ package codesquad.model;
 
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
-import codesquad.model.responses.Response;
+import codesquad.model.responses.ResponseTemplate;
 import codesquad.model.responses.ResponseCode;
 import codesquad.webserver.ViewResolver;
 import com.google.common.collect.Maps;
@@ -46,7 +46,7 @@ public class Header {
         httpSession.putCookie(cookie);
     }
 
-    public Response getResponse(Map<ResponseCode, Response> responses) {
+    public ResponseTemplate getResponse(Map<ResponseCode, ResponseTemplate> responses) {
         return responses.get(responseCode);
     }
 
@@ -61,7 +61,6 @@ public class Header {
     }
 
     public String writeCookie() {
-        if (cookie.isEmpty()) return "";
         StringBuilder sb = new StringBuilder("Set-Cookie: ");
         for (String key : cookie.keySet()) {
             sb.append(key + "=" + cookie.get(key) + ";");
@@ -70,8 +69,8 @@ public class Header {
         return sb.toString();
     }
 
-    public boolean isCookieModified() {
-        return cookieModified;
+    public boolean hasCookie() {
+        return !this.cookie.isEmpty();
     }
 
     public byte[] writeBody() throws IOException {

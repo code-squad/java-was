@@ -1,13 +1,14 @@
 package codesquad.model.responses;
 
-import codesquad.model.Header;
+import java.util.List;
 
-import java.io.DataOutputStream;
+public class Response {
 
-public interface Response {
+    private List<String> accpet;
 
-    byte[] header(DataOutputStream dos, Header header) throws Exception;
+    private ResponseCode responseCode;
 
-    void body(DataOutputStream dos, byte[] body);
+    private byte[] body;
+
 
 }
