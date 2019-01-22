@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -14,30 +15,26 @@ public class ResponseEntity {
 
     private static final Logger logger = getLogger(ResponseEntity.class);
 
-    private int statusCode;
     private byte[] body;
-    private String location;
-    private Map<Integer, Consumer<DataOutputStream>> statusMapper = new HashMap<>();
+    private Map<String, String> header;
+    private static Map<String, String> statusMapper = new HashMap<>();
+    private static Map<String, Consumer<DataOutputStream>> statusProcessor = new HashMap<>();
 
-    public ResponseEntity(int statusCode, String location, byte[] body) {
-        this.statusCode = statusCode;
-        this.location = location;
+    static {
+        statusMapper.put("200", "OK");
+        statusMapper.put("302", "FOUND");
+    }
+
+    public ResponseEntity(byte[] body) {
+        this.header = new HashMap<>();
         this.body = body;
 
         initStatusMapper();
     }
 
     public void initStatusMapper()  {
-        statusMapper.put(200, (dos) -> response300Header(dos));
-        statusMapper.put(302, (dos) -> response302Header(dos));
-    }
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+        statusProcessor.put("200", (dos) -> response200Header(dos));
+        statusProcessor.put("302", (dos) -> response302Header(dos));
     }
 
     public byte[] getBody() {
@@ -48,46 +45,56 @@ public class ResponseEntity {
         this.body = body;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+    public ResponseEntity addHeader(String key, String value) {
+        header.put(key, value);
+        return this;
     }
 
     /*
        @param
        @return response에 대한 공통적인 속성을 작성한 템플
     */
-    public ResponseEntity responseHeader(DataOutputStream dos) {
-        try {
-            /* 여기서 Socket Close 발생! why..? -> socket 의 input/output stream이 닫히면 socket도 같이 닫히는 현상 발생! */
-            dos.writeBytes(String.format("HTTP/1.1 %d %s\r\n", this.statusCode, statusMapper.get(this.statusCode)));
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes(String.format("Content-Length: %d\r\n", this.body.length));
+    public ResponseEntity responseHeader(DataOutputStream dos) throws IOException {
 
-            /* status에 따라 response 구성이 조금씩 다르기 때문에 다른 부분은 람다로 처리 */
-            statusMapper.get(this.statusCode).accept(dos);
+        String statusCode = obtainStatusCode();
+        dos.writeBytes(String.format("HTTP/1.1 %s %s\r\n", statusCode, obtainStatus(statusCode)));
+        dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+        dos.writeBytes(String.format("Content-Length: %d\r\n", this.body.length));
 
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+        /* status에 따라 response 구성이 조금씩 다르기 때문에 다른 부분은 람다로 처리 */
+        statusProcessor.get(statusCode).accept(dos);
+
+        dos.writeBytes("\r\n");
+
         return this;
+    }
+
+    public String obtainStatusCode() {
+        return this.header.get("status");
+    }
+
+    public String obtainStatus(String statusCode) {
+        return statusMapper.get(statusCode);
     }
 
     private void response302Header(DataOutputStream dos) {
         try {
-            logger.debug("Create 302 Header");
-            dos.writeBytes(String.format("Location: %s", location));
+            logger.debug("Location : {}", header.get("Location"));
+            dos.writeBytes(String.format("Location: %s", header.get("Location")));
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void response300Header(DataOutputStream dos) {
-        logger.debug("Create 300 Header");
+    private void response200Header(DataOutputStream dos) {
+        if(header.containsKey("Set-Cookie")) {
+            try {
+                logger.debug("Cookie 적용 완료!");
+                dos.writeBytes(String.format("Set-Cookie: %s", header.get("Set-Cookie")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public ResponseEntity responseBody(DataOutputStream dos) {
@@ -101,16 +108,10 @@ public class ResponseEntity {
         return this;
     }
 
-    public boolean hasLocation() {
-        return location != null;
-    }
-
     @Override
     public String toString() {
         return "ResponseEntity{" +
-                "statusCode=" + statusCode +
-                ", location='" + location + '\'' +
-                ", statusMapper=" + statusMapper +
+                "header=" + header +
                 '}';
     }
 }

@@ -28,8 +28,6 @@ public class WebServer {
                 RequestHandler requestHandler = new RequestHandler(connection);
                 requestHandler.start();
             }
-
-            logger.debug("Connection close : {}\n{}",connection.isClosed(), connection == null);
         }
     }
 }

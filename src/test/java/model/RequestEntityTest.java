@@ -36,7 +36,7 @@ public class RequestEntityTest {
 
     @Test
     public void obtainParameterTest() {
-        RequestEntity requestEntity = new RequestEntity(path, "GET", "");
+        RequestEntity requestEntity = new RequestEntity(path, "GET", "", null);
         assertThat(requestEntity.obtainParamElement("userId")).isEqualTo("javajigi");
         assertThat(requestEntity.obtainParamElement("blank")).isEqualTo("");
     }
