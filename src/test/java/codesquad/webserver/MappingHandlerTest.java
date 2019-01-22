@@ -2,10 +2,7 @@ package codesquad.webserver;
 
 import codesquad.Controller;
 import codesquad.model.Header;
-import codesquad.model.responses.ResponseTemplate;
-import codesquad.model.responses.ResponseTemplate200;
-import codesquad.model.responses.ResponseTemplate300;
-import codesquad.model.responses.ResponseCode;
+import codesquad.model.responses.*;
 import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,17 +19,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MappingHandlerTest {
     private static final Logger log = getLogger(MappingHandlerTest.class);
     private Header header;
-    private static Map<ResponseCode, ResponseTemplate> responses = Maps.newHashMap();
+    private static Map<ResponseCode, ResponseTemplate> templates = Maps.newHashMap();
 
     static {
-        responses.put(ResponseCode.OK, new ResponseTemplate200());
-        responses.put(ResponseCode.FOUND, new ResponseTemplate300());
+        templates.put(ResponseCode.OK, new ResponseTemplate200());
+        templates.put(ResponseCode.FOUND, new ResponseTemplate300());
     }
 
     @Before
     public void setUp() throws Exception {
         header = new Header(URL, Maps.newHashMap());
-
     }
 
     @Test
@@ -48,7 +44,8 @@ public class MappingHandlerTest {
     public void redirect() {
         Object result = "redirect:/index.html";
         header.generateResponseCode(result);
-        ResponseTemplate responseTemplate = header.getResponse(responses);
+        Response response = header.toResponse();
+        ResponseTemplate responseTemplate = response.chooseTemplate(templates);
         assertThat(responseTemplate instanceof ResponseTemplate300).isTrue();
     }
 
@@ -56,7 +53,8 @@ public class MappingHandlerTest {
     public void ok() {
         Object result = "/index.html";
         header.generateResponseCode(result);
-        ResponseTemplate responseTemplate = header.getResponse(responses);
+        Response response = header.toResponse();
+        ResponseTemplate responseTemplate = response.chooseTemplate(templates);
         assertThat(responseTemplate instanceof ResponseTemplate200).isTrue();
     }
 }

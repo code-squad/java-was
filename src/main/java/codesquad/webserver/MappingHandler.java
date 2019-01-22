@@ -4,7 +4,6 @@ import codesquad.Controller;
 import codesquad.RequestMapping;
 import codesquad.model.Header;
 import codesquad.model.HttpSession;
-import codesquad.model.RequestMethod;
 import codesquad.model.Url;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -60,7 +59,6 @@ public class MappingHandler {
                 .filter(arg -> (arg instanceof HttpSession))
                 .forEach(arg -> {
                     HttpSession httpSession = (HttpSession)arg;
-                    log.debug("쿠키값 입히기");
                     header.addCookie(httpSession);
                 });
     }

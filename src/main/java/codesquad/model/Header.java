@@ -1,18 +1,15 @@
 package codesquad.model;
 
+import codesquad.model.responses.Response;
+import codesquad.model.responses.ResponseCode;
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
-import codesquad.model.responses.ResponseTemplate;
-import codesquad.model.responses.ResponseCode;
-import codesquad.webserver.ViewResolver;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -46,44 +43,18 @@ public class Header {
         httpSession.putCookie(cookie);
     }
 
-    public ResponseTemplate getResponse(Map<ResponseCode, ResponseTemplate> responses) {
-        return responses.get(responseCode);
-    }
-
     public void generateResponseCode(Object result) {
         String newAccessPath = (String) result;
-        if (newAccessPath.contains("redirect")) {
-            url.renewAccessPath(newAccessPath.split(":")[1]);
-            responseCode = ResponseCode.FOUND;
+        if (!newAccessPath.contains("redirect")) {
+            url.renewAccessPath(newAccessPath);
             return;
         }
-        url.renewAccessPath(newAccessPath);
-    }
-
-    public String writeCookie() {
-        StringBuilder sb = new StringBuilder("Set-Cookie: ");
-        for (String key : cookie.keySet()) {
-            sb.append(key + "=" + cookie.get(key) + ";");
-        }
-        sb.append(" Path=/");
-        return sb.toString();
-    }
-
-    public boolean hasCookie() {
-        return !this.cookie.isEmpty();
-    }
-
-    public byte[] writeBody() throws IOException {
-        if (url.getAccessPath().equals("/user/list.html")) return ViewResolver.renewUserList();
-        return Files.readAllBytes(new File(url.generateFilePath()).toPath());
+        url.renewAccessPath(newAccessPath.split(":")[1]);
+        responseCode = ResponseCode.FOUND;
     }
 
     public Method findMappingMethod(Map<Url, Method> mappingHandler) {
         return mappingHandler.get(this.url);
-    }
-
-    public String generateAccessPath() {
-        return this.url.generateAccessPath();
     }
 
     public void setBodyValue(BufferedReader br) throws IOException {
@@ -95,7 +66,7 @@ public class Header {
     }
 
     public Object bindingQuery(Object aInstance) {
-        return url.bindingQeury(aInstance);
+        return url.bindingQuery(aInstance);
     }
 
     public void putCookie(Map<String, Object> newCookie) {
@@ -104,19 +75,13 @@ public class Header {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Header{" +
-                "url=" + url +
-                ", contentLength=" + contentLength +
-                ", cookie=" + cookie +
-                ", cookieModified=" + cookieModified +
-                ", accept=" + accept +
-                ", responseCode=" + responseCode +
-                '}';
+    public Response toResponse() {
+        return new Response(accept, responseCode, url.getAccessPath(), cookie);
     }
 
-    public boolean isCssFile() {
-        return this.accept.contains("text/css");
+    @Override
+    public String toString() {
+        return "Header[url=" + url + ", contentLength=" + contentLength + ", cookie=" + cookie +
+                ", cookieModified=" + cookieModified + ", accept=" + accept + ", responseCode=" + responseCode + ']';
     }
 }

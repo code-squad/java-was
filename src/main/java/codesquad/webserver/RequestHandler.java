@@ -2,6 +2,7 @@ package codesquad.webserver;
 
 import codesquad.model.Header;
 import codesquad.model.Url;
+import codesquad.model.responses.Response;
 import codesquad.util.HttpRequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,6 @@ public class RequestHandler extends Thread {
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
@@ -50,7 +50,7 @@ public class RequestHandler extends Thread {
             }
 
             log.debug(header.toString());
-            ViewHandler.resolve(out, header);
+            ViewHandler.resolve(out, header.toResponse());
 
         } catch (Exception e) {
             log.error(e.getMessage());

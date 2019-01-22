@@ -1,13 +1,11 @@
 package codesquad.model.responses;
 
-import codesquad.model.Header;
-
 import java.io.DataOutputStream;
 
 public interface ResponseTemplate {
 
-    byte[] header(DataOutputStream dos, Header header) throws Exception;
+    void header(DataOutputStream dos, Response response);
 
-    void body(DataOutputStream dos, byte[] body);
+    void body(DataOutputStream dos, Response response);
 
 }

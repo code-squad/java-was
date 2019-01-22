@@ -1,12 +1,10 @@
 package codesquad.model;
 
 import codesquad.util.HttpRequestUtils;
-import codesquad.webserver.WebServer;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +16,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class Url {
     private static final Logger log = getLogger(Url.class);
 
-    public static final String ROOT_STATIC_PATH = "./webapp";
     public static final String QUESTION_MARK = "\\?";
     public static final String BLANK = " ";
 
@@ -48,18 +45,7 @@ public class Url {
     }
 
     public String getAccessPath() {
-        return accessPath;
-    }
-
-    public String generateAccessPath() {
-        StringBuilder sb = new StringBuilder("http://");
-        return sb.append(WebServer.SERVER_IP)
-                .append(WebServer.DEFAULT_PORT)
-                .append(this.accessPath).toString();
-    }
-
-    public String generateFilePath() {
-        return ROOT_STATIC_PATH + this.accessPath;
+        return this.accessPath;
     }
 
     public void setQueryValue(String bodyText) {
@@ -84,7 +70,7 @@ public class Url {
         this.accessPath = newAccessPath;
     }
 
-    public Object bindingQeury(Object aInstance) {
+    public Object bindingQuery(Object aInstance) {
         Arrays.stream(aInstance.getClass().getDeclaredMethods())
                 .filter(method -> method.getName().startsWith("set"))
                 .filter(method -> queryValue.containsKey(getFieldName(method.getName())))
@@ -95,6 +81,14 @@ public class Url {
     private String getFieldName(String methodName) {
         String setterName = methodName.substring(3);
         return setterName.substring(0, 1).toLowerCase() + setterName.substring(1);
+    }
+
+    public boolean hasAllThoseFields(List<String> fields) {
+        if(queryValue.isEmpty()) return false;
+        for (String key : queryValue.keySet()) {
+            if(!fields.contains(key)) return false;
+        }
+        return true;
     }
 
     @Override
@@ -114,13 +108,5 @@ public class Url {
     @Override
     public int hashCode() {
         return Objects.hash(requestMethod, accessPath);
-    }
-
-    public boolean hasAllThoseFields(List<String> fields) {
-        if(queryValue.isEmpty()) return false;
-        for (String key : queryValue.keySet()) {
-            if(!fields.contains(key)) return false;
-        }
-        return true;
     }
 }
