@@ -8,7 +8,7 @@ public enum RequestMethod {
     PUT,
     DELETE;
 
-    static RequestMethod of(String requestMethod) {
+    public static RequestMethod of(String requestMethod) {
         return Arrays.stream(RequestMethod.values())
                 .filter(request -> request.toString().equals(requestMethod))
                 .findFirst().get();

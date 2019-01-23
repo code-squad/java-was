@@ -4,24 +4,25 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import codesquad.model.RequestMethod;
+import codesquad.model.Url;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class HttpRequestUtils {
-    /**
-     * @param queryString
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
-     * @return
-     */
+    private static final Logger log = getLogger(HttpRequestUtils.class);
+
+    public static final String QUESTION_MARK = "\\?";
+    public static final String BLANK = " ";
+
     public static Map<String, String> parseQueryString(String queryString) {
+        log.debug("queryString : " + queryString);
         return parseValues(queryString, "&");
     }
 
-    /**
-     * @param cookies
-     *            값은 name1=value1; name2=value2 형식임
-     * @return
-     */
     public static Map<String, String> parseCookies(String cookies) {
         return parseValues(cookies, ";");
     }
@@ -53,6 +54,14 @@ public class HttpRequestUtils {
 
     public static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
+    }
+
+    public static Url parseUrl(String url) {
+        String[] parsedUrl = url.split(BLANK);
+        String[] parsedPath = parsedUrl[1].split(QUESTION_MARK);
+        RequestMethod requestMethod = RequestMethod.of(parsedUrl[0]);
+        if (parsedPath.length == 1) return new Url(requestMethod, parsedPath[0], Maps.newHashMap());
+        return new Url(requestMethod, parsedPath[0], parseQueryString(parsedPath[1]));
     }
 
     public static class Pair {

@@ -2,7 +2,6 @@ package codesquad.model;
 
 import codesquad.util.HttpRequestUtils;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Method;
@@ -15,9 +14,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class Url {
     private static final Logger log = getLogger(Url.class);
-
-    public static final String QUESTION_MARK = "\\?";
-    public static final String BLANK = " ";
 
     private RequestMethod requestMethod;
 
@@ -37,11 +33,7 @@ public class Url {
     }
 
     public static Url of(String url) {
-        String[] parsedUrl = url.split(BLANK);
-        String[] parsedPath = parsedUrl[1].split(QUESTION_MARK);
-        RequestMethod requestMethod = RequestMethod.of(parsedUrl[0]);
-        if (parsedPath.length == 1) return new Url(requestMethod, parsedPath[0], Maps.newHashMap());
-        return new Url(requestMethod, parsedPath[0], HttpRequestUtils.parseQueryString(parsedUrl[1]));
+        return HttpRequestUtils.parseUrl(url);
     }
 
     public String getAccessPath() {
@@ -84,9 +76,9 @@ public class Url {
     }
 
     public boolean hasAllThoseFields(List<String> fields) {
-        if(queryValue.isEmpty()) return false;
+        if (queryValue.isEmpty()) return false;
         for (String key : queryValue.keySet()) {
-            if(!fields.contains(key)) return false;
+            if (!fields.contains(key)) return false;
         }
         return true;
     }
