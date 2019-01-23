@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static codesquad.fixture.UrlFixture.*;
 import static codesquad.fixture.UserFixture.USER;
@@ -48,20 +49,22 @@ public class ParameterBinderTest {
     }
 
     @Test
-    public void isValidForCookie() {
-        Object aInstance = new HttpSession();
-        assertThat(ParameterBinder.isValidForCookie(aInstance)).isTrue();
+    public void isValidForCookie_세션값없을때() {
+        Object aInstance = HttpSession.of(null);
+        assertThat(ParameterBinder.isValidForSession(aInstance)).isTrue();
     }
 
     @Test
     public void bindingCookie() throws Exception {
+        HttpSession session = HttpSession.of(null);
+        session.setAttribute("logined", true);
+
         Class<?> parameterType = HttpSession.class;
         Object aInstance = parameterType.newInstance();
         Map<String, String> map = Maps.newHashMap();
-        map.put("Cookie", "logined=true");
+        map.put("Cookie", HttpSession.COOKIE_KEY + "=" + session.getSessionID().toString());
         HttpRequest httpRequest = new HttpRequest(URL, map);
-        ParameterBinder.bindingCookie(aInstance, httpRequest);
-        HttpSession httpSession = (HttpSession) aInstance;
-        assertThat(httpSession.getAttribute("logined")).isEqualTo("true");
+        HttpSession httpSession = (HttpSession)ParameterBinder.bindingSession(aInstance, httpRequest);
+        assertThat(httpSession.getAttribute("logined")).isEqualTo(true);
     }
 }

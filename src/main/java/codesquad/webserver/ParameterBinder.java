@@ -23,8 +23,8 @@ public class ParameterBinder {
                 args.add(bindingQuery(aInstance, httpRequest));
                 continue;
             }
-            if (isValidForCookie(aInstance)) {
-                args.add(bindingCookie(aInstance, httpRequest));
+            if (isValidForSession(aInstance)) {
+                args.add(bindingSession(aInstance, httpRequest));
                 continue;
             }
             args.add(aInstance);
@@ -32,7 +32,7 @@ public class ParameterBinder {
         return args.toArray();
     }
 
-    static boolean isValidForCookie(Object aInstance) {
+    static boolean isValidForSession(Object aInstance) {
         return aInstance instanceof HttpSession;
     }
 
@@ -46,9 +46,9 @@ public class ParameterBinder {
         return httpRequest.bindingQuery(aInstance);
     }
 
-    public static Object bindingCookie(Object aInstance, HttpRequest httpRequest) {
+    public static Object bindingSession(Object aInstance, HttpRequest httpRequest) {
         HttpSession httpSession = (HttpSession) aInstance;
-        httpSession.addCookie(httpRequest);
-        return httpSession;
+        log.debug("httpRequest SID : {}", httpRequest.getSID());
+        return httpSession.of(httpRequest.getSID());
     }
 }

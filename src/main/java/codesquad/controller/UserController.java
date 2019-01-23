@@ -36,8 +36,8 @@ public class UserController {
 
     @RequestMapping(value = "/user/list", method = HttpMethod.GET)
     public String list(HttpSession session) {
-        log.debug(session.toString());
-        if(!session.getAttribute("logined").equals("true")) return "/user/login.html";
+        log.debug("session값 확인 : {}", session);
+        if(!session.getAttribute("logined").equals(true)) return "/user/login.html";
         return "/user/list.html";
     }
 }

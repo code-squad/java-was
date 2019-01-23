@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,7 @@ public class HttpRequest {
 
     private Map<String, String> cookie = Maps.newHashMap();
 
-    private boolean cookieModified = false;
-
-    private List<String> accept;
+    private List<String> accept = new ArrayList<>();
 
     private ResponseCode responseCode = ResponseCode.OK;
 
@@ -39,7 +38,6 @@ public class HttpRequest {
     }
 
     public void addCookie(HttpSession httpSession) {
-        cookieModified = true;
         httpSession.putCookie(cookie);
     }
 
@@ -69,10 +67,8 @@ public class HttpRequest {
         return url.bindingQuery(aInstance);
     }
 
-    public void putCookie(Map<String, Object> newCookie) {
-        for (String key : cookie.keySet()) {
-            newCookie.put(key, cookie.get(key));
-        }
+    public String getSID() {
+        return cookie.get(HttpSession.COOKIE_KEY);
     }
 
     public HttpResponse toResponse() {
@@ -82,6 +78,6 @@ public class HttpRequest {
     @Override
     public String toString() {
         return "HttpRequest[url=" + url + ", contentLength=" + contentLength + ", cookie=" + cookie +
-                ", cookieModified=" + cookieModified + ", accept=" + accept + ", responseCode=" + responseCode + ']';
+                ", accept=" + accept + ", responseCode=" + responseCode + ']';
     }
 }
