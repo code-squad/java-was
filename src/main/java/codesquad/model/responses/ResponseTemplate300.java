@@ -11,11 +11,11 @@ public class ResponseTemplate300 implements ResponseTemplate {
     private static final Logger log = getLogger(ResponseTemplate300.class);
 
     @Override
-    public void header(DataOutputStream dos, Response response) {
+    public void header(DataOutputStream dos, HttpResponse httpResponse) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes(response.writeLocation());
-            dos.writeBytes(response.writeCookie());
+            dos.writeBytes(httpResponse.writeLocation());
+            dos.writeBytes(httpResponse.writeCookie());
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -23,7 +23,7 @@ public class ResponseTemplate300 implements ResponseTemplate {
     }
 
     @Override
-    public void body(DataOutputStream dos, Response response) {
+    public void body(DataOutputStream dos, HttpResponse httpResponse) {
         try {
             dos.flush();
         } catch (IOException e) {

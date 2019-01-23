@@ -1,6 +1,6 @@
 package codesquad;
 
-import codesquad.model.RequestMethod;
+import codesquad.model.HttpMethod;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,5 +13,5 @@ public @interface RequestMapping {
 
     String value() default "";
 
-    RequestMethod method() default RequestMethod.GET;
+    HttpMethod method() default HttpMethod.GET;
 }

@@ -2,7 +2,7 @@ package codesquad.webserver;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
-import codesquad.model.Header;
+import codesquad.model.HttpRequest;
 import codesquad.model.HttpSession;
 import codesquad.model.Url;
 import org.reflections.Reflections;
@@ -44,22 +44,22 @@ public class MappingHandler {
         return mappingHandler.containsKey(url);
     }
 
-    public static void invoke(Header header) throws Exception {
-        Method thisMethod = header.findMappingMethod(mappingHandler);
-        Object thisObject = header.findMappingMethod(mappingHandler).getDeclaringClass().newInstance();
-        Object[] args = ParameterBinder.bind(thisMethod, header);
+    public static void invoke(HttpRequest httpRequest) throws Exception {
+        Method thisMethod = httpRequest.findMappingMethod(mappingHandler);
+        Object thisObject = httpRequest.findMappingMethod(mappingHandler).getDeclaringClass().newInstance();
+        Object[] args = ParameterBinder.bind(thisMethod, httpRequest);
         Object result = thisMethod.invoke(thisObject, args);
-        reflectCookie(args, header);
-        header.generateResponseCode(result);
-        log.debug(header.toString());
+        reflectCookie(args, httpRequest);
+        httpRequest.generateResponseCode(result);
+        log.debug(httpRequest.toString());
     }
 
-    private static void reflectCookie(Object[] args, Header header) {
+    private static void reflectCookie(Object[] args, HttpRequest httpRequest) {
         Arrays.stream(args)
                 .filter(arg -> (arg instanceof HttpSession))
                 .forEach(arg -> {
                     HttpSession httpSession = (HttpSession)arg;
-                    header.addCookie(httpSession);
+                    httpRequest.addCookie(httpSession);
                 });
     }
 

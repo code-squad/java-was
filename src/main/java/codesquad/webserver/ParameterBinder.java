@@ -1,6 +1,6 @@
 package codesquad.webserver;
 
-import codesquad.model.Header;
+import codesquad.model.HttpRequest;
 import codesquad.model.HttpSession;
 import org.slf4j.Logger;
 
@@ -15,16 +15,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class ParameterBinder {
     private static final Logger log = getLogger(ParameterBinder.class);
 
-    public static Object[] bind(Method thisMethod, Header header) throws Exception {
+    public static Object[] bind(Method thisMethod, HttpRequest httpRequest) throws Exception {
         List<Object> args = new ArrayList<>();
         for (Class<?> parameterType : thisMethod.getParameterTypes()) {
             Object aInstance = parameterType.newInstance();
-            if (isValidForQuery(parameterType, header)) {
-                args.add(bindingQuery(aInstance, header));
+            if (isValidForQuery(parameterType, httpRequest)) {
+                args.add(bindingQuery(aInstance, httpRequest));
                 continue;
             }
             if (isValidForCookie(aInstance)) {
-                args.add(bindingCookie(aInstance, header));
+                args.add(bindingCookie(aInstance, httpRequest));
                 continue;
             }
             args.add(aInstance);
@@ -36,19 +36,19 @@ public class ParameterBinder {
         return aInstance instanceof HttpSession;
     }
 
-    static boolean isValidForQuery(Class<?> parameterType, Header header) {
+    static boolean isValidForQuery(Class<?> parameterType, HttpRequest httpRequest) {
         List<String> fields = Arrays.stream(parameterType.getDeclaredFields())
                 .map(field -> field.getName()).collect(Collectors.toList());
-        return header.hasAllThoseFields(fields);
+        return httpRequest.hasAllThoseFields(fields);
     }
 
-    static Object bindingQuery(Object aInstance, Header header) {
-        return header.bindingQuery(aInstance);
+    static Object bindingQuery(Object aInstance, HttpRequest httpRequest) {
+        return httpRequest.bindingQuery(aInstance);
     }
 
-    public static Object bindingCookie(Object aInstance, Header header) {
+    public static Object bindingCookie(Object aInstance, HttpRequest httpRequest) {
         HttpSession httpSession = (HttpSession) aInstance;
-        httpSession.addCookie(header);
+        httpSession.addCookie(httpRequest);
         return httpSession;
     }
 }

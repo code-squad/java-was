@@ -4,8 +4,8 @@ import java.io.DataOutputStream;
 
 public interface ResponseTemplate {
 
-    void header(DataOutputStream dos, Response response);
+    void header(DataOutputStream dos, HttpResponse httpResponse);
 
-    void body(DataOutputStream dos, Response response);
+    void body(DataOutputStream dos, HttpResponse httpResponse);
 
 }

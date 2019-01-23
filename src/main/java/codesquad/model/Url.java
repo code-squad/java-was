@@ -15,19 +15,19 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class Url {
     private static final Logger log = getLogger(Url.class);
 
-    private RequestMethod requestMethod;
+    private HttpMethod httpMethod;
 
     private String accessPath;
 
     private Map<String, String> queryValue;
 
-    public Url(RequestMethod requestMethod, String accessPath) {
-        this.requestMethod = requestMethod;
+    public Url(HttpMethod httpMethod, String accessPath) {
+        this.httpMethod = httpMethod;
         this.accessPath = accessPath;
     }
 
-    public Url(RequestMethod requestMethod, String accessPath, Map<String, String> queryString) {
-        this.requestMethod = requestMethod;
+    public Url(HttpMethod httpMethod, String accessPath, Map<String, String> queryString) {
+        this.httpMethod = httpMethod;
         this.accessPath = accessPath;
         this.queryValue = queryString;
     }
@@ -85,7 +85,7 @@ public class Url {
 
     @Override
     public String toString() {
-        return "Url[requestMethod=" + requestMethod + ", accessPath=" + accessPath + ", queryValue=" + queryValue + ']';
+        return "Url[httpMethod=" + httpMethod + ", accessPath=" + accessPath + ", queryValue=" + queryValue + ']';
     }
 
     @Override
@@ -93,12 +93,12 @@ public class Url {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Url url = (Url) o;
-        return requestMethod == url.requestMethod &&
+        return httpMethod == url.httpMethod &&
                 accessPath.equals(url.accessPath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestMethod, accessPath);
+        return Objects.hash(httpMethod, accessPath);
     }
 }

@@ -1,6 +1,6 @@
 package codesquad.model;
 
-import codesquad.model.responses.Response;
+import codesquad.model.responses.HttpResponse;
 import codesquad.model.responses.ResponseCode;
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
@@ -16,8 +16,8 @@ import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class Header {
-    private static final Logger log = getLogger(Header.class);
+public class HttpRequest {
+    private static final Logger log = getLogger(HttpRequest.class);
 
     private Url url;
 
@@ -31,7 +31,7 @@ public class Header {
 
     private ResponseCode responseCode = ResponseCode.OK;
 
-    public Header(Url url, Map<String, String> headers) {
+    public HttpRequest(Url url, Map<String, String> headers) {
         this.url = url;
         if (headers.containsKey("Accept")) this.accept = Arrays.asList(headers.get("Accept").split(","));
         if (headers.containsKey("Content-Length")) contentLength = Integer.parseInt(headers.get("Content-Length"));
@@ -45,7 +45,7 @@ public class Header {
 
     public void generateResponseCode(Object result) {
         String newAccessPath = (String) result;
-        if (!newAccessPath.contains("redirect")) {
+        if (!newAccessPath.startsWith("redirect:")) {
             url.renewAccessPath(newAccessPath);
             return;
         }
@@ -75,13 +75,13 @@ public class Header {
         }
     }
 
-    public Response toResponse() {
-        return new Response(accept, responseCode, url.getAccessPath(), cookie);
+    public HttpResponse toResponse() {
+        return new HttpResponse(accept, responseCode, url.getAccessPath(), cookie);
     }
 
     @Override
     public String toString() {
-        return "Header[url=" + url + ", contentLength=" + contentLength + ", cookie=" + cookie +
+        return "HttpRequest[url=" + url + ", contentLength=" + contentLength + ", cookie=" + cookie +
                 ", cookieModified=" + cookieModified + ", accept=" + accept + ", responseCode=" + responseCode + ']';
     }
 }

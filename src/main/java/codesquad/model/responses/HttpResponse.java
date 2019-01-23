@@ -14,8 +14,8 @@ import java.util.Map;
 import static codesquad.webserver.WebServer.ROOT_STATIC_PATH;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class Response {
-    private static final Logger log = getLogger(Response.class);
+public class HttpResponse {
+    private static final Logger log = getLogger(HttpResponse.class);
 
     private List<String> accpets;
 
@@ -27,7 +27,7 @@ public class Response {
 
     private byte[] body;
 
-    public Response(List<String> accpets, ResponseCode responseCode, String accessPath, Map<String, String> cookie) {
+    public HttpResponse(List<String> accpets, ResponseCode responseCode, String accessPath, Map<String, String> cookie) {
         this.accpets = accpets;
         this.responseCode = responseCode;
         this.accessPath = accessPath;

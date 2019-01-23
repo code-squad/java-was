@@ -1,6 +1,5 @@
 package codesquad.webserver;
 
-import codesquad.model.Header;
 import codesquad.model.responses.*;
 import org.slf4j.Logger;
 
@@ -20,10 +19,10 @@ public class ViewHandler {
         templates.put(ResponseCode.FOUND, new ResponseTemplate300());
     }
 
-    public static void resolve(OutputStream out, Response response) throws Exception {
+    public static void resolve(OutputStream out, HttpResponse httpResponse) throws Exception {
         DataOutputStream dos = new DataOutputStream(out);
-        ResponseTemplate responseTemplate = response.chooseTemplate(templates);
-        responseTemplate.header(dos, response);
-        responseTemplate.body(dos, response);
+        ResponseTemplate responseTemplate = httpResponse.chooseTemplate(templates);
+        responseTemplate.header(dos, httpResponse);
+        responseTemplate.body(dos, httpResponse);
     }
 }

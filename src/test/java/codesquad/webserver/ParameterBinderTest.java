@@ -1,6 +1,6 @@
 package codesquad.webserver;
 
-import codesquad.model.Header;
+import codesquad.model.HttpRequest;
 import codesquad.model.HttpSession;
 import codesquad.model.User;
 import com.google.common.collect.Maps;
@@ -20,31 +20,31 @@ public class ParameterBinderTest {
     @Test
     public void isValidForQuery_모든필드값_있을때() {
         Class<User> targetClass = User.class;
-        Header header = new Header(URL, Maps.newHashMap());
-        assertThat(ParameterBinder.isValidForQuery(targetClass, header)).isTrue();
+        HttpRequest httpRequest = new HttpRequest(URL, Maps.newHashMap());
+        assertThat(ParameterBinder.isValidForQuery(targetClass, httpRequest)).isTrue();
     }
 
     @Test
     public void isValidForQuery_일부필드값_있을때() {
         Class<User> targetClass = User.class;
-        Header header = new Header(URL2, Maps.newHashMap());
-        assertThat(ParameterBinder.isValidForQuery(targetClass, header)).isTrue();
+        HttpRequest httpRequest = new HttpRequest(URL2, Maps.newHashMap());
+        assertThat(ParameterBinder.isValidForQuery(targetClass, httpRequest)).isTrue();
     }
 
     @Test
     public void isValidForQuery_일부필드값_틀릴때() {
         Class<User> targetClass = User.class;
-        Header header = new Header(URL3, Maps.newHashMap());
-        log.debug(header.toString());
-        assertThat(ParameterBinder.isValidForQuery(targetClass, header)).isFalse();
+        HttpRequest httpRequest = new HttpRequest(URL3, Maps.newHashMap());
+        log.debug(httpRequest.toString());
+        assertThat(ParameterBinder.isValidForQuery(targetClass, httpRequest)).isFalse();
     }
 
     @Test
     public void bindingQuery() throws Exception {
         Class<?> parameterType = User.class;
-        Header header = new Header(URL, Maps.newHashMap());
+        HttpRequest httpRequest = new HttpRequest(URL, Maps.newHashMap());
         Object aInstance = parameterType.newInstance();
-        assertThat(ParameterBinder.bindingQuery(aInstance, header)).isEqualTo(USER);
+        assertThat(ParameterBinder.bindingQuery(aInstance, httpRequest)).isEqualTo(USER);
     }
 
     @Test
@@ -59,8 +59,8 @@ public class ParameterBinderTest {
         Object aInstance = parameterType.newInstance();
         Map<String, String> map = Maps.newHashMap();
         map.put("Cookie", "logined=true");
-        Header header = new Header(URL, map);
-        ParameterBinder.bindingCookie(aInstance, header);
+        HttpRequest httpRequest = new HttpRequest(URL, map);
+        ParameterBinder.bindingCookie(aInstance, httpRequest);
         HttpSession httpSession = (HttpSession) aInstance;
         assertThat(httpSession.getAttribute("logined")).isEqualTo("true");
     }

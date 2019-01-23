@@ -1,7 +1,7 @@
 package codesquad.webserver;
 
 import codesquad.Controller;
-import codesquad.model.Header;
+import codesquad.model.HttpRequest;
 import codesquad.model.responses.*;
 import com.google.common.collect.Maps;
 import org.junit.Before;
@@ -18,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MappingHandlerTest {
     private static final Logger log = getLogger(MappingHandlerTest.class);
-    private Header header;
+    private HttpRequest httpRequest;
     private static Map<ResponseCode, ResponseTemplate> templates = Maps.newHashMap();
 
     static {
@@ -28,7 +28,7 @@ public class MappingHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        header = new Header(URL, Maps.newHashMap());
+        httpRequest = new HttpRequest(URL, Maps.newHashMap());
     }
 
     @Test
@@ -43,18 +43,18 @@ public class MappingHandlerTest {
     @Test
     public void redirect() {
         Object result = "redirect:/index.html";
-        header.generateResponseCode(result);
-        Response response = header.toResponse();
-        ResponseTemplate responseTemplate = response.chooseTemplate(templates);
+        httpRequest.generateResponseCode(result);
+        HttpResponse httpResponse = httpRequest.toResponse();
+        ResponseTemplate responseTemplate = httpResponse.chooseTemplate(templates);
         assertThat(responseTemplate instanceof ResponseTemplate300).isTrue();
     }
 
     @Test
     public void ok() {
         Object result = "/index.html";
-        header.generateResponseCode(result);
-        Response response = header.toResponse();
-        ResponseTemplate responseTemplate = response.chooseTemplate(templates);
+        httpRequest.generateResponseCode(result);
+        HttpResponse httpResponse = httpRequest.toResponse();
+        ResponseTemplate responseTemplate = httpResponse.chooseTemplate(templates);
         assertThat(responseTemplate instanceof ResponseTemplate200).isTrue();
     }
 }

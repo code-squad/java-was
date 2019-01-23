@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class ResponseTemplateCodeTest {
-    private static final Logger log = getLogger(ResponseTemplateCodeTest.class);
+public class HttpResponseTemplateCodeTest {
+    private static final Logger log = getLogger(HttpResponseTemplateCodeTest.class);
 
     @Test
     public void name() {

@@ -30,8 +30,8 @@ public class HttpSession {
         }
     }
 
-    public Object addCookie(Header header) {
-        header.putCookie(newCookie);
+    public Object addCookie(HttpRequest httpRequest) {
+        httpRequest.putCookie(newCookie);
         return this;
     }
 

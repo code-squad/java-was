@@ -11,13 +11,13 @@ public class ResponseTemplate200 implements ResponseTemplate {
     private static final Logger log = getLogger(ResponseTemplate200.class);
 
     @Override
-    public void header(DataOutputStream dos, Response response) {
+    public void header(DataOutputStream dos, HttpResponse httpResponse) {
         try {
-            response.writeBody();
+            httpResponse.writeBody();
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes(response.writeContentType());
-            dos.writeBytes(response.writeCookie());
-            dos.writeBytes(response.writeContentLength());
+            dos.writeBytes(httpResponse.writeContentType());
+            dos.writeBytes(httpResponse.writeCookie());
+            dos.writeBytes(httpResponse.writeContentLength());
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -25,9 +25,9 @@ public class ResponseTemplate200 implements ResponseTemplate {
     }
 
     @Override
-    public void body(DataOutputStream dos, Response response) {
+    public void body(DataOutputStream dos, HttpResponse httpResponse) {
         try {
-            response.write(dos);
+            httpResponse.write(dos);
             dos.flush();
         } catch (IOException e) {
             log.error(e.getMessage());
