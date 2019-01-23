@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 
 import java.util.Map;
 
+import http.Pair;
 import org.junit.Test;
 
-import util.HttpRequestUtils.Pair;
 
 public class HttpRequestUtilsTest {
     @Test
