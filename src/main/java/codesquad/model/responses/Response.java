@@ -1,7 +1,6 @@
 package codesquad.model.responses;
 
 import codesquad.webserver.ViewResolver;
-import codesquad.webserver.WebServer;
 import org.slf4j.Logger;
 
 import java.io.DataOutputStream;
@@ -73,8 +72,6 @@ public class Response {
     }
 
     public String writeLocation() {
-        StringBuilder redirectAddress = new StringBuilder("http://").append(WebServer.SERVER_IP)
-                .append(WebServer.DEFAULT_PORT).append(this.accessPath);
-        return new StringBuilder("Location: ").append(redirectAddress).append("\r\n").toString();
+        return new StringBuilder("Location: ").append(this.accessPath).append("\r\n").toString();
     }
 }
