@@ -23,13 +23,13 @@ public class UserController {
 
     @RequestMapping(value = "/user/login", method = HttpMethod.POST)
     public String login(User user, HttpSession session) {
-        log.debug(user.toString());
+        log.debug("로그인한 사용자 : {}", user);
         try {
             UserService.login(user);
             session.setAttribute("logined", true);
             return "redirect:/index.html";
-        } catch(Exception e) {
-            log.error(e.getMessage());
+        } catch(RuntimeException e) {
+            log.error("로그인 실패! ", e);
             return "/user/login_failed.html";
         }
     }

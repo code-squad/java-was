@@ -9,11 +9,10 @@ import org.slf4j.LoggerFactory;
 public class WebServer {
     private static final Logger log = LoggerFactory.getLogger(WebServer.class);
     public static final int DEFAULT_PORT = 8080;
-    public static final String SERVER_IP = "127.0.0.1:";
     public static final String ROOT_STATIC_PATH = "./webapp";
 
     public static void main(String args[]) throws Exception {
-        int port = 0;
+        int port;
         if (args == null || args.length == 0) {
             port = DEFAULT_PORT;
         } else {
