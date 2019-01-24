@@ -26,17 +26,12 @@ public class IOUtils {
         readFirstLine(br, headers);
         readRestLines(br, headers);
         readBody(br, headers);
-
-        for (HttpRequestKey httpRequestKey : headers.keySet()) {
-            log.debug("httpRequestKey : " + headers.get(httpRequestKey));
-        }
-
         return headers;
     }
 
     private static void readBody(BufferedReader br, Map<HttpRequestKey, String> headers) throws IOException {
         String bodyText = IOUtils.readData(br, Integer.parseInt(headers.getOrDefault(HttpRequestKey.CONTENT_LENGTH, "0")));
-        if (!Strings.isNullOrEmpty(bodyText)) headers.put(HttpRequestKey.BODY_VALUE, bodyText);
+        if (!Strings.isNullOrEmpty(bodyText)) headers.put(HttpRequestKey.QUERY_VALUE, bodyText);
     }
 
     private static void readRestLines(BufferedReader br, Map<HttpRequestKey, String> headers) throws IOException {
@@ -45,7 +40,6 @@ public class IOUtils {
             log.debug(line);
             HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
             headers.put(HttpRequestKey.of(pair.getKey()), pair.getValue());
-            log.debug(line);
         }
     }
 

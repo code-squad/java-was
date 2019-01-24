@@ -9,10 +9,13 @@ import org.junit.Test;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
-import static codesquad.fixture.UrlFixture.URL;
+import static codesquad.model.HttpRequestTest.TEST_DIRECTORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -28,7 +31,8 @@ public class MappingHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        httpRequest = new HttpRequest(URL, Maps.newHashMap());
+        InputStream in = new FileInputStream(new File(TEST_DIRECTORY + "Http_POST.txt"));
+        httpRequest = new HttpRequest(in);
     }
 
     @Test

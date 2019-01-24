@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class HttpSessionTest {

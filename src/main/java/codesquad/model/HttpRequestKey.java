@@ -17,7 +17,6 @@ public enum HttpRequestKey {
     ACCEPT("Accept"),
     ACCEPT_ENCODING("Accept-Encoding"),
     ACCEPT_LANGUAGE("Accept-Language"),
-    BODY_VALUE("BodyValue"),
     REFERER("Referer"),
     ORIGIN("Origin"),
     ETC("etc");

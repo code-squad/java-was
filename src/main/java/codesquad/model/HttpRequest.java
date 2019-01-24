@@ -37,7 +37,7 @@ public class HttpRequest {
         accept = Arrays.asList(headers.getOrDefault(HttpRequestKey.ACCEPT, "").split(","));
         contentLength = Integer.parseInt(headers.getOrDefault(HttpRequestKey.CONTENT_LENGTH, "0"));
         cookie = HttpRequestUtils.parseCookies(headers.getOrDefault(HttpRequestKey.COOKIE, ""));
-        queryValue = HttpRequestUtils.parseQueryString(headers.get(HttpRequestKey.BODY_VALUE));
+        queryValue = HttpRequestUtils.parseQueryString(headers.get(HttpRequestKey.QUERY_VALUE));
     }
 
     public void addCookie(HttpSession httpSession) {
