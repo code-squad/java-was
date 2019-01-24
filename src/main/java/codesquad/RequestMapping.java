@@ -1,6 +1,6 @@
 package codesquad;
 
-import codesquad.model.HttpMethod;
+import codesquad.model.request.HttpMethod;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,5 +1,6 @@
 package codesquad.model;
 
+import codesquad.model.request.HttpRequestKey;
 import codesquad.util.HttpRequestUtils;
 import org.junit.Test;
 import org.slf4j.Logger;

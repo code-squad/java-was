@@ -2,7 +2,7 @@ package codesquad.controller;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
-import codesquad.model.HttpMethod;
+import codesquad.model.request.HttpMethod;
 import codesquad.model.HttpSession;
 import codesquad.model.User;
 import codesquad.service.UserService;

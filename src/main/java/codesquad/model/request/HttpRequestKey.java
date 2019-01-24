@@ -1,4 +1,4 @@
-package codesquad.model;
+package codesquad.model.request;
 
 import com.google.common.base.Strings;
 

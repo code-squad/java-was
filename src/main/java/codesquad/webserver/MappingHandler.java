@@ -2,9 +2,9 @@ package codesquad.webserver;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
-import codesquad.model.HttpRequest;
+import codesquad.model.request.HttpRequest;
 import codesquad.model.HttpSession;
-import codesquad.model.Url;
+import codesquad.model.request.Url;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 

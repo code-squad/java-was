@@ -1,6 +1,6 @@
 package codesquad.util;
 
-import codesquad.model.HttpRequestKey;
+import codesquad.model.request.HttpRequestKey;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;

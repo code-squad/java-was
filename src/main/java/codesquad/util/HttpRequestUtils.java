@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import codesquad.model.HttpRequestKey;
+import codesquad.model.request.HttpRequestKey;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -18,7 +18,6 @@ public class HttpRequestUtils {
     public static final String BLANK = " ";
 
     public static Map<String, String> parseQueryString(String queryString) {
-        log.debug("queryString : " + queryString);
         return parseValues(queryString, "&");
     }
 

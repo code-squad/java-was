@@ -1,7 +1,7 @@
 package codesquad.webserver;
 
 import codesquad.Controller;
-import codesquad.model.HttpRequest;
+import codesquad.model.request.HttpRequest;
 import codesquad.model.responses.*;
 import com.google.common.collect.Maps;
 import org.junit.Before;

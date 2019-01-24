@@ -1,7 +1,7 @@
 package codesquad.fixture;
 
-import codesquad.model.HttpMethod;
-import codesquad.model.Url;
+import codesquad.model.request.HttpMethod;
+import codesquad.model.request.Url;
 
 import java.util.HashMap;
 import java.util.Map;

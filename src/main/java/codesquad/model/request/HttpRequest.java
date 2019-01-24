@@ -1,5 +1,6 @@
-package codesquad.model;
+package codesquad.model.request;
 
+import codesquad.model.HttpSession;
 import codesquad.model.responses.HttpResponse;
 import codesquad.model.responses.ResponseCode;
 import codesquad.util.HttpRequestUtils;

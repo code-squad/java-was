@@ -1,6 +1,6 @@
 package codesquad.webserver;
 
-import codesquad.model.HttpRequest;
+import codesquad.model.request.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,6 @@ public class RequestHandler extends Thread {
                 MappingHandler.invoke(httpRequest);
             }
 
-            log.debug(httpRequest.toString());
             ViewHandler.resolve(out, httpRequest.toResponse());
 
         } catch (Exception e) {

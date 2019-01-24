@@ -1,4 +1,4 @@
-package codesquad.model;
+package codesquad.model.request;
 
 import org.slf4j.Logger;
 

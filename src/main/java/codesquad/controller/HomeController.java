@@ -2,7 +2,7 @@ package codesquad.controller;
 
 import codesquad.Controller;
 import codesquad.RequestMapping;
-import codesquad.model.HttpMethod;
+import codesquad.model.request.HttpMethod;
 
 @Controller
 public class HomeController {

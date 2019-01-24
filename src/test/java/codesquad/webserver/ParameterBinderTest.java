@@ -1,6 +1,6 @@
 package codesquad.webserver;
 
-import codesquad.model.HttpRequest;
+import codesquad.model.request.HttpRequest;
 import codesquad.model.HttpSession;
 import codesquad.model.User;
 import org.junit.Test;
