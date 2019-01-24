@@ -3,14 +3,19 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.Optional;
+import java.util.Map;
 
+import db.DataBase;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.PathReaderUtils;
+import util.HttpRequestUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+    private static final String USER_CREATE = "/user/create";
+    private static final String GET_METHOD = "GET";
+    private static final String SUFFIX_HTML = "html";
 
     private Socket connection;
 
@@ -26,13 +31,29 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            Optional<String> maybePath = PathReaderUtils.extractURL(br.readLine());
-            log.debug("maybePath : {}", maybePath);
+            String headerFirstLine = br.readLine();
+            String[] tokens = headerFirstLine.split(" ");
             byte[] body = "Hello World".getBytes();
-            if(maybePath.isPresent()){
-                log.debug("path : {}", "./webapp" + maybePath.get());
-                body = Files.readAllBytes(new File("./webapp" + maybePath.get()).toPath());
+
+            if(tokens[0].equals(GET_METHOD)) {
+                log.debug("tokens[1] : {}", tokens[1]);
+                if(tokens[1].endsWith(SUFFIX_HTML)) {
+                    log.debug("get html path : {}", tokens[1]);
+                    body = Files.readAllBytes(new File("./webapp" + tokens[1]).toPath());
+                }
+                if(tokens[1].startsWith(USER_CREATE)){
+                    body = "HelloCreate".getBytes();
+                    String[] parts = tokens[1].split("\\?");
+                    Map<String, String> parseValues = HttpRequestUtils.parseQueryString(parts[1]);
+                    log.debug("map : {}", parseValues);
+                    User newUser =
+                            new User(parseValues.get("userId"), parseValues.get("password"), parseValues.get("name"), parseValues.get("email"));
+                    log.debug("user : {}", newUser);
+                    DataBase.addUser(newUser);
+                    log.debug("db user : {}", DataBase.findUserById(parseValues.get("userId")));
+                }
             }
+
             DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, body.length);
             responseBody(dos, body);
