@@ -1,4 +1,4 @@
-package http;
+package webserver.http.request;
 
 import vo.HttpMethod;
 

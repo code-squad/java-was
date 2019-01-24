@@ -1,7 +1,7 @@
 package util;
 
-import http.Pair;
-import http.RequestHeaders;
+import webserver.http.Pair;
+import webserver.http.request.RequestHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

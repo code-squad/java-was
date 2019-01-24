@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.Map;
 
-import http.Pair;
+import webserver.http.Pair;
 import org.junit.Test;
 
 

@@ -1,4 +1,4 @@
-package http;
+package webserver.http.request;
 
 public class HttpRequest {
     private RequestLine requestLine;
@@ -6,6 +6,11 @@ public class HttpRequest {
     private RequestBody requestBody;
 
     public HttpRequest() {
+    }
+
+    public HttpRequest(RequestLine requestLine, RequestHeaders requestHeaders) {
+        this.requestLine = requestLine;
+        this.requestHeaders = requestHeaders;
     }
 
     public HttpRequest(RequestLine requestLine, RequestHeaders requestHeaders, RequestBody requestBody) {
@@ -24,5 +29,9 @@ public class HttpRequest {
 
     public RequestBody getRequestBody() {
         return requestBody;
+    }
+
+    public String getUri() {
+        return this.requestLine.getUri();
     }
 }

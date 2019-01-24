@@ -1,6 +1,4 @@
-package http;
-
-import util.HttpRequestUtils;
+package webserver.http;
 
 public class Pair {
     private String key;
