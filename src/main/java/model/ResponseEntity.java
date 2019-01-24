@@ -1,6 +1,7 @@
 package model;
 
 import org.slf4j.Logger;
+import webserver.ClientModel;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -54,16 +55,20 @@ public class ResponseEntity {
        @param
        @return response에 대한 공통적인 속성을 작성한 템플
     */
-    public ResponseEntity responseHeader(DataOutputStream dos) throws IOException {
+    public ResponseEntity responseHeader(DataOutputStream dos, boolean isResource) throws IOException {
 
         String statusCode = obtainStatusCode();
         dos.writeBytes(String.format("HTTP/1.1 %s %s\r\n", statusCode, obtainStatus(statusCode)));
-        dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+        String contentType = "Content-Type: text/html;charset=utf-8\r\n";
+        if(isResource) {
+            contentType = "Content-Type: text/css\r\n";
+        }
+        dos.writeBytes(contentType);
         dos.writeBytes(String.format("Content-Length: %d\r\n", this.body.length));
 
         /* status에 따라 response 구성이 조금씩 다르기 때문에 다른 부분은 람다로 처리 */
         statusProcessor.get(statusCode).accept(dos);
-
+        dos.writeBytes(String.format("Set-Cookie: %s\r\n", header.get("Set-Cookie")));
         dos.writeBytes("\r\n");
 
         return this;
@@ -79,22 +84,14 @@ public class ResponseEntity {
 
     private void response302Header(DataOutputStream dos) {
         try {
-            logger.debug("Location : {}", header.get("Location"));
-            dos.writeBytes(String.format("Location: %s", header.get("Location")));
+            dos.writeBytes(String.format("Location: %s\r\n", header.get("Location")));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void response200Header(DataOutputStream dos) {
-        if(header.containsKey("Set-Cookie")) {
-            try {
-                logger.debug("Cookie 적용 완료!");
-                dos.writeBytes(String.format("Set-Cookie: %s", header.get("Set-Cookie")));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
     }
 
     public ResponseEntity responseBody(DataOutputStream dos) {

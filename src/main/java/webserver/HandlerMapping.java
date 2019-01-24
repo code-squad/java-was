@@ -1,137 +1,143 @@
 package webserver;
 
-import db.DataBase;
+import model.Mapping;
 import model.RequestEntity;
 import model.User;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import security.ClientSession;
 import security.HttpSession;
-import service.UserService;
 import setting.Controller;
 import setting.GetMapping;
 import setting.PostMapping;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.UnaryOperator;
+import java.lang.reflect.Parameter;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Controller
 public class HandlerMapping {
 
     private static final Logger logger = getLogger(HandlerMapping.class);
 
-    private static Map<RequestEntity, UnaryOperator<RequestEntity>> parameterHandlerMap = new HashMap<>();
+    private static Map<Mapping, BiFunction<Map, String, String>> handlerMapper = new HashMap<>();
 
+    /* 요청 Mapping 정보에 따라 호출되는 메소드를 매핑 */
     static {
-        /* 회원가입 GET */
-        parameterHandlerMap.put(new RequestEntity("/users/create", "GET", "", null)
-                , requestHeader -> createConstructor(User.class, requestHeader));
-        /* [메인화면 이동] */
-        parameterHandlerMap.put(new RequestEntity("/index.html", "GET", "", null), null);
-        /* 회원가입 POST */
-        parameterHandlerMap.put(new RequestEntity("/users/create", "POST", "", null)
-                , requestEntity -> saveUser(requestEntity));
-        /* 회원가입 이동 */
-        parameterHandlerMap.put(new RequestEntity("/users/form", "GET", "", null), null);
-        /* 로그인 이동 */
-        parameterHandlerMap.put(new RequestEntity("/users/login", "GET", "", null), null);
-        /* 회원리스트 GET */
-        parameterHandlerMap.put(new RequestEntity("/users/list", "GET", "", null)
-                , requestEntity -> showList(requestEntity));
-        /* 로그인 POST */
-        parameterHandlerMap.put(new RequestEntity("/users/login", "POST", "", null)
-                , requestEntity -> processLogin(requestEntity));
+        Reflections reflections = new Reflections("webserver");
+
+        /* setting.MainController 어노테이션 붙어있는 클래스만 확인! */
+        Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class);
+        for (Class<?> clazz : classes) {
+            /* Get, Post Method 만 등록!
+                    --> [질문] 상속관계를 통해 중복성 제거를 원함! How to Do..?!
+            */
+            registerGetMethod(clazz, obtainMethodStream(clazz, "GetMapping"));
+            registerPostMethod(clazz, obtainMethodStream(clazz, "PostMapping"));
+
+        }
     }
 
-    static {
-        Class clazz = HandlerMapping.class;
-        Method[] methods = clazz.getDeclaredMethods();
+    /*
+       @param  @Annotation 이름
+       @return @Annotation 이름이 붙은 모든 메소드의 스트림을 반환
+    */
+    public static Stream<Method> obtainMethodStream(Class clazz, String name) {
+        return Stream.of(clazz.getDeclaredMethods())
+                .filter(m -> hasAnnotation(m.getDeclaredAnnotations(), name).isPresent());
+    }
 
-        for(Method method : methods) {
-            for(Annotation annotation : method.getAnnotations()) {
-                String annotationName = annotation.annotationType().getSimpleName();
-                if(annotationName.equals())
+    /*
+       @param  @Annotation PostMapping 을 가진 메소드의 스트림
+       @return Void 메소드 등록!
+    */
+    public static void registerPostMethod(Class clazz, Stream<Method> stream) {
+        List<Method> postMethods = stream.collect(Collectors.toList());
+        for (Method postMethod : postMethods) {
+            PostMapping postMapping = postMethod.getAnnotation(PostMapping.class);
+            handlerMapper.put(new Mapping(postMapping.value(), "POST")
+                    , (body, jSessionId) -> invokeMethod(createAllParameters(body, postMethod, jSessionId), clazz, postMethod));
+        }
+    }
+
+    /*
+       @param  @Annotation PostMapping 을 가진 메소드의 스트림
+       @return Void 메소드 등록!
+    */
+    public static void registerGetMethod(Class clazz, Stream<Method> stream) {
+        List<Method> getMethods = stream.collect(Collectors.toList());
+        for (Method getMethod : getMethods) {
+            GetMapping getMapping = getMethod.getAnnotation(GetMapping.class);
+            handlerMapper.put(new Mapping(getMapping.value(), "GET")
+                    , (body, jSessionId) -> invokeMethod(createAllParameters(body, getMethod, jSessionId), clazz, getMethod));
+        }
+    }
+
+    public static String invokeMethod(List<Object> body, Class clazz, Method method) {
+        String returnPage = "";
+        try {
+            Object[] objects = body.toArray();
+            returnPage = (String) method.invoke(clazz.newInstance(), objects);
+        } catch (Exception e) {
+
+        }
+        return returnPage;
+    }
+
+    public static List<Object> createAllParameters(Map<String, String> body, Method method, String jSessionId)  {
+        Parameter[] parameters = method.getParameters();
+        List<Object> args = new ArrayList<>();
+        int index = 0;
+        for (Parameter parameter : parameters) {
+            Class clazz = parameter.getType();
+            try {
+                /*[개선 필요] 중복제거 필요! -> Map + Lambda 활용하면 제거 가능할 듯..?! */
+                /* String 객체 */
+                if(clazz.newInstance() instanceof String) {
+                    int i = 0;
+                    for (String key : body.keySet()) {
+                        /* String Type 은 옵션을 부여하지 않으면, args0 ~ n 형식으로 동작하기 때문에 아래와 같은 로직 필요 */
+                        if(i == index) {
+                            args.add(body.get(key));
+                            index++;
+                        }
+                        i++;
+                    }
+                }
+
+                /* HttpSession 객체 */
+                if(clazz.newInstance() instanceof HttpSession) {
+                    args.add(new HttpSession(jSessionId));
+                }
+
+                /* Model 객체 */
+                if(clazz.newInstance() instanceof Model) {
+                    args.add(new Model(jSessionId));
+                }
+
+                /* 객체 */
+                if(!(clazz.newInstance() instanceof String || clazz.newInstance() instanceof HttpSession)) {
+                    args.add(createParameterObject(clazz, body));
+                }
+
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
-    }
-
-    @GetMapping(value = "/index.html")
-    public RequestEntity navigate(RequestEntity requestEntity) {
-        return requestEntity;
-    }
-
-    @PostMapping(value="/users/create")
-    public String join(User user) {
-        return "";
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public static RequestEntity processCookie(RequestEntity requestEntity) {
-        ClientSession clientSession = HttpSession.getSession(requestEntity.obtainParamElement("JSESSIONID"));
-        if(clientSession != null && clientSession.hasSession("loginedUser")) {
-            logger.debug("Cookie 등록 완료");
-            return requestEntity.addCookie("logined=true");
-        }
-        return requestEntity.addCookie("logined=false");
-    }
-
-    private static RequestEntity showList(RequestEntity requestEntity) {
-        logger.debug("Show List Request Entity : {}", requestEntity.toString());
-        if(isLoginedUser(requestEntity)) {
-            return requestEntity;
-        }
-        return new RequestEntity("/index.html", "GET", "", null);
-    }
-
-    private static boolean isLoginedUser(RequestEntity requestEntity) {
-        return requestEntity.hasLoginLoCookie();
-    }
-
-    private static RequestEntity processLogin(RequestEntity requestEntity) {
-        if(isLoginSuccess(requestEntity)) {
-            logger.debug("Login 성공");
-            ClientSession clientSession = new ClientSession();
-            clientSession.registerSession("loginedUser", createConstructor(User.class, requestEntity));
-            HttpSession.addSession(requestEntity.obtainParamElement("JSESSIONID"), clientSession);
-            return requestEntity;
-        }
-        logger.debug("Login 실패");
-        return new RequestEntity("/users/login_failed", "GET", "", null);
-    }
-
-    public static boolean isLoginSuccess(RequestEntity requestEntity) {
-        String userId = readParameter(requestEntity, "userId");
-        String password = readParameter(requestEntity, "password");
-        User registeredUser = DataBase.findUserById(userId);
-        logger.debug("DB에 입력된 사용자 : {}", registeredUser.toString());
-
-        return registeredUser.enableLogin(userId, password);
-    }
-
-    public static String readParameter(RequestEntity requestEntity, String paramName) {
-        return requestEntity.obtainParamElement(paramName);
-    }
-
-    private static RequestEntity saveUser(RequestEntity requestEntity) {
-        User user = (User) createConstructor(User.class, requestEntity);
-        UserService.saverUser(user);
-        logger.debug("회원가입 처리 완료!");
-
-        return requestEntity;
+        return args;
     }
 
     /*
        @param  리턴하는 클래스 타입, URL 객체
        @return 리플랙션으로 URL path 필드에 해당하는 setter 메소드를 호출하여 객체 반환 (단, 자바빈 규약 준수)
     */
-    public static <T> T createConstructor(Class clazz, RequestEntity requestEntity) {
+    public static <T> T createParameterObject(Class clazz, Map<String, String> params) {
         T obj = null;
         try {
             obj = (T) clazz.newInstance();
@@ -139,13 +145,29 @@ public class HandlerMapping {
             for (Method method : methods) {
                 if(method.getName().startsWith("set")) {
                     String field = obtainField(method.getName());
-                    method.invoke(obj, requestEntity.obtainParamElement(field));
+                    method.invoke(obj, params.get(field));
                 }
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return obj;
+    }
+
+    public static Optional<Annotation> hasAnnotation(Annotation[] annotations, String name) {
+        return Stream.of(annotations).filter(a -> a.annotationType().getSimpleName().contains(name)).findFirst();
+    }
+
+    public static String readParameter(RequestEntity requestEntity, String paramName) {
+        return requestEntity.obtainParamElement(paramName);
+    }
+
+    public static String processHandler(Mapping mapping, Map<String, String> body, String jSessionId) {
+        if(mapping.isResource()) {
+            body.put("filePath", mapping.getPath());
+            return handlerMapper.get(new Mapping("/css", "GET")).apply(body, jSessionId);
+        }
+        return handlerMapper.get(mapping).apply(body, jSessionId);
     }
 
     /*
@@ -156,12 +178,5 @@ public class HandlerMapping {
         StringBuilder sb = new StringBuilder(methodName).replace(0, 3, "");
         sb.replace(0, 1, String.valueOf(sb.toString().charAt(0)).toLowerCase());
         return sb.toString();
-    }
-
-    public static RequestEntity processRequest(RequestEntity requestEntity) {
-        if(parameterHandlerMap.get(requestEntity) != null) {
-            return parameterHandlerMap.get(requestEntity).apply(requestEntity);
-        }
-        return requestEntity;
     }
 }

@@ -33,7 +33,7 @@ public class RequestEntityFactory {
         Map<String, String> header = new HashMap<>();
         String headerLine = "";
         while((headerLine = br.readLine()).trim().length() > 0) {
-            /* (개선점)이 부분 개선 필요! */
+            /* [질문] JSESSIONID를 추출하는 부분 개선 필요! */
             if(headerLine.contains("JSESSIONID=")) {
                 String[] line = headerLine.split(";");
                 header.put(line[0].split(COLON)[0], line[0].split(COLON)[1].trim());

@@ -3,6 +3,9 @@ package model;
 import java.util.Objects;
 
 public class User {
+
+    public static final User GUEST_USER = new GuestUser();
+
     private String userId;
     private String password;
     private String name;
@@ -55,6 +58,14 @@ public class User {
         return this.userId.equals(userId) && this.password.equals(password);
     }
 
+    public boolean isJoinUser(User savedUser) {
+        return this.userId.equals(savedUser.userId) && this.password.equals(savedUser.password);
+    }
+
+    public boolean isGuestUser() {
+        return false;
+    }
+
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
@@ -75,4 +86,13 @@ public class User {
     public int hashCode() {
         return Objects.hash(userId, password, name, email);
     }
+
+    private static class GuestUser extends User {
+
+        @Override
+        public boolean isGuestUser() {
+            return true;
+        }
+    }
+
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClientSession {
+    public static final String LOGIN_SESSION = "loginedUser";
 
     private Map<String, Object> session;
 
@@ -11,8 +12,8 @@ public class ClientSession {
         session = new HashMap<>();
     }
 
-    public ClientSession registerSession(String sessionName, Object object) {
-        session.put(sessionName, object);
+    public ClientSession registerSession(Object object) {
+        session.put(LOGIN_SESSION, object);
         return this;
     }
 

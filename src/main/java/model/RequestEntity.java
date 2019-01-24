@@ -13,14 +13,11 @@ public class RequestEntity {
     private static final String SPLIT_QUESTION = "\\?";
     private static final String QUESTION_MARK = "?";
 
-    private String path;
+    private Mapping mapping;
     private Map<String, String> body = new HashMap<>();
-    private String method;
     private Map<String, String> headerInfo;
 
     public RequestEntity(String path, String method, String body, Map<String, String> headerInfo) {
-        this.path = path;
-        this.method = method;
         this.headerInfo = headerInfo;
 
         /* POST Method Parameter 존재할 경우에만 동작 */
@@ -30,13 +27,27 @@ public class RequestEntity {
 
         /* GET Method Parameter 존재할 경우에만 동작! */
         if(path.contains(QUESTION_MARK)) {
-            initParams(path);
+            path = initParams(path);
         }
+
+        this.mapping = new Mapping(path, method);
     }
 
-    private void initParams(String path) {
-        this.path = path.split(SPLIT_QUESTION)[0];
+    private String initParams(String path) {
         this.body = HttpRequestUtils.parseQueryString(path.split(SPLIT_QUESTION)[1]);
+        return path.split(SPLIT_QUESTION)[0];
+    }
+
+    public Mapping getMapping() {
+        return mapping;
+    }
+
+    public Map<String, String> getBody() {
+        return body;
+    }
+
+    public String getJsessionId() {
+        return headerInfo.get("JSESSIONID");
     }
 
     /*
@@ -66,55 +77,24 @@ public class RequestEntity {
         return ParameterConverter.urlDecoding(body.get(field));
     }
 
-    /*
-       @param Cookie 명
-       @return 쿠키 등록 후, 체인방식을 위해 본인 리턴
-    */
-    public RequestEntity addCookie(String cookie) {
-        headerInfo.put("Cookie", cookie);
-        return this;
-    }
-
-    /*
-       @param
-       @return 쿠키 등록 유무 확인
-    */
-    public boolean hasLoginLoCookie() {
-        if(headerInfo != null && headerInfo.containsKey("Cookie")) {
-            return headerInfo.get("Cookie").contains("logined=true");
-        }
-        return false;
-    }
-
-    public boolean hasHeader(String headerName) {
-        return this.headerInfo.containsKey(headerName);
-    }
-
-    public String obtainCookie() {
-        return headerInfo.get("Cookie");
+    public void addHeader(String key, String value) {
+        this.headerInfo.put(key, value);
     }
 
     @Override
     public String toString() {
         return "RequestEntity{" +
-                "path='" + path + '\'' +
+                "mapping=" + mapping +
                 ", body=" + body +
-                ", method='" + method + '\'' +
                 ", headerInfo=" + headerInfo +
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RequestEntity urlInfo = (RequestEntity) o;
-        return Objects.equals(path, urlInfo.path) &&
-                Objects.equals(method, urlInfo.method);
+    public boolean isResource() {
+        return headerInfo.get("Accept").contains("text/css");
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(path, method);
+    public String obtainCookie() {
+        return this.headerInfo.get("Cookie");
     }
 }

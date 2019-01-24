@@ -2,6 +2,7 @@ package util;
 
 import org.junit.Test;
 import org.slf4j.Logger;
+import webserver.MainController;
 import webserver.HandlerMapping;
 
 import java.lang.annotation.Annotation;
@@ -24,5 +25,11 @@ public class ReflectionTest {
                 logger.debug("Annotation : {}", annotation.annotationType().getSimpleName());
             }
         }
+    }
+
+    @Test
+    public void 어노테이션2_Test() {
+        Class clazz = MainController.class;
+        Method[] methods = clazz.getDeclaredMethods();
     }
 }

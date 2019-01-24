@@ -4,11 +4,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpSession {
-    /* key : JSESSIONID, Obkect(User.class) */
+    /* key : JSESSIONID, Object(User.class) */
     private static Map<String, ClientSession> httpSessions = new HashMap<>();
 
-    public static void addSession(String jsessionID, ClientSession clientSession) {
-        httpSessions.put(jsessionID, clientSession);
+    private String jSessionId;
+
+    public HttpSession() {
+
+    }
+
+    public HttpSession(String jSessionId) {
+        this.jSessionId = jSessionId;
+    }
+
+    public void addSession(Object object) {
+        if(httpSessions.containsKey(this.jSessionId)) {
+            httpSessions.put(this.jSessionId, httpSessions.get(this.jSessionId).registerSession(object));
+        }
+        httpSessions.put(this.jSessionId, new ClientSession().registerSession(object));
     }
 
     public static void removeSession(String jssesionID) {
@@ -21,5 +34,12 @@ public class HttpSession {
 
     public static ClientSession getSession(String jsessionID) {
         return httpSessions.get(jsessionID);
+    }
+
+    public boolean isLoginUser() {
+        if(!httpSessions.containsKey(this.jSessionId) || !httpSessions.get(this.jSessionId).hasSession(ClientSession.LOGIN_SESSION)) {
+            return false;
+        }
+        return true;
     }
 }
