@@ -43,7 +43,7 @@ public class ParameterBinder {
     }
 
     static Object bindingQuery(Object aInstance, HttpRequest httpRequest) {
-        return httpRequest.bindingQuery(aInstance);
+        return httpRequest.bindingQueryValue(aInstance);
     }
 
     public static Object bindingSession(Object aInstance, HttpRequest httpRequest) {

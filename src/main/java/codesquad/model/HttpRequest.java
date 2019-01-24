@@ -4,13 +4,12 @@ import codesquad.model.responses.HttpResponse;
 import codesquad.model.responses.ResponseCode;
 import codesquad.util.HttpRequestUtils;
 import codesquad.util.IOUtils;
-import com.google.common.collect.Maps;
+import codesquad.util.ReflectionUtils;
 import org.slf4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,19 +21,23 @@ public class HttpRequest {
 
     private Url url;
 
-    private int contentLength = 0;
+    private Map<String, String> queryValue;
 
-    private Map<String, String> cookie = Maps.newHashMap();
+    private int contentLength;
 
-    private List<String> accept = new ArrayList<>();
+    private Map<String, String> cookie;
+
+    private List<String> accept;
 
     private ResponseCode responseCode = ResponseCode.OK;
 
-    public HttpRequest(Url url, Map<String, String> headers) {
-        this.url = url;
-        if (headers.containsKey("Accept")) this.accept = Arrays.asList(headers.get("Accept").split(","));
-        if (headers.containsKey("Content-Length")) contentLength = Integer.parseInt(headers.get("Content-Length"));
-        if (headers.containsKey("Cookie")) cookie = HttpRequestUtils.parseCookies(headers.get("Cookie"));
+    public HttpRequest(InputStream in) throws IOException {
+        Map<HttpRequestKey, String> headers = IOUtils.readHeader(in);
+        url = new Url(HttpMethod.of(headers.get(HttpRequestKey.HTTP_METHOD)), headers.get(HttpRequestKey.ACCESS_PATH));
+        accept = Arrays.asList(headers.getOrDefault(HttpRequestKey.ACCEPT, "").split(","));
+        contentLength = Integer.parseInt(headers.getOrDefault(HttpRequestKey.CONTENT_LENGTH, "0"));
+        cookie = HttpRequestUtils.parseCookies(headers.getOrDefault(HttpRequestKey.COOKIE, ""));
+        queryValue = HttpRequestUtils.parseQueryString(headers.get(HttpRequestKey.BODY_VALUE));
     }
 
     public void addCookie(HttpSession httpSession) {
@@ -55,16 +58,20 @@ public class HttpRequest {
         return mappingHandler.get(this.url);
     }
 
-    public void setBodyValue(BufferedReader br) throws IOException {
-        this.url.setQueryValue(IOUtils.readData(br, contentLength));
-    }
-
     public boolean hasAllThoseFields(List<String> fields) {
-        return url.hasAllThoseFields(fields);
+        if (queryValue.isEmpty()) return false;
+        for (String key : queryValue.keySet()) {
+            if (!fields.contains(key)) return false;
+        }
+        return true;
     }
 
-    public Object bindingQuery(Object aInstance) {
-        return url.bindingQuery(aInstance);
+    public Object bindingQueryValue(Object aInstance) {
+        Arrays.stream(aInstance.getClass().getDeclaredMethods())
+                .filter(method -> method.getName().startsWith("set"))
+                .filter(method -> queryValue.containsKey(ReflectionUtils.getFieldName(method.getName())))
+                .forEach(method -> ReflectionUtils.injectValue(aInstance, method, queryValue));
+        return aInstance;
     }
 
     public String getSID() {
@@ -75,9 +82,13 @@ public class HttpRequest {
         return new HttpResponse(accept, responseCode, url.getAccessPath(), cookie);
     }
 
+    public boolean hasMappingUrl(Map<Url, Method> mappingHandler) {
+        return mappingHandler.containsKey(url);
+    }
+
     @Override
     public String toString() {
-        return "HttpRequest[url=" + url + ", contentLength=" + contentLength + ", cookie=" + cookie +
-                ", accept=" + accept + ", responseCode=" + responseCode + ']';
+        return "HttpRequest[url=" + url + ", queryValue=" + queryValue + ", contentLength=" + contentLength +
+                ", cookie=" + cookie + ", accept=" + accept + ", responseCode=" + responseCode + ']';
     }
 }

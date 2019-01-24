@@ -40,8 +40,8 @@ public class MappingHandler {
                 });
     }
 
-    public static boolean hasMappingPath(Url url) {
-        return mappingHandler.containsKey(url);
+    public static boolean hasMappingPath(HttpRequest httpRequest) {
+        return httpRequest.hasMappingUrl(mappingHandler);
     }
 
     public static void invoke(HttpRequest httpRequest) throws Exception {

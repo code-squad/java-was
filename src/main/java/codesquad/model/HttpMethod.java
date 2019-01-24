@@ -3,6 +3,7 @@ package codesquad.model;
 import java.util.Arrays;
 
 public enum HttpMethod {
+
     POST,
     GET,
     PUT,
