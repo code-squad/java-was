@@ -1,15 +1,35 @@
 package util;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-import java.util.Map;
-
 import org.junit.Test;
-
 import util.HttpRequestUtils.Pair;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
 public class HttpRequestUtilsTest {
+    @Test
+    public void test() {
+        String headers =
+                "Host: localhost:8080\n\r" +
+                        "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\n\r" +
+                        "Referer: http://localhost:8080/user/form.html\n\r";
+        List<String> list = Arrays.asList(headers.split("\\n\\r"));
+        Map<String, String> ret = HttpRequestUtils.parseHeader(list);
+        System.out.println(ret);
+        assertThat(ret.get("Host"), is("localhost:8080"));
+        assertThat(ret.get("Accept"), is("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"));
+        assertThat(ret.get("Referer"), is("http://localhost:8080/user/form.html"));
+
+
+
+    }
+
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
