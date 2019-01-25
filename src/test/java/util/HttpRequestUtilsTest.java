@@ -3,11 +3,12 @@ package util;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.util.List;
 import java.util.Map;
 
+import webserver.http.Pair;
 import org.junit.Test;
 
-import util.HttpRequestUtils.Pair;
 
 public class HttpRequestUtilsTest {
     @Test
@@ -69,5 +70,13 @@ public class HttpRequestUtilsTest {
         String header = "Content-Length: 59";
         Pair pair = HttpRequestUtils.parseHeader(header);
         assertThat(pair, is(new Pair("Content-Length", "59")));
+    }
+
+    @Test
+    public void parseAccepts() {
+        String accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
+        List<String> parameters = HttpRequestUtils.parseAccepts(accept);
+
+        assertThat(parameters.get(0), is("text/html"));
     }
 }
