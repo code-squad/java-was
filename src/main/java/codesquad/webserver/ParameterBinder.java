@@ -16,7 +16,7 @@ public class ParameterBinder {
 
     static {
         parameterBinderHandler.put(MethodParameter.COMMON, new QueryHandlerMethodArgumentResolver());
-        parameterBinderHandler.put(MethodParameter.HTTP_SESSION, new QueryHandlerMethodArgumentResolver());
+        parameterBinderHandler.put(MethodParameter.HTTP_SESSION, new SessionHandlerMethodArgumentResovler());
     }
 
     public static Object[] bind(Method thisMethod, HttpRequest httpRequest) throws Exception {
@@ -26,9 +26,8 @@ public class ParameterBinder {
 
             HandlerMethodArgumentResolver handlerMethodArgumentResolver =
                     parameterBinderHandler.get(MethodParameter.getMethodParameter(aInstance));
-
             if(handlerMethodArgumentResolver.supportsParameter(parameterType, httpRequest)) {
-                handlerMethodArgumentResolver.resolveArgument(aInstance, httpRequest);
+                aInstance = handlerMethodArgumentResolver.resolveArgument(aInstance, httpRequest);
             }
 
             args.add(aInstance);

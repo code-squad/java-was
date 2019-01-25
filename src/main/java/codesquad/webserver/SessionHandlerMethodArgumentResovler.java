@@ -17,7 +17,6 @@ public class SessionHandlerMethodArgumentResovler implements HandlerMethodArgume
     @Override
     public Object resolveArgument(Object aInstance, HttpRequest httpRequest) {
         HttpSession httpSession = (HttpSession) aInstance;
-        log.debug("httpRequest SID : {}", httpRequest.getSID());
         return httpSession.of(httpRequest.getSID());
     }
 }

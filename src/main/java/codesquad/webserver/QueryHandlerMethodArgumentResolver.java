@@ -21,7 +21,6 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
 
     @Override
     public Object resolveArgument(Object aInstance, HttpRequest httpRequest) {
-        log.debug("QueryHandlerMethodArgumentResolver called");
         return httpRequest.bindingQueryValue(aInstance);
     }
 

@@ -1,12 +1,17 @@
 package codesquad.model;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class HttpSession {
+    private static final Logger log = getLogger(HttpSession.class);
     public static final String COOKIE_KEY = "SID";
     private static Map<UUID, Map<String, Object>> sessionRepository = new HashMap<>();
 
@@ -23,7 +28,7 @@ public class HttpSession {
     }
 
     public static HttpSession of(String maySessionId) {
-        if (maySessionId == null) return new HttpSession(UUID.randomUUID());
+        if (Strings.isNullOrEmpty(maySessionId)) return new HttpSession(UUID.randomUUID());
         return new HttpSession(UUID.fromString(maySessionId));
     }
 
