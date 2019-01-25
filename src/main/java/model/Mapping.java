@@ -1,15 +1,19 @@
 package model;
 
+import util.HttpRequestUtils;
+
 import java.util.Objects;
 
 public class Mapping {
 
-    private static final String RESOURCE_MARK = ".css";
+    public static final String RESOURCE_MARK = ".css";
+    public static final String SPLIT_QUESTION = "\\?";
+    public static final String QUESTION_MARK = "?";
 
-    private String method;
+    private MethodType method;
     private String path;
 
-    public Mapping(String path, String method) {
+    public Mapping(String path, MethodType method) {
         this.method = method;
         this.path = path;
     }
@@ -20,6 +24,19 @@ public class Mapping {
 
     public boolean isResource() {
         return path.contains(RESOURCE_MARK);
+    }
+
+    public static Mapping of(String path, String method) {
+        /* GET Method Parameter 존재할 경우에만 동작! */
+        if(path.contains(QUESTION_MARK)) {
+            path = initParams(path);
+        }
+
+        return new Mapping(path, MethodType.obtainMethodType(method));
+    }
+
+    private static String initParams(String path) {
+        return path.split(SPLIT_QUESTION)[0];
     }
 
     @Override

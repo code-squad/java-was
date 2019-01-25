@@ -1,6 +1,7 @@
 package webserver;
 
 import model.Mapping;
+import model.MethodType;
 import model.RequestEntity;
 import model.User;
 import org.reflections.Reflections;
@@ -61,7 +62,7 @@ public class HandlerMapping {
         List<Method> postMethods = stream.collect(Collectors.toList());
         for (Method postMethod : postMethods) {
             PostMapping postMapping = postMethod.getAnnotation(PostMapping.class);
-            handlerMapper.put(new Mapping(postMapping.value(), "POST")
+            handlerMapper.put(new Mapping(postMapping.value(), MethodType.obtainMethodType("POST"))
                     , (body, jSessionId) -> invokeMethod(createAllParameters(body, postMethod, jSessionId), clazz, postMethod));
         }
     }
@@ -74,7 +75,7 @@ public class HandlerMapping {
         List<Method> getMethods = stream.collect(Collectors.toList());
         for (Method getMethod : getMethods) {
             GetMapping getMapping = getMethod.getAnnotation(GetMapping.class);
-            handlerMapper.put(new Mapping(getMapping.value(), "GET")
+            handlerMapper.put(new Mapping(getMapping.value(), MethodType.obtainMethodType("GET"))
                     , (body, jSessionId) -> invokeMethod(createAllParameters(body, getMethod, jSessionId), clazz, getMethod));
         }
     }
@@ -122,7 +123,7 @@ public class HandlerMapping {
                 }
 
                 /* 객체 */
-                if(!(clazz.newInstance() instanceof String || clazz.newInstance() instanceof HttpSession)) {
+                if(!(clazz.newInstance() instanceof String || clazz.newInstance() instanceof HttpSession || clazz.newInstance() instanceof  Model)) {
                     args.add(createParameterObject(clazz, body));
                 }
 
@@ -165,7 +166,7 @@ public class HandlerMapping {
     public static String processHandler(Mapping mapping, Map<String, String> body, String jSessionId) {
         if(mapping.isResource()) {
             body.put("filePath", mapping.getPath());
-            return handlerMapper.get(new Mapping("/css", "GET")).apply(body, jSessionId);
+            return handlerMapper.get(new Mapping("/css", MethodType.obtainMethodType("GET"))).apply(body, jSessionId);
         }
         return handlerMapper.get(mapping).apply(body, jSessionId);
     }

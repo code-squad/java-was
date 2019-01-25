@@ -1,9 +1,9 @@
 package util;
 
-import model.RequestEntity;
-import model.ResponseEntity;
+import model.HttpRequest;
+import model.HttpResponse;
 import org.slf4j.Logger;
-import webserver.ClientModel;
+import model.ClientModel;
 import webserver.ViewResolver;
 
 import java.io.*;
@@ -12,9 +12,9 @@ import java.nio.file.Paths;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class ResponseEntityFactory {
+public class HttpResponseFactory {
 
-    private static final Logger logger = getLogger(ResponseEntityFactory.class);
+    private static final Logger logger = getLogger(HttpResponseFactory.class);
 
     private static final String REDIRECT_KEYWORD = "redirect:";
 
@@ -22,14 +22,14 @@ public class ResponseEntityFactory {
        @param
        @return 리턴하는 페이지의 HTML 태그를 읽어서 반환
     */
-    public static ResponseEntity of(RequestEntity requestEntity, String view, ClientModel clientModel) throws IOException {
+    public static HttpResponse of(HttpRequest httpRequest, String view, ClientModel clientModel) throws IOException {
         String path = ViewResolver.obtainPath(view);
         byte[] body = new byte[0];
         if(!isRedirect(view)) {
             body = Files.readAllBytes(Paths.get(path));
         }
 
-        ResponseEntity responseEntity = new ResponseEntity(body);
+        HttpResponse responseEntity = new HttpResponse(body);
         String status = obtainStatusCode(view);
         responseEntity.addHeader("status", status);
 
@@ -37,7 +37,7 @@ public class ResponseEntityFactory {
             responseEntity.addHeader("Location", ViewResolver.obtainRemovePath(view));
         }
 
-        responseEntity.addHeader("Set-Cookie", String.format("%s; Path=/",requestEntity.obtainCookie()));
+        responseEntity.addHeader("Set-Cookie", String.format("%s; Path=/",httpRequest.obtainHeader("Cookie")));
 
         return responseEntity;
     }

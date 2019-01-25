@@ -32,7 +32,7 @@ public class ViewResolver {
     }
 
 
-    public static String obtainRemoveRedirectFullPath(String path) {
+    public static String obtainPath(String path) {
         if(path.contains(REDIRECT_KEYWORD)) {
             return obtainFullPath(obtainRemovePath(path));
         }

@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static model.Mapping.SPLIT_QUESTION;
+
 public class RequestEntity {
 
     private static final String SPLIT_BLANK = " ";
-    private static final String SPLIT_QUESTION = "\\?";
-    private static final String QUESTION_MARK = "?";
 
     private Mapping mapping;
     private Map<String, String> body = new HashMap<>();
@@ -20,22 +20,13 @@ public class RequestEntity {
     public RequestEntity(String path, String method, String body, Map<String, String> headerInfo) {
         this.headerInfo = headerInfo;
 
-        /* POST Method Parameter 존재할 경우에만 동작 */
-        if(!body.equals("")) {
-           this.body = HttpRequestUtils.parseQueryString(body);
+        /* GET URL Method Parameter 존재할 경우에만 동작 */
+        if(path.contains(Mapping.QUESTION_MARK)) {
+           body = path.split(SPLIT_QUESTION)[1];
         }
 
-        /* GET Method Parameter 존재할 경우에만 동작! */
-        if(path.contains(QUESTION_MARK)) {
-            path = initParams(path);
-        }
-
-        this.mapping = new Mapping(path, method);
-    }
-
-    private String initParams(String path) {
-        this.body = HttpRequestUtils.parseQueryString(path.split(SPLIT_QUESTION)[1]);
-        return path.split(SPLIT_QUESTION)[0];
+        this.body = HttpRequestUtils.parseQueryString(body);
+        this.mapping = Mapping.of(path, method);
     }
 
     public Mapping getMapping() {
