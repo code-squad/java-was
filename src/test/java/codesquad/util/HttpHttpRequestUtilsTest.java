@@ -1,18 +1,18 @@
 package codesquad.util;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.slf4j.LoggerFactory.getLogger;
+import codesquad.util.HttpRequestUtils.Pair;
+import org.junit.Test;
+import org.slf4j.Logger;
 
 import java.util.Map;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import org.slf4j.Logger;
-import codesquad.util.HttpRequestUtils.Pair;
-
-public class HttpHeaderUtilsTest {
-    private static final Logger log = getLogger(HttpHeaderUtilsTest.class);
+public class HttpHttpRequestUtilsTest {
+    private static final Logger log = getLogger(HttpHttpRequestUtilsTest.class);
 
     @Test
     public void parseQueryString() {

@@ -4,32 +4,30 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import codesquad.model.request.HttpRequestKey;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class HttpRequestUtils {
-    /**
-     * @param queryString
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
-     * @return
-     */
+    private static final Logger log = getLogger(HttpRequestUtils.class);
+
+    public static final String QUESTION_MARK = "\\?";
+    public static final String BLANK = " ";
+
     public static Map<String, String> parseQueryString(String queryString) {
         return parseValues(queryString, "&");
     }
 
-    /**
-     * @param cookies
-     *            값은 name1=value1; name2=value2 형식임
-     * @return
-     */
     public static Map<String, String> parseCookies(String cookies) {
+        if (Strings.isNullOrEmpty(cookies)) return Maps.newHashMap();
         return parseValues(cookies, ";");
     }
 
     private static Map<String, String> parseValues(String values, String separator) {
-        if (Strings.isNullOrEmpty(values)) {
-            return Maps.newHashMap();
-        }
+        if (Strings.isNullOrEmpty(values)) return Maps.newHashMap();
 
         String[] tokens = values.split(separator);
         return Arrays.stream(tokens)
@@ -39,20 +37,26 @@ public class HttpRequestUtils {
     }
 
     static Pair getKeyValue(String keyValue, String regex) {
-        if (Strings.isNullOrEmpty(keyValue)) {
-            return null;
-        }
+        if (Strings.isNullOrEmpty(keyValue)) return null;
 
         String[] tokens = keyValue.split(regex);
-        if (tokens.length != 2) {
-            return null;
-        }
+        if (tokens.length != 2) return null;
 
         return new Pair(tokens[0], tokens[1]);
     }
 
     public static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
+    }
+
+    public static Map<HttpRequestKey, String> parseFirstLine(String firstLine) {
+        Map<HttpRequestKey, String> headers = Maps.newHashMap();
+        String[] parsedUrl = firstLine.split(BLANK);
+        String[] parsedPath = parsedUrl[1].split(QUESTION_MARK);
+        headers.put(HttpRequestKey.HTTP_METHOD, parsedUrl[0]);
+        headers.put(HttpRequestKey.ACCESS_PATH, parsedPath[0]);
+        if (parsedPath.length != 1) headers.put(HttpRequestKey.QUERY_VALUE, parsedPath[1]);
+        return headers;
     }
 
     public static class Pair {

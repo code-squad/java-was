@@ -1,15 +1,16 @@
-package codesquad.model;
+package codesquad.model.request;
 
 import java.util.Arrays;
 
-public enum RequestMethod {
+public enum HttpMethod {
+
     POST,
     GET,
     PUT,
     DELETE;
 
-    static RequestMethod of(String requestMethod) {
-        return Arrays.stream(RequestMethod.values())
+    public static HttpMethod of(String requestMethod) {
+        return Arrays.stream(HttpMethod.values())
                 .filter(request -> request.toString().equals(requestMethod))
                 .findFirst().get();
     }

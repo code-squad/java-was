@@ -12,9 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class ViewResolverTest {
     private static final Logger log = getLogger(ViewResolverTest.class);

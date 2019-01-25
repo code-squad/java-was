@@ -1,16 +1,17 @@
 package codesquad.webserver;
 
-import codesquad.model.Header;
 import codesquad.model.HttpSession;
 import codesquad.model.User;
-import com.google.common.collect.Maps;
+import codesquad.model.request.HttpRequest;
 import org.junit.Test;
 import org.slf4j.Logger;
 
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
-import static codesquad.fixture.UrlFixture.*;
 import static codesquad.fixture.UserFixture.USER;
+import static codesquad.model.HttpRequestTest.TEST_DIRECTORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -18,50 +19,48 @@ public class ParameterBinderTest {
     private static final Logger log = getLogger(ParameterBinderTest.class);
 
     @Test
-    public void isValidForQuery_모든필드값_있을때() {
-        Class<User> targetClass = User.class;
-        Header header = new Header(URL, Maps.newHashMap());
-        assertThat(ParameterBinder.isValidForQuery(targetClass, header)).isTrue();
+    public void isValidForQuery_모든필드값_있을때() throws Exception {
+        Class<?> targetClass = User.class;
+        InputStream in = new FileInputStream(new File(TEST_DIRECTORY + "Http_POST.txt"));
+        HttpRequest httpRequest = new HttpRequest(in);
+        HandlerMethodArgumentResolver handlerMethodArgumentResolver = new QueryHandlerMethodArgumentResolver();
+        assertThat(handlerMethodArgumentResolver.supportsParameter(targetClass, httpRequest)).isTrue();
     }
 
     @Test
-    public void isValidForQuery_일부필드값_있을때() {
-        Class<User> targetClass = User.class;
-        Header header = new Header(URL2, Maps.newHashMap());
-        assertThat(ParameterBinder.isValidForQuery(targetClass, header)).isTrue();
+    public void isValidForQuery_일부필드값_있을때() throws Exception {
+        Class<?> targetClass = User.class;
+        InputStream in = new FileInputStream(new File(TEST_DIRECTORY + "Http_POST2.txt"));
+        HttpRequest httpRequest = new HttpRequest(in);
+        HandlerMethodArgumentResolver handlerMethodArgumentResolver = new QueryHandlerMethodArgumentResolver();
+        assertThat(handlerMethodArgumentResolver.supportsParameter(targetClass, httpRequest)).isTrue();
     }
 
     @Test
-    public void isValidForQuery_일부필드값_틀릴때() {
-        Class<User> targetClass = User.class;
-        Header header = new Header(URL3, Maps.newHashMap());
-        log.debug(header.toString());
-        assertThat(ParameterBinder.isValidForQuery(targetClass, header)).isFalse();
+    public void isValidForQuery_일부필드값_틀릴때() throws Exception {
+        Class<?> targetClass = User.class;
+        InputStream in = new FileInputStream(new File(TEST_DIRECTORY + "Http_POST3.txt"));
+        HttpRequest httpRequest = new HttpRequest(in);
+        HandlerMethodArgumentResolver handlerMethodArgumentResolver = new QueryHandlerMethodArgumentResolver();
+        assertThat(handlerMethodArgumentResolver.supportsParameter(targetClass, httpRequest)).isFalse();
     }
 
     @Test
     public void bindingQuery() throws Exception {
         Class<?> parameterType = User.class;
-        Header header = new Header(URL, Maps.newHashMap());
+        InputStream in = new FileInputStream(new File(TEST_DIRECTORY + "Http_POST.txt"));
+        HttpRequest httpRequest = new HttpRequest(in);
         Object aInstance = parameterType.newInstance();
-        assertThat(ParameterBinder.bindingQuery(aInstance, header)).isEqualTo(USER);
+        HandlerMethodArgumentResolver handlerMethodArgumentResolver = new QueryHandlerMethodArgumentResolver();
+        assertThat(handlerMethodArgumentResolver.resolveArgument(aInstance, httpRequest)).isEqualTo(USER);
     }
 
     @Test
-    public void isValidForCookie() {
-        Object aInstance = new HttpSession();
-        assertThat(ParameterBinder.isValidForCookie(aInstance)).isTrue();
-    }
-
-    @Test
-    public void bindingCookie() throws Exception {
-        Class<?> parameterType = HttpSession.class;
-        Object aInstance = parameterType.newInstance();
-        Map<String, String> map = Maps.newHashMap();
-        map.put("Cookie", "logined=true");
-        Header header = new Header(URL, map);
-        ParameterBinder.bindingCookie(aInstance, header);
-        HttpSession httpSession = (HttpSession) aInstance;
-        assertThat(httpSession.getAttribute("logined")).isEqualTo("true");
+    public void isValidForCookie_세션값없을때() throws Exception {
+        Class<?> targetClass = HttpSession.class;
+        InputStream in = new FileInputStream(new File(TEST_DIRECTORY + "Http_POST.txt"));
+        HttpRequest httpRequest = new HttpRequest(in);
+        HandlerMethodArgumentResolver handlerMethodArgumentResolver = new SessionHandlerMethodArgumentResovler();
+        assertThat(handlerMethodArgumentResolver.supportsParameter(targetClass, httpRequest)).isTrue();
     }
 }

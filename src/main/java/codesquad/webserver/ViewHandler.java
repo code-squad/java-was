@@ -1,10 +1,6 @@
 package codesquad.webserver;
 
-import codesquad.model.Header;
-import codesquad.model.responses.Response;
-import codesquad.model.responses.Response200;
-import codesquad.model.responses.Response300;
-import codesquad.model.responses.ResponseCode;
+import codesquad.model.responses.*;
 import org.slf4j.Logger;
 
 import java.io.DataOutputStream;
@@ -16,21 +12,17 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class ViewHandler {
     private static final Logger log = getLogger(ViewHandler.class);
-    private static final Map<ResponseCode, Response> responses = new HashMap<>();
-    private DataOutputStream dos;
+    private static final Map<ResponseCode, ResponseTemplate> templates = new HashMap<>();
 
     static {
-        responses.put(ResponseCode.OK, new Response200());
-        responses.put(ResponseCode.FOUND, new Response300());
+        templates.put(ResponseCode.OK, new ResponseTemplate200());
+        templates.put(ResponseCode.FOUND, new ResponseTemplate300());
     }
 
-    public ViewHandler(OutputStream out) {
-        this.dos = new DataOutputStream(out);
-    }
-
-    public void resolve(Header header) {
-        Response response = header.getResponse(responses);
-        response.header(dos, header);
-        response.body(dos);
+    public static void resolve(OutputStream out, HttpResponse httpResponse) throws Exception {
+        DataOutputStream dos = new DataOutputStream(out);
+        ResponseTemplate responseTemplate = httpResponse.chooseTemplate(templates);
+        responseTemplate.header(dos, httpResponse);
+        responseTemplate.body(dos, httpResponse);
     }
 }
