@@ -19,20 +19,6 @@ public class ParameterBinderTest {
     private static final Logger log = getLogger(ParameterBinderTest.class);
 
     @Test
-    public void MethodParameter_COMMON() throws Exception {
-        Class<?> parameterType = User.class;
-        Object aInstacne = parameterType.newInstance();
-        assertThat(MethodParameter.getMethodParameter(aInstacne)).isEqualTo(MethodParameter.COMMON);
-    }
-
-    @Test
-    public void MethodParameter_HTTP_SESSION() throws Exception {
-        Class<?> parameterType = HttpSession.class;
-        Object aInstacne = parameterType.newInstance();
-        assertThat(MethodParameter.getMethodParameter(aInstacne)).isEqualTo(MethodParameter.HTTP_SESSION);
-    }
-
-    @Test
     public void isValidForQuery_모든필드값_있을때() throws Exception {
         Class<?> targetClass = User.class;
         InputStream in = new FileInputStream(new File(TEST_DIRECTORY + "Http_POST.txt"));
