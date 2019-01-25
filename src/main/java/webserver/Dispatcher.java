@@ -1,6 +1,7 @@
 package webserver;
 
 import controller.MainController;
+import controller.StyleSheetController;
 import controller.UserController;
 import webserver.http.request.HttpRequest;
 import webserver.http.response.HttpResponse;
@@ -22,10 +23,15 @@ public class Dispatcher {
             logger.info("MainController");
             goMainController(request, response);
         }
+
+        if (request.getUri().startsWith("/css")) {
+            logger.info("StyleSheetController");
+            goStyleSheetController(request, response);
+        }
     }
 
     private static void goUserController(HttpRequest request, HttpResponse response) throws IOException {
-        if (request.getUri().endsWith("/form"))
+        if (request.getUri().endsWith("/form.html"))
             UserController.createForm(request, response);
 
         if (request.getUri().endsWith("/create"))
@@ -37,9 +43,18 @@ public class Dispatcher {
         if (request.getUri().endsWith("/login"))
             UserController.login(request, response);
 
+        if (request.getUri().endsWith("/login_failed.html"))
+            UserController.loginForm_failed(request, response);
+
+        if (request.getUri().endsWith("/list"))
+            UserController.list(request, response);
     }
 
     private static void goMainController(HttpRequest request, HttpResponse response) throws IOException {
         MainController.index(request, response);
+    }
+
+    private static void goStyleSheetController(HttpRequest request, HttpResponse response) throws IOException {
+        StyleSheetController.styleSheet(request, response);
     }
 }
