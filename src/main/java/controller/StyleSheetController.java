@@ -7,9 +7,10 @@ import webserver.http.response.HttpResponse;
 import java.io.IOException;
 
 public class StyleSheetController extends AbstractController {
-    public static void styleSheet(HttpRequest request, HttpResponse response) throws IOException {
-        byte[] body = HttpResponseUtils.generateBody(request.getUri());
-        HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getAcceptType()));
+    @Override
+    public void doGet(HttpRequest request, HttpResponse response) throws IOException {
+        byte[] body = HttpResponseUtils.generateBody(request.getPath());
+        HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
         HttpResponseUtils.responseBody(response, body);
         HttpResponseUtils.responseSend(response);
     }

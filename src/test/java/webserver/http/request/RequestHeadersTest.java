@@ -44,7 +44,7 @@ public class RequestHeadersTest {
         BufferedReader br = BufferedReaderGenerator.generateBufferedReader(value);
         RequestHeaders headers = HttpHeaderUtils.parseRequestHeaders(br);
 
-        List<String> accepts = headers.getAccepts();
-        logger.debug("AcceptType : {}", accepts.get(0));
+        String header = headers.getHeader("Accept");
+        assertTrue(header.startsWith("text/"));
     }
 }

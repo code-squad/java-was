@@ -3,7 +3,6 @@ package webserver.http.request;
 import util.HttpRequestUtils;
 import webserver.http.Pair;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +39,5 @@ public class RequestHeaders {
         if (cookie.equals(EMPTY_HEADER))
             return new HashMap<>();
         return HttpRequestUtils.parseCookies(cookie);
-    }
-
-    public List<String> getAccepts() {
-        String accept = getHeader("Accept");
-        if (accept.equals(EMPTY_HEADER))
-            return new ArrayList<>();
-        return HttpRequestUtils.parseAccepts(accept);
     }
 }

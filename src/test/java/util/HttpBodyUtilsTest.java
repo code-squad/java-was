@@ -33,7 +33,7 @@ public class HttpBodyUtilsTest {
         RequestBody requestBody = HttpBodyUtils.parseRequestBody(br, requestHeaders.getContentLength());
 
 
-        assertThat(requestBody.getBody().get("password"), is("password"));
+        assertThat(requestBody.getParameter("password"), is("password"));
 
     }
 }

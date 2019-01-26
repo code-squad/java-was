@@ -2,7 +2,8 @@ package util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.http.request.RequestBody;
+import webserver.RequestGenerator;
+import webserver.http.request.HttpRequest;
 import model.User;
 import org.junit.Test;
 import support.BufferedReaderGenerator;
@@ -19,21 +20,37 @@ public class ObjectMakerTest {
 
     @Test
     public void makeNewUser() throws IOException {
-        String value = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
-        BufferedReader br = BufferedReaderGenerator.generateBufferedReader(value);
-        RequestBody requestBody = HttpBodyUtils.parseRequestBody(br, 59);
+        String value = "POST /user/create HTTP/1.1\n" +
+                "Host: localhost:8080\n" +
+                "Connection: keep-alive\n" +
+                "Content-Length: 59\n" +
+                "Content-Type: application/x-www-form-urlencoded\n" +
+                "Accept: */*\n" +
+                "\n" +
+                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
 
-        User user = ObjectMaker.makeNewUser(requestBody);
+        BufferedReader br = BufferedReaderGenerator.generateBufferedReader(value);
+        HttpRequest request = RequestGenerator.generateRequest(br);
+
+        User user = ObjectMaker.makeNewUser(request);
         assertThat(user.getUserId(), is("javajigi"));
     }
 
     @Test
     public void makeLoginUser() throws IOException {
-        String value = "userId=javajigi&password=password";
-        BufferedReader br = BufferedReaderGenerator.generateBufferedReader(value);
-        RequestBody requestBody = HttpBodyUtils.parseRequestBody(br, 33);
+        String value = "POST /user/login HTTP/1.1\n" +
+                "Host: localhost:8080\n" +
+                "Connection: keep-alive\n" +
+                "Content-Length: 33\n" +
+                "Content-Type: application/x-www-form-urlencoded\n" +
+                "Accept: */*\n" +
+                "\n" +
+                "userId=javajigi&password=password";
 
-        User user = ObjectMaker.makeNewUser(requestBody);
+        BufferedReader br = BufferedReaderGenerator.generateBufferedReader(value);
+        HttpRequest request = RequestGenerator.generateRequest(br);
+
+        User user = ObjectMaker.makeNewUser(request);
         assertThat(user.getUserId(), is("javajigi"));
 
         logger.debug("name : {}", user.getName());

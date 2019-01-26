@@ -22,7 +22,7 @@ public class RequestHandler extends Thread {
 
         // inputstream 요청, outputstream 응답
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             DataOutputStream dos = new DataOutputStream(out);
 
             HttpRequest request = RequestGenerator.generateRequest(br);
