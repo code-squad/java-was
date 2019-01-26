@@ -9,25 +9,16 @@ import java.io.IOException;
 import java.util.List;
 
 public abstract class AbstractController implements Controller {
-    private static final String HTML_EXTENSION = ".html";
-    private static final String CSS_DIRECTIVE = ",*/*;q=0.1";
-    private static final String HTML_DIRECTIVE = ";charset=utf-8";
+    static final String CSS_COTENT_TYPE = "text/css,*/*;q=0.1";
+    static final String HTML_CONTENT_TYPE = "text/html;charset=utf-8";
+    static final String JS_CONTENT_TYPE = "text/javascript;charset=UTF-8";
+    static final String WOFF_CONTENT_TYPE = "application/font-woff";
+    static final String TTF_CONTENT_TYPE = "application/font-ttf";
 
-    private static final String JS_CONTENT_TYPE = "text/javascript;charset=UTF-8";
-    private static final String FONT_TYPE_1 = "application/font-woff";
-    private static final String FONT_TYPE_2 = "application/font-ttf";
-
-    static String makeHtmlUrl(String uri) {
-        if (uri.endsWith(HTML_EXTENSION))
-            return uri;
-        return uri + HTML_EXTENSION;
-    }
-
-    static String makeContentType(String acceptType) {
-        List<String> accepts = HttpRequestUtils.parseAccepts(acceptType);
-        if (accepts.get(0).endsWith("/css"))
-            return acceptType + CSS_DIRECTIVE;
-        return acceptType + HTML_DIRECTIVE;
+    static String getFontsType(String path) {
+        if (path.endsWith(".woff"))
+            return WOFF_CONTENT_TYPE;
+        return TTF_CONTENT_TYPE;
     }
 
     @Override

@@ -26,7 +26,7 @@ public class LoginController extends AbstractController {
         User loginUser = ObjectMaker.makeNewUser(request);
         try {
             UserService.login(loginUser);
-            HttpResponseUtils.response302Header(response, "/");
+            HttpResponseUtils.response302Header(response, "/index.html");
             HttpResponseUtils.responseCookieHeader(response, true);
         } catch (UnAuthenticationException e) {
             HttpResponseUtils.response302Header(response, "/user/login_failed.html");
@@ -37,15 +37,15 @@ public class LoginController extends AbstractController {
     }
 
     private void loginForm(HttpRequest request, HttpResponse response) throws IOException {
-        byte[] body = HttpResponseUtils.generateBody(makeHtmlUrl(request.getPath()));
-        HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
+        byte[] body = HttpResponseUtils.generateBody(request.getPath());
+        HttpResponseUtils.response200Header(response, body.length, HTML_CONTENT_TYPE);
         HttpResponseUtils.responseBody(response, body);
         HttpResponseUtils.responseSend(response);
     }
 
     private void loginFailedForm(HttpRequest request, HttpResponse response) throws IOException {
-        byte[] body = HttpResponseUtils.generateBody(makeHtmlUrl(request.getPath()));
-        HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
+        byte[] body = HttpResponseUtils.generateBody(request.getPath());
+        HttpResponseUtils.response200Header(response, body.length, HTML_CONTENT_TYPE);
         HttpResponseUtils.responseBody(response, body);
         HttpResponseUtils.responseSend(response);
     }

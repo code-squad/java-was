@@ -5,9 +5,6 @@ import java.util.Map;
 public class RequestBody {
     private Map<String, String> body;
 
-    public RequestBody() {
-    }
-
     public RequestBody(Map<String, String> body) {
         this.body = body;
     }

@@ -11,7 +11,7 @@ public class IndexController extends AbstractController {
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
         String uri = "/index.html";
         byte[] body = HttpResponseUtils.generateBody(uri);
-        HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
+        HttpResponseUtils.response200Header(response, body.length, HTML_CONTENT_TYPE);
         HttpResponseUtils.responseBody(response, body);
         HttpResponseUtils.responseSend(response);
     }

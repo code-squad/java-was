@@ -10,7 +10,7 @@ public class StyleSheetController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
         byte[] body = HttpResponseUtils.generateBody(request.getPath());
-        HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
+        HttpResponseUtils.response200Header(response, body.length, CSS_COTENT_TYPE);
         HttpResponseUtils.responseBody(response, body);
         HttpResponseUtils.responseSend(response);
     }

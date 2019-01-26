@@ -14,22 +14,21 @@ import java.util.Map;
 public class ListUserController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
-        String logined = request.getHeader("Cookie");
-        if (isLogin(logined)) {
+        String header = request.getHeader("Cookie");
+        if (isLogin(header)) {
             List<User> users = UserService.findAll();
             byte[] body = HttpResponseUtils.generateUsersBody(users);
-            HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
+            HttpResponseUtils.response200Header(response, body.length, HTML_CONTENT_TYPE);
             HttpResponseUtils.responseBody(response, body);
         }
-        if (isLogin(logined)) {
+        if (isLogin(header)) {
             HttpResponseUtils.response302Header(response, "/user/login.html");
         }
         HttpResponseUtils.responseSend(response);
     }
 
-    private boolean isLogin(String logined) {
-        Map<String, String> cookies = HttpRequestUtils.parseCookies(logined);
-
-        return true;
+    private boolean isLogin(String header) {
+        Map<String, String> cookie = HttpRequestUtils.parseCookies(header);
+        return cookie.get("logined").equals("true");
     }
 }
