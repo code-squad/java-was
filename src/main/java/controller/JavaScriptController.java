@@ -1,16 +1,15 @@
 package controller;
 
+import util.HttpResponseUtils;
 import webserver.http.request.HttpRequest;
 import webserver.http.response.HttpResponse;
-import util.HttpResponseUtils;
 
 import java.io.IOException;
 
-public class MainController extends AbstractController {
+public class JavaScriptController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
-        String uri = "/index.html";
-        byte[] body = HttpResponseUtils.generateBody(uri);
+        byte[] body = HttpResponseUtils.generateBody(request.getPath());
         HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
         HttpResponseUtils.responseBody(response, body);
         HttpResponseUtils.responseSend(response);

@@ -13,7 +13,12 @@ import java.io.IOException;
 public class LoginController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
-        super.doGet(request, response);
+        String path = request.getPath();
+        if (path.endsWith("/login.html"))
+            loginForm(request, response);
+
+        if (path.endsWith("/login_failed.html"))
+            loginFailedForm(request, response);
     }
 
     @Override
@@ -29,5 +34,19 @@ public class LoginController extends AbstractController {
         } finally {
             HttpResponseUtils.responseSend(response);
         }
+    }
+
+    private void loginForm(HttpRequest request, HttpResponse response) throws IOException {
+        byte[] body = HttpResponseUtils.generateBody(makeHtmlUrl(request.getPath()));
+        HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
+        HttpResponseUtils.responseBody(response, body);
+        HttpResponseUtils.responseSend(response);
+    }
+
+    private void loginFailedForm(HttpRequest request, HttpResponse response) throws IOException {
+        byte[] body = HttpResponseUtils.generateBody(makeHtmlUrl(request.getPath()));
+        HttpResponseUtils.response200Header(response, body.length, makeContentType(request.getHeader("Accept")));
+        HttpResponseUtils.responseBody(response, body);
+        HttpResponseUtils.responseSend(response);
     }
 }

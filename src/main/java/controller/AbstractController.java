@@ -13,6 +13,10 @@ public abstract class AbstractController implements Controller {
     private static final String CSS_DIRECTIVE = ",*/*;q=0.1";
     private static final String HTML_DIRECTIVE = ";charset=utf-8";
 
+    private static final String JS_CONTENT_TYPE = "text/javascript;charset=UTF-8";
+    private static final String FONT_TYPE_1 = "application/font-woff";
+    private static final String FONT_TYPE_2 = "application/font-ttf";
+
     static String makeHtmlUrl(String uri) {
         if (uri.endsWith(HTML_EXTENSION))
             return uri;
