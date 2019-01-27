@@ -1,10 +1,7 @@
 package util;
 
-import model.HttpRequest;
-import model.MethodType;
 import org.junit.Test;
 import org.slf4j.Logger;
-import webserver.ViewResolver;
 
 import java.io.File;
 import java.io.IOException;

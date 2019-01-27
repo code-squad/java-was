@@ -1,12 +1,9 @@
-package webserver;
+package webserver.viewresolver;
 
-import model.HttpRequest;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

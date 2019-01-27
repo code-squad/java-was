@@ -1,7 +1,7 @@
 package util;
 
 import org.slf4j.Logger;
-import webserver.ClientModel;
+import webserver.viewresolver.ClientModel;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

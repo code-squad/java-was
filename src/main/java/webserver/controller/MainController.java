@@ -1,18 +1,13 @@
-package webserver;
+package webserver.controller;
 
-import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
-import security.ClientSession;
 import security.HttpSession;
 import service.UserService;
 import setting.Controller;
 import setting.GetMapping;
 import setting.PostMapping;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import webserver.viewresolver.Model;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

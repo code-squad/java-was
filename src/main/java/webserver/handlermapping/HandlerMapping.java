@@ -1,4 +1,4 @@
-package webserver;
+package webserver.handlermapping;
 
 import model.HttpRequest;
 import model.Mapping;
@@ -9,6 +9,9 @@ import security.HttpSession;
 import setting.Controller;
 import setting.GetMapping;
 import setting.PostMapping;
+import webserver.WebMvcConfig;
+import webserver.viewresolver.Model;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,10 +29,14 @@ public class HandlerMapping {
 
     private static Map<Mapping, BiFunction<Map, String, String>> handlerMapper = new HashMap<>();
 
+    private static WebMvcConfig webMvcConfig;
+
     /* 요청 Mapping 정보에 따라 호출되는 메소드를 매핑 */
     static {
-        Reflections reflections = new Reflections("webserver");
+        webMvcConfig = new WebMvcConfig();
+        webMvcConfig.initHandlerMethodArgumentResolvers();
 
+        Reflections reflections = new Reflections("webserver");
         /* setting.MainController 어노테이션 붙어있는 클래스만 확인! */
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class);
         for (Class<?> clazz : classes) {
@@ -91,65 +98,12 @@ public class HandlerMapping {
     public static List<Object> createAllParameters(Map<String, String> body, Method method, String jSessionId)  {
         Parameter[] parameters = method.getParameters();
         List<Object> args = new ArrayList<>();
-        int index = 0;
         for (Parameter parameter : parameters) {
             Class clazz = parameter.getType();
-            try {
-                /*[개선 필요] 중복제거 필요! -> Map + Lambda 활용하면 제거 가능할 듯..?! */
-                /* String 객체 */
-                if(clazz.newInstance() instanceof String) {
-                    int i = 0;
-                    for (String key : body.keySet()) {
-                        /* String Type 은 옵션을 부여하지 않으면, args0 ~ n 형식으로 동작하기 때문에 아래와 같은 로직 필요 */
-                        if(i == index) {
-                            args.add(body.get(key));
-                            index++;
-                        }
-                        i++;
-                    }
-                }
-
-                /* HttpSession 객체 */
-                if(clazz.newInstance() instanceof HttpSession) {
-                    args.add(new HttpSession(jSessionId));
-                }
-
-                /* Model 객체 */
-                if(clazz.newInstance() instanceof Model) {
-                    args.add(new Model(jSessionId));
-                }
-
-                /* 객체 */
-                if(!(clazz.newInstance() instanceof String || clazz.newInstance() instanceof HttpSession || clazz.newInstance() instanceof  Model)) {
-                    args.add(createParameterObject(clazz, body));
-                }
-
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            Object object = webMvcConfig.obtainHandlerMethodArgumentResolver(clazz).resolveArgument(clazz, jSessionId, body);
+            args.add(object);
         }
         return args;
-    }
-
-    /*
-       @param  리턴하는 클래스 타입, URL 객체
-       @return 리플랙션으로 URL path 필드에 해당하는 setter 메소드를 호출하여 객체 반환 (단, 자바빈 규약 준수)
-    */
-    public static <T> T createParameterObject(Class clazz, Map<String, String> params) {
-        T obj = null;
-        try {
-            obj = (T) clazz.newInstance();
-            Method[] methods = clazz.getDeclaredMethods();
-            for (Method method : methods) {
-                if(method.getName().startsWith("set")) {
-                    String field = obtainField(method.getName());
-                    method.invoke(obj, params.get(field));
-                }
-            }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return obj;
     }
 
     public static Optional<Annotation> hasAnnotation(Annotation[] annotations, String name) {
@@ -166,15 +120,5 @@ public class HandlerMapping {
             return handlerMapper.get(new Mapping("/css", MethodType.obtainMethodType("GET"))).apply(body, jSessionId);
         }
         return handlerMapper.get(mapping).apply(body, jSessionId);
-    }
-
-    /*
-       @param  setter 메소드 이름
-       @return setter 메소드 이름에서 필드값 추출 후 반환
-    */
-    public static String obtainField(String methodName) {
-        StringBuilder sb = new StringBuilder(methodName).replace(0, 3, "");
-        sb.replace(0, 1, String.valueOf(sb.toString().charAt(0)).toLowerCase());
-        return sb.toString();
     }
 }

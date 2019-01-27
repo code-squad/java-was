@@ -3,8 +3,8 @@ package util;
 import model.HttpRequest;
 import model.HttpResponse;
 import org.slf4j.Logger;
-import webserver.ClientModel;
-import webserver.ViewResolver;
+import webserver.viewresolver.ClientModel;
+import webserver.viewresolver.ViewResolver;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
