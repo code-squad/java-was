@@ -22,7 +22,7 @@ public class HttpHeaderFactory {
         Map<String, String> header = new HashMap<>();
         String headerLine = "";
         while((headerLine = br.readLine()) != null && headerLine.trim().length() > 0) {
-            /* [질문] JSESSIONID를 추출하는 부분 개선 필요! */
+            /* [개선점] JSESSIONID를 추출하는 부분 개선 필요! --> 기존에 작성된 IOUtil 활용 예정 */
             if(headerLine.contains(JSESSION_SPLIT)) {
                 String[] line = headerLine.split(";");
                 header.put(line[0].split(COLON)[0], line[0].split(COLON)[1].trim());

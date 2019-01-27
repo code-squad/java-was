@@ -34,7 +34,7 @@ public class RequestHandler extends Thread {
             String view = HandlerMapping.processHandler(httpRequest.getMapping(), httpRequest.getBody()
                     , httpRequest.obtainHeader("JSESSIONID"));
             logger.debug("Return view : {}", view);
-            /* [질문] AOP 를 통해 자동으로 로그인 확인 유무를 체크하길 원함!
+            /* [개선점] AOP 를 통해 자동으로 로그인 확인 유무를 체크하길 원함!
                 세션에 본인이 등록되었는지 확인하여 logined=true, or false 설정
             */
             String logined = "logined=false";
