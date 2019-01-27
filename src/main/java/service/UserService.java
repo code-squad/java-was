@@ -16,6 +16,7 @@ public class UserService {
 
     public static boolean isJoinUser(User user) {
         User savedUser = DataBase.findUserById(user.getUserId());
+
         if(user.isJoinUser(savedUser)) {
             return true;
         }

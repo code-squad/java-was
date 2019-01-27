@@ -2,14 +2,12 @@ package util;
 
 import org.slf4j.Logger;
 import webserver.viewresolver.ClientModel;
-
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class IOUtils {
@@ -94,7 +92,4 @@ public class IOUtils {
     public static String removeRegex(String word) {
         return word.replace("{", "").replace("}", "");
     }
-
-
-
 }

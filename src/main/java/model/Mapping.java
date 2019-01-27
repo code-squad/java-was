@@ -1,7 +1,5 @@
 package model;
 
-import util.HttpRequestUtils;
-
 import java.util.Objects;
 
 public class Mapping {

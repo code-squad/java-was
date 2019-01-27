@@ -20,6 +20,7 @@ public class RequestEntityTest {
     @Test
     public void obtainURL() {
         assertThat(HttpRequest.obtainURL("GET /api/url HTTP1.1")).isEqualTo("/api/url");
+        assertThat(RequestEntity.obtainURL("GET /api/url HTTP1.1")).isEqualTo("/api/url");
     }
 
     @Test

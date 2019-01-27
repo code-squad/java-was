@@ -1,8 +1,6 @@
 package util;
 
 import org.slf4j.Logger;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class HandlerMappingTest {
