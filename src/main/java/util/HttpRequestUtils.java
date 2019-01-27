@@ -1,9 +1,6 @@
 package util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
@@ -24,6 +21,9 @@ public class HttpRequestUtils {
      * @return
      */
     public static Map<String, String> parseCookies(String cookies) {
+        if (cookies == null) {
+            return new HashMap<>();
+        }
         return parseValues(cookies, ";");
     }
 

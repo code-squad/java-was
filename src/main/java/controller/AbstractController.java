@@ -1,14 +1,13 @@
 package controller;
 
-import util.HttpRequestUtils;
 import vo.HttpMethod;
 import webserver.http.request.HttpRequest;
 import webserver.http.response.HttpResponse;
 
 import java.io.IOException;
-import java.util.List;
 
 public abstract class AbstractController implements Controller {
+    static final String CONTENT_TYPE = "Content-Type";
     static final String CSS_COTENT_TYPE = "text/css,*/*;q=0.1";
     static final String HTML_CONTENT_TYPE = "text/html;charset=utf-8";
     static final String JS_CONTENT_TYPE = "text/javascript;charset=UTF-8";

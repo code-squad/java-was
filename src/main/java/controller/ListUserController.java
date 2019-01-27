@@ -17,18 +17,20 @@ public class ListUserController extends AbstractController {
         String header = request.getHeader("Cookie");
         if (isLogin(header)) {
             List<User> users = UserService.findAll();
-            byte[] body = HttpResponseUtils.generateUsersBody(users);
-            HttpResponseUtils.response200Header(response, body.length, HTML_CONTENT_TYPE);
-            HttpResponseUtils.responseBody(response, body);
+            String usersHtml = HttpResponseUtils.generateUsersBody(users);
+
+            response.addHeader(CONTENT_TYPE, HTML_CONTENT_TYPE);
+            response.forwardBody(usersHtml);
         }
-        if (isLogin(header)) {
-            HttpResponseUtils.response302Header(response, "/user/login.html");
+        if (!isLogin(header)) {
+            response.sendRedirect("/user/login.html");
         }
-        HttpResponseUtils.responseSend(response);
     }
 
     private boolean isLogin(String header) {
         Map<String, String> cookie = HttpRequestUtils.parseCookies(header);
+        if (cookie.isEmpty())
+            return false;
         return cookie.get("logined").equals("true");
     }
 }
