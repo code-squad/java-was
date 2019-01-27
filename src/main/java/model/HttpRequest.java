@@ -14,7 +14,7 @@ public class HttpRequest {
 
     private Mapping mapping;
     private HttpHeader httpHeader;
-    private Map<String, String> body = new HashMap<>();
+    private Map<String, String> body;
 
     public HttpRequest(String path, MethodType method, String body, HttpHeader httpHeader) {
         this.httpHeader = httpHeader;
@@ -33,6 +33,18 @@ public class HttpRequest {
 
     public Map<String, String> getBody() {
         return body;
+    }
+
+    public String obtainHeader(String headerName) {
+        return httpHeader.obtainHeader(headerName);
+    }
+
+    public void addHeader(String headerName, String headerValue) {
+        httpHeader.addHeader(headerName, headerValue);
+    }
+
+    public boolean isResource() {
+        return httpHeader.isResource();
     }
 
     /*
@@ -60,18 +72,6 @@ public class HttpRequest {
             return "";
         }
         return ParameterConverter.urlDecoding(body.get(field));
-    }
-
-    public String obtainHeader(String headerName) {
-        return httpHeader.obtainHeader(headerName);
-    }
-
-    public void addHeader(String headerName, String headerValue) {
-        httpHeader.addHeader(headerName, headerValue);
-    }
-
-    public boolean isResource() {
-        return httpHeader.isResource();
     }
 
     @Override

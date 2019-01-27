@@ -1,15 +1,24 @@
 package util;
 
-import model.RequestEntity;
+import model.HttpRequest;
+import model.MethodType;
 import org.junit.Test;
+import org.slf4j.Logger;
 import webserver.ViewResolver;
 
+import java.io.File;
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class ViewResolverTest {
+
+    private static final Logger logger = getLogger(ViewResolverTest.class);
+
     @Test
-    public void obtainReturnViewTest() {
-        assertThat(ViewResolver.obtainReturnView(new RequestEntity("/index.html", "GET", null, null)))
-                .isEqualTo("./webapp/index.html");
+    public void root_디렉토리_확인_Test() throws IOException {
+        String path = new File(".").getCanonicalPath();
+        logger.debug("Root Path : {}", path);
     }
 }

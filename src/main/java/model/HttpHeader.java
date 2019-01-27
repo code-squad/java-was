@@ -5,8 +5,6 @@ import java.util.Map;
 
 public class HttpHeader {
 
-    private static final String COLON = ":";
-
     private Map<String, String> header;
 
     public HttpHeader() {

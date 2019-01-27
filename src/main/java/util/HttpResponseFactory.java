@@ -3,12 +3,13 @@ package util;
 import model.HttpRequest;
 import model.HttpResponse;
 import org.slf4j.Logger;
-import model.ClientModel;
+import webserver.ClientModel;
 import webserver.ViewResolver;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -22,11 +23,13 @@ public class HttpResponseFactory {
        @param
        @return 리턴하는 페이지의 HTML 태그를 읽어서 반환
     */
-    public static HttpResponse of(HttpRequest httpRequest, String view, ClientModel clientModel) throws IOException {
+    public static HttpResponse of(HttpRequest httpRequest, String view, ClientModel clientModel)
+            throws IOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         String path = ViewResolver.obtainPath(view);
         byte[] body = new byte[0];
         if(!isRedirect(view)) {
-            body = Files.readAllBytes(Paths.get(path));
+            String a = readBody(path, clientModel);
+            body = a.getBytes();
         }
 
         HttpResponse responseEntity = new HttpResponse(body);
@@ -42,12 +45,21 @@ public class HttpResponseFactory {
         return responseEntity;
     }
 
-    public static String readBody(String path, ClientModel clientModel) throws FileNotFoundException {
+    public static String readBody(String path, ClientModel clientModel)
+            throws IOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         StringBuilder sb = new StringBuilder();
-        File view = new File(path);
+        String line = "";
+        List<String> accumulate = new ArrayList<>();
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
-
+        while((line = br.readLine()) != null) {
+            sb.append(processMustache(line, clientModel, accumulate));
+        }
         return sb.toString();
+    }
+
+    public static String processMustache(String line, ClientModel clientModel, List<String> accumulate)
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        return IOUtils.extractRegex(line, accumulate, clientModel);
     }
 
     public static String obtainStatusCode(String path) {

@@ -1,6 +1,6 @@
 package webserver;
 
-import model.RequestEntity;
+import model.HttpRequest;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -11,7 +11,6 @@ import java.util.Map;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class ViewResolver {
-    private static Map<RequestEntity, String> viewMappingResolver = new HashMap<>();
 
     private static final Logger logger = getLogger(ViewResolver.class);
 
@@ -42,9 +41,5 @@ public class ViewResolver {
 
     public static String obtainRemovePath(String path) {
         return path.split(REDIRECT_KEYWORD)[1];
-    }
-
-    public static String obtainReturnView(RequestEntity requestEntity) {
-        return viewMappingResolver.get(requestEntity);
     }
 }

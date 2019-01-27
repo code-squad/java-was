@@ -1,13 +1,18 @@
 package util;
 
 import model.HttpHeader;
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class HttpHeaderFactory {
+
+    private static final Logger logger = getLogger(HttpHeaderFactory.class);
 
     private static final String COLON = ":";
 
@@ -16,7 +21,7 @@ public class HttpHeaderFactory {
     public static HttpHeader of(BufferedReader br) throws IOException {
         Map<String, String> header = new HashMap<>();
         String headerLine = "";
-        while((headerLine = br.readLine()).trim().length() > 0) {
+        while((headerLine = br.readLine()) != null && headerLine.trim().length() > 0) {
             /* [질문] JSESSIONID를 추출하는 부분 개선 필요! */
             if(headerLine.contains(JSESSION_SPLIT)) {
                 String[] line = headerLine.split(";");

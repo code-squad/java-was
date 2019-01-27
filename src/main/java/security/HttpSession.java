@@ -1,5 +1,7 @@
 package security;
 
+import model.User;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,5 +43,9 @@ public class HttpSession {
             return false;
         }
         return true;
+    }
+
+    public User obtainLoginUser() {
+        return httpSessions.get(this.jSessionId).getLoginUser();
     }
 }

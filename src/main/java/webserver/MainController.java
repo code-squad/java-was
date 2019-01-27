@@ -63,7 +63,7 @@ public class MainController {
             logger.debug("로그인하지 않아서 메인화면 이동");
             return "redirect:/users/login";
         }
-        model.addAttribute("users", DataBase.findAll().stream().collect(Collectors.toList()));
+        model.addAttribute("user", httpSession.obtainLoginUser());
         return "/user/list.html";
     }
 

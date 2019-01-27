@@ -8,7 +8,7 @@ import service.UserService;
 import setting.Controller;
 import setting.GetMapping;
 import setting.PostMapping;
-import model.Model;
+import webserver.Model;
 
 import java.util.stream.Collectors;
 

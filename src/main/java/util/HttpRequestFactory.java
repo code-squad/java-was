@@ -4,8 +4,14 @@ import model.HttpHeader;
 import model.HttpRequest;
 import model.MethodType;
 import org.slf4j.Logger;
+import webserver.ClientModel;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -30,7 +36,7 @@ public class HttpRequestFactory {
         String body = "";
         if(contentLength > 0) {
             char[] buf = new char[contentLength + 2];
-            int read = br.read(buf);
+            br.read(buf);
             body = new String(buf);
         }
         return body;

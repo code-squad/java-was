@@ -17,4 +17,15 @@ public class ClientModel {
     }
 
 
+    public boolean hasMustache(String key) {
+        return attributes.containsKey(key);
+    }
+
+    public Object obtainAttribute(String key) {
+        if(attributes.containsKey(key)) {
+            return attributes.get(key);
+        }
+
+        return null;
+    }
 }

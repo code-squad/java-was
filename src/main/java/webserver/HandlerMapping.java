@@ -1,12 +1,10 @@
 package webserver;
 
+import model.HttpRequest;
 import model.Mapping;
 import model.MethodType;
-import model.RequestEntity;
-import model.User;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
-import security.ClientSession;
 import security.HttpSession;
 import setting.Controller;
 import setting.GetMapping;
@@ -17,7 +15,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -159,8 +156,8 @@ public class HandlerMapping {
         return Stream.of(annotations).filter(a -> a.annotationType().getSimpleName().contains(name)).findFirst();
     }
 
-    public static String readParameter(RequestEntity requestEntity, String paramName) {
-        return requestEntity.obtainParamElement(paramName);
+    public static String readParameter(HttpRequest httpRequest, String paramName) {
+        return httpRequest.obtainParamElement(paramName);
     }
 
     public static String processHandler(Mapping mapping, Map<String, String> body, String jSessionId) {

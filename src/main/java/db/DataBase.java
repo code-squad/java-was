@@ -12,7 +12,7 @@ public class DataBase {
 
     static {
         /* 로그인 반복적으로 수행하는 것이 불편해서 테스트 아이디 생성 */
-        users.put("javajigi", new User("javajigi", "password", "MrPobi", "slipp@naver.com"));
+        users.put("javajigi", new User("javajigi", "password", "Pobi", "slipp@naver.com"));
     }
 
     public static void addUser(User user) {
