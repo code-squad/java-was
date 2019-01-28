@@ -5,10 +5,10 @@ import webserver.http.response.HttpResponse;
 
 import java.io.IOException;
 
-public class StyleSheetController extends AbstractController {
+public class FontsController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
-        response.addHeader(CONTENT_TYPE, CSS_COTENT_TYPE);
+        response.addHeader(CONTENT_TYPE, getFontsType(request.getPath()));
         response.forward(request.getPath());
     }
 }

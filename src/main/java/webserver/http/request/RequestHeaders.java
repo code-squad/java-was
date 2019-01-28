@@ -1,19 +1,12 @@
 package webserver.http.request;
 
-import util.HttpRequestUtils;
 import webserver.http.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RequestHeaders {
     private static String EMPTY_HEADER = "";
     private List<Pair> headers;
-
-    public RequestHeaders() {
-    }
 
     public RequestHeaders(List<Pair> headers) {
         this.headers = headers;
@@ -35,17 +28,4 @@ public class RequestHeaders {
         return Integer.parseInt(contentLength);
     }
 
-    public Map<String, String> getCookie() {
-        String cookie = getHeader("Cookie");
-        if (cookie.equals(EMPTY_HEADER))
-            return new HashMap<>();
-        return HttpRequestUtils.parseCookies(cookie);
-    }
-
-    public List<String> getAccepts() {
-        String accept = getHeader("Accept");
-        if (accept.equals(EMPTY_HEADER))
-            return new ArrayList<>();
-        return HttpRequestUtils.parseAccepts(accept);
-    }
 }

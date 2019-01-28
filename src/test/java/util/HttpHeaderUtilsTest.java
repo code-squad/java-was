@@ -27,6 +27,5 @@ public class HttpHeaderUtilsTest {
         RequestHeaders requestHeaders = HttpHeaderUtils.parseRequestHeaders(br);
         assertThat(requestHeaders.getHeader("Host"), is("localhost:8080"));
         assertThat(requestHeaders.getHeader("Content-Length"), is("59"));
-
     }
 }

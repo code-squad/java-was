@@ -10,9 +10,6 @@ public class RequestLine {
     private String version;
     private Map<String, String> query;
 
-    public RequestLine() {
-    }
-
     public RequestLine(HttpMethod method, String uri, String version, Map<String, String> query) {
         this.method = method;
         this.uri = uri;
@@ -34,6 +31,10 @@ public class RequestLine {
 
     public Map<String, String> getQuery() {
         return query;
+    }
+
+    public String getQueryParameter(String key) {
+        return query.get(key);
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import support.BufferedReaderGenerator;
 import util.HttpHeaderUtils;
+import util.HttpRequestUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class RequestHeadersTest {
         BufferedReader br = BufferedReaderGenerator.generateBufferedReader(value);
         RequestHeaders headers = HttpHeaderUtils.parseRequestHeaders(br);
 
-        Map<String, String> cookie = headers.getCookie();
+        Map<String, String> cookie = HttpRequestUtils.parseCookies(headers.getHeader("Cookie"));
         logger.debug("logined : {}", cookie.get("logined"));
         assertThat(cookie.get("logined"), is("true"));
     }
@@ -44,7 +45,7 @@ public class RequestHeadersTest {
         BufferedReader br = BufferedReaderGenerator.generateBufferedReader(value);
         RequestHeaders headers = HttpHeaderUtils.parseRequestHeaders(br);
 
-        List<String> accepts = headers.getAccepts();
-        logger.debug("AcceptType : {}", accepts.get(0));
+        String header = headers.getHeader("Accept");
+        assertTrue(header.startsWith("text/"));
     }
 }
