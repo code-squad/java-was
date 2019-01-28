@@ -29,7 +29,7 @@ public class RequestHeadersTest {
         BufferedReader br = BufferedReaderGenerator.generateBufferedReader(value);
         RequestHeaders headers = HttpHeaderUtils.parseRequestHeaders(br);
 
-        Map<String, String> cookie = HttpRequestUtils.parseCookies(headers.getHeader("CooKie"));
+        Map<String, String> cookie = HttpRequestUtils.parseCookies(headers.getHeader("Cookie"));
         logger.debug("logined : {}", cookie.get("logined"));
         assertThat(cookie.get("logined"), is("true"));
     }

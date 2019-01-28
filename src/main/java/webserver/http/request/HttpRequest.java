@@ -13,8 +13,8 @@ public class HttpRequest {
         this.requestBody = requestBody;
     }
 
-    public HttpMethod getMethod() {
-        return this.requestLine.getMethod();
+    public boolean matchMethod(HttpMethod method) {
+        return this.requestLine.getMethod().equals(method);
     }
 
     public String getPath() {
@@ -26,6 +26,9 @@ public class HttpRequest {
     }
 
     public String getParameter(String key) {
-        return this.requestBody.getParameter(key);
+        String parameter = this.requestBody.getParameter(key);
+        if (parameter == null)
+            return this.requestLine.getQueryParameter(key);
+        return parameter;
     }
 }

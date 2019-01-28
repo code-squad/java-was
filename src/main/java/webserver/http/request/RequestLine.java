@@ -33,6 +33,10 @@ public class RequestLine {
         return query;
     }
 
+    public String getQueryParameter(String key) {
+        return query.get(key);
+    }
+
     @Override
     public String toString() {
         return "RequestLine{" +

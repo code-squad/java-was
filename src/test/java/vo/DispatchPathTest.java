@@ -12,16 +12,15 @@ import static org.junit.Assert.*;
 
 public class DispatchPathTest {
     private static final Logger logger = LoggerFactory.getLogger(DispatchPathTest.class);
+    String formPath = "/user/form";
+    String createPath = "/user/create";
+    String listPath = "/user/list";
+    String loginFailedFormPath = "/user/login_failed.html";
+    String loginFormPath = "/user/login.html";
+    String loginPath = "/user/login";
 
     @Test
-    public void findController() {
-        String formPath = "/user/form";
-        String createPath = "/user/create";
-        String listPath = "/user/list";
-        String loginFailedFormPath = "/user/login_failed.html";
-        String loginFormPath = "/user/login.html";
-        String loginPath = "/user/login";
-
+    public void findController_create() {
         Controller form = DispatchPath.findController(formPath);
         logger.debug("formPath : {}", form);
         assertTrue(form instanceof CreateUserController);
@@ -29,11 +28,10 @@ public class DispatchPathTest {
         Controller create = DispatchPath.findController(createPath);
         logger.debug("createPath : {}", create);
         assertTrue(create instanceof CreateUserController);
+    }
 
-        Controller list = DispatchPath.findController(listPath);
-        logger.debug("listPath : {}", list);
-        assertTrue(list instanceof ListUserController);
-
+    @Test
+    public void findController_login() {
         Controller loginFailedForm = DispatchPath.findController(loginFailedFormPath);
         logger.debug("loginFailedFormPath : {}", loginFailedForm);
         assertTrue(loginFailedForm instanceof LoginController);
@@ -47,5 +45,10 @@ public class DispatchPathTest {
         assertTrue(login instanceof LoginController);
     }
 
-
+    @Test
+    public void findController_list() {
+        Controller list = DispatchPath.findController(listPath);
+        logger.debug("listPath : {}", list);
+        assertTrue(list instanceof ListUserController);
+    }
 }

@@ -14,7 +14,7 @@ public abstract class AbstractController implements Controller {
     static final String WOFF_CONTENT_TYPE = "application/font-woff";
     static final String TTF_CONTENT_TYPE = "application/font-ttf";
 
-    static String getFontsType(String path) {
+    String getFontsType(String path) {
         if (path.endsWith(".woff"))
             return WOFF_CONTENT_TYPE;
         return TTF_CONTENT_TYPE;
@@ -22,9 +22,9 @@ public abstract class AbstractController implements Controller {
 
     @Override
     public void service(HttpRequest request, HttpResponse response) throws IOException {
-        if (request.getMethod().equals(HttpMethod.GET))
+        if (request.matchMethod(HttpMethod.GET))
             doGet(request, response);
-        if (request.getMethod().equals(HttpMethod.POST))
+        if (request.matchMethod(HttpMethod.POST))
             doPost(request, response);
     }
 
