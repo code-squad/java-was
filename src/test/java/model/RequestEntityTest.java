@@ -19,6 +19,7 @@ public class RequestEntityTest {
 
     @Test
     public void obtainURL() {
+        assertThat(HttpRequest.obtainURL("GET /api/url HTTP1.1")).isEqualTo("/api/url");
         assertThat(RequestEntity.obtainURL("GET /api/url HTTP1.1")).isEqualTo("/api/url");
     }
 
@@ -36,14 +37,14 @@ public class RequestEntityTest {
 
     @Test
     public void obtainParameterTest() {
-        RequestEntity requestEntity = new RequestEntity(path, "GET", "", null);
-        assertThat(requestEntity.obtainParamElement("userId")).isEqualTo("javajigi");
-        assertThat(requestEntity.obtainParamElement("blank")).isEqualTo("");
+        HttpRequest httpRequest = new HttpRequest(path, MethodType.GET, null, null);
+        assertThat(httpRequest.obtainParamElement("userId")).isEqualTo("javajigi");
+        assertThat(httpRequest.obtainParamElement("blank")).isEqualTo("");
     }
 
     @Test
     public void obtainURLTest() {
-        assertThat(RequestEntity.obtainURL("GET /user/create?userId=javajigi HTTP/1.1"))
+        assertThat(HttpRequest.obtainURL("GET /user/create?userId=javajigi HTTP/1.1"))
                 .isEqualTo("/user/create?userId=javajigi");
 
     }

@@ -1,18 +1,13 @@
-package webserver;
+package webserver.controller;
 
-import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
-import security.ClientSession;
 import security.HttpSession;
 import service.UserService;
 import setting.Controller;
 import setting.GetMapping;
 import setting.PostMapping;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import webserver.viewresolver.Model;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -63,7 +58,7 @@ public class MainController {
             logger.debug("로그인하지 않아서 메인화면 이동");
             return "redirect:/users/login";
         }
-        model.addAttribute("users", DataBase.findAll().stream().collect(Collectors.toList()));
+        model.addAttribute("user", httpSession.obtainLoginUser());
         return "/user/list.html";
     }
 

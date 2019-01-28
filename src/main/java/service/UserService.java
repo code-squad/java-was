@@ -16,7 +16,7 @@ public class UserService {
 
     public static boolean isJoinUser(User user) {
         User savedUser = DataBase.findUserById(user.getUserId());
-        logger.debug("SavedUser : {}, LoginUser : {}", savedUser.toString(), user.toString());
+
         if(user.isJoinUser(savedUser)) {
             return true;
         }

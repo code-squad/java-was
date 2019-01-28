@@ -4,18 +4,19 @@ import org.slf4j.Logger;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class ResponseEntity {
+public class HttpResponse {
 
-    private static final Logger logger = getLogger(ResponseEntity.class);
+    private static final Logger logger = getLogger(HttpResponse.class);
 
     private byte[] body;
-    private Map<String, String> header;
+    private HttpHeader httpHeader;
     private static Map<String, String> statusMapper = new HashMap<>();
     private static Map<String, Consumer<DataOutputStream>> statusProcessor = new HashMap<>();
 
@@ -24,14 +25,14 @@ public class ResponseEntity {
         statusMapper.put("302", "FOUND");
     }
 
-    public ResponseEntity(byte[] body) {
-        this.header = new HashMap<>();
+    public HttpResponse(byte[] body) {
+        this.httpHeader = new HttpHeader();
         this.body = body;
 
         initStatusMapper();
     }
 
-    public void initStatusMapper()  {
+    public void initStatusMapper() {
         statusProcessor.put("200", (dos) -> response200Header(dos));
         statusProcessor.put("302", (dos) -> response302Header(dos));
     }
@@ -44,8 +45,8 @@ public class ResponseEntity {
         this.body = body;
     }
 
-    public ResponseEntity addHeader(String key, String value) {
-        header.put(key, value);
+    public HttpResponse addHeader(String key, String value) {
+        httpHeader.addHeader(key, value);
         return this;
     }
 
@@ -53,27 +54,22 @@ public class ResponseEntity {
        @param
        @return response에 대한 공통적인 속성을 작성한 템플
     */
-    public ResponseEntity responseHeader(DataOutputStream dos, boolean isResource) throws IOException {
+    public HttpResponse responseHeader(DataOutputStream dos, boolean isResource) throws IOException {
 
-        String statusCode = obtainStatusCode();
+        String statusCode = httpHeader.obtainHeader("status");
         dos.writeBytes(String.format("HTTP/1.1 %s %s\r\n", statusCode, obtainStatus(statusCode)));
         String contentType = "Content-Type: text/html;charset=utf-8\r\n";
         if(isResource) {
             contentType = "Content-Type: text/css\r\n";
         }
         dos.writeBytes(contentType);
-        dos.writeBytes(String.format("Content-Length: %d\r\n", this.body.length));
 
         /* status에 따라 response 구성이 조금씩 다르기 때문에 다른 부분은 람다로 처리 */
         statusProcessor.get(statusCode).accept(dos);
-        dos.writeBytes(String.format("Set-Cookie: %s\r\n", header.get("Set-Cookie")));
+        dos.writeBytes(String.format("Set-Cookie: %s\r\n", httpHeader.obtainHeader("Set-Cookie")));
         dos.writeBytes("\r\n");
 
         return this;
-    }
-
-    public String obtainStatusCode() {
-        return this.header.get("status");
     }
 
     public String obtainStatus(String statusCode) {
@@ -82,17 +78,21 @@ public class ResponseEntity {
 
     private void response302Header(DataOutputStream dos) {
         try {
-            dos.writeBytes(String.format("Location: %s\r\n", header.get("Location")));
+            dos.writeBytes(String.format("Location: %s\r\n", httpHeader.obtainHeader("Location")));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void response200Header(DataOutputStream dos) {
-
+        try {
+            dos.writeBytes(String.format("Content-Length: %d\r\n", this.body.length));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public ResponseEntity responseBody(DataOutputStream dos) {
+    public HttpResponse responseBody(DataOutputStream dos) {
         try {
             dos.write(this.body, 0, this.body.length);
             dos.flush();
@@ -105,8 +105,9 @@ public class ResponseEntity {
 
     @Override
     public String toString() {
-        return "ResponseEntity{" +
-                "header=" + header +
+        return "HttpResponse{" +
+                "body=" + Arrays.toString(body) +
+                ", httpHeader=" + httpHeader +
                 '}';
     }
 }

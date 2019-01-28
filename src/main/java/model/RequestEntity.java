@@ -17,7 +17,7 @@ public class RequestEntity {
     private Map<String, String> body = new HashMap<>();
     private Map<String, String> headerInfo;
 
-    public RequestEntity(String path, String method, String body, Map<String, String> headerInfo) {
+    public RequestEntity(String path, MethodType method, String body, Map<String, String> headerInfo) {
         this.headerInfo = headerInfo;
 
         /* POST Method Parameter 존재할 경우에만 동작 */

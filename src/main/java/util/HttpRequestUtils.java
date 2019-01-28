@@ -9,7 +9,11 @@ import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
     /*
+<<<<<<< HEAD
+      @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식
+=======
       @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+>>>>>>> e06fe4e90d61436325c7fbfd0bdaa570b70b3190
       @return
     */
     public static Map<String, String> parseQueryString(String queryString) {
