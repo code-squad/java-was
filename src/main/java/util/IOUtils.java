@@ -34,12 +34,7 @@ public class IOUtils {
 
     public static boolean isPattern(String line) {
         Matcher matcher = Pattern.compile(REGEX).matcher(line);
-
-        if(matcher.find()) {
-            return true;
-        }
-
-        return false;
+        return matcher.find();
     }
 
     public static String extractRegex(String line, List<String> accumulate, ClientModel clientModel)

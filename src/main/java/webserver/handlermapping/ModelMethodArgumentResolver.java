@@ -19,7 +19,7 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
     }
 
     @Override
-    public Class identification() {
-        return Model.class;
+    public boolean identification(Class clazz) {
+        return Model.class == clazz;
     }
 }

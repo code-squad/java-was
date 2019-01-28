@@ -1,11 +1,9 @@
 package model;
 
 import org.slf4j.Logger;
-import webserver.ClientModel;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;

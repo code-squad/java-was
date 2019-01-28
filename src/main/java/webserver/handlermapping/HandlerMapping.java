@@ -42,7 +42,6 @@ public class HandlerMapping {
         for (Class<?> clazz : classes) {
             /* Get, Post Method 만 등록!
                     --> [개선점] 상속관계 --> Custom Annotation 상속불가
-                    --> Enum 활용 --> How..?
             */
             registerGetMethod(clazz, obtainMethodStream(clazz, "GetMapping"));
             registerPostMethod(clazz, obtainMethodStream(clazz, "PostMapping"));

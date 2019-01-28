@@ -20,7 +20,7 @@ public class HttpSessionMethodArgumentResolver implements HandlerMethodArgumentR
     }
 
     @Override
-    public Class identification() {
-        return HttpSession.class;
+    public boolean identification(Class clazz) {
+        return HttpSession.class == clazz;
     }
 }

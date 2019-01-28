@@ -19,7 +19,7 @@ public class StringMethodArgumentResolver implements HandlerMethodArgumentResolv
     }
 
     @Override
-    public Class identification() {
-        return String.class;
+    public boolean identification(Class clazz) {
+        return String.class == clazz;
     }
 }

@@ -4,6 +4,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import setting.ArgumentResolver;
 import setting.Controller;
+import webserver.handlermapping.CustomObjectMethodArgumentResolver;
 import webserver.handlermapping.HandlerMethodArgumentResolver;
 
 import java.util.*;
@@ -11,10 +12,10 @@ import java.util.stream.Stream;
 
 public class WebMvcConfig {
 
-    private Map<Class, HandlerMethodArgumentResolver> handlerMethodArgumentResolvers;
+    private List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers;
 
     public WebMvcConfig() {
-        this.handlerMethodArgumentResolvers = new HashMap<>();
+        this.handlerMethodArgumentResolvers = new ArrayList<>();
     }
 
     public void initHandlerMethodArgumentResolvers() {
@@ -22,8 +23,7 @@ public class WebMvcConfig {
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(ArgumentResolver.class);
         for (Class<?> clazz : classes) {
             try {
-                HandlerMethodArgumentResolver handlerMethodArgumentResolver = (HandlerMethodArgumentResolver) clazz.newInstance();
-                handlerMethodArgumentResolvers.put(handlerMethodArgumentResolver.identification(), handlerMethodArgumentResolver);
+                handlerMethodArgumentResolvers.add((HandlerMethodArgumentResolver) clazz.newInstance());
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -31,9 +31,12 @@ public class WebMvcConfig {
     }
 
     public HandlerMethodArgumentResolver obtainHandlerMethodArgumentResolver(Class clazz) {
-        if(handlerMethodArgumentResolvers.containsKey(clazz)) {
-            return handlerMethodArgumentResolvers.get(clazz);
+        for (HandlerMethodArgumentResolver handlerMethodArgumentResolver : handlerMethodArgumentResolvers) {
+            if(handlerMethodArgumentResolver.identification(clazz)) {
+                return handlerMethodArgumentResolver;
+            }
         }
-        return handlerMethodArgumentResolvers.get(Object.class);
+
+        return new CustomObjectMethodArgumentResolver();
     }
 }

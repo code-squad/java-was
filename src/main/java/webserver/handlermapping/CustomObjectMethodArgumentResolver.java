@@ -37,8 +37,8 @@ public class CustomObjectMethodArgumentResolver implements HandlerMethodArgument
     }
 
     @Override
-    public Class identification() {
-        return Object.class;
+    public boolean identification(Class clazz) {
+        return Object.class == clazz;
     }
 
     /*

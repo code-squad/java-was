@@ -7,5 +7,5 @@ public interface HandlerMethodArgumentResolver {
 
     Object resolveArgument(Class clazz, String jSessionId, Map<String, String> body);
 
-    Class identification();
+    boolean identification(Class clazz);
 }
