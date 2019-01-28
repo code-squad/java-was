@@ -17,9 +17,4 @@ public class StringMethodArgumentResolver implements HandlerMethodArgumentResolv
     public Object resolveArgument(Class clazz, String jSessionId, Map<String, String> body) {
         return body.remove(body.keySet().iterator().next());
     }
-
-    @Override
-    public boolean identification(Class clazz) {
-        return String.class == clazz;
-    }
 }

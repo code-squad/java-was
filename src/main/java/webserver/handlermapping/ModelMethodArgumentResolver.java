@@ -17,9 +17,4 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
         body.remove(clazz.getSimpleName());
         return new Model(jSessionId);
     }
-
-    @Override
-    public boolean identification(Class clazz) {
-        return Model.class == clazz;
-    }
 }

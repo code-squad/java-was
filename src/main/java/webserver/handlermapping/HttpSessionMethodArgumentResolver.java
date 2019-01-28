@@ -18,9 +18,4 @@ public class HttpSessionMethodArgumentResolver implements HandlerMethodArgumentR
         body.remove(clazz.getSimpleName());
         return new HttpSession(jSessionId);
     }
-
-    @Override
-    public boolean identification(Class clazz) {
-        return HttpSession.class == clazz;
-    }
 }

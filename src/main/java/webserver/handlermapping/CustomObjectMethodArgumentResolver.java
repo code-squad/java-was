@@ -36,11 +36,6 @@ public class CustomObjectMethodArgumentResolver implements HandlerMethodArgument
         return obj;
     }
 
-    @Override
-    public boolean identification(Class clazz) {
-        return Object.class == clazz;
-    }
-
     /*
        @param  setter 메소드 이름
        @return setter 메소드 이름에서 필드값 추출 후 반환

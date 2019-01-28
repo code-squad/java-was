@@ -30,9 +30,9 @@ public class WebMvcConfig {
         }
     }
 
-    public HandlerMethodArgumentResolver obtainHandlerMethodArgumentResolver(Class clazz) {
+    public HandlerMethodArgumentResolver obtainHandlerMethodArgumentResolver(Class clazz) throws InstantiationException, IllegalAccessException {
         for (HandlerMethodArgumentResolver handlerMethodArgumentResolver : handlerMethodArgumentResolvers) {
-            if(handlerMethodArgumentResolver.identification(clazz)) {
+            if(handlerMethodArgumentResolver.supportsParameter(clazz)) {
                 return handlerMethodArgumentResolver;
             }
         }
