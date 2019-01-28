@@ -2,6 +2,7 @@ package util;
 
 import org.junit.Test;
 import org.slf4j.Logger;
+import setting.GetMapping;
 import webserver.controller.MainController;
 import webserver.handlermapping.HandlerMapping;
 
@@ -32,5 +33,11 @@ public class ReflectionTest {
     public void 어노테이션2_Test() {
         Class clazz = MainController.class;
         Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            if(method.getAnnotation(GetMapping.class) != null) {
+                logger.debug("Method Getter name : {}", method.getName());
+            }
+        }
     }
+
 }

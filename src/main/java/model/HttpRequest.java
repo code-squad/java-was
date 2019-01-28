@@ -3,7 +3,6 @@ package model;
 import util.HttpRequestUtils;
 import util.ParameterConverter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
@@ -60,7 +59,7 @@ public class HttpRequest {
        @return HttpHeader 에서 MethodType 추출
     */
     public static MethodType obtainMethod(String line) {
-        return MethodType.obtainMethodType(line.split(SPLIT_BLANK)[0]);
+        return MethodType.obtainMethodTypeByName(line.split(SPLIT_BLANK)[0]);
     }
 
     /*

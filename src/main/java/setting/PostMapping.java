@@ -8,5 +8,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PostMapping {
-    public String value() default "";
+    String value() default "";
+
+    Class identification() default PostMapping.class;
 }

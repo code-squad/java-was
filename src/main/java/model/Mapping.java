@@ -30,7 +30,7 @@ public class Mapping {
             path = initParams(path);
         }
 
-        return new Mapping(path, MethodType.obtainMethodType(method));
+        return new Mapping(path, MethodType.obtainMethodTypeByName(method));
     }
 
     private static String initParams(String path) {

@@ -5,19 +5,17 @@ import model.Mapping;
 import model.MethodType;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
-import security.HttpSession;
 import setting.Controller;
 import setting.GetMapping;
 import setting.PostMapping;
 import webserver.WebMvcConfig;
-import webserver.viewresolver.Model;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,6 +27,8 @@ public class HandlerMapping {
 
     private static Map<Mapping, BiFunction<Map, String, String>> handlerMapper = new HashMap<>();
 
+    private static Map<Class, Function<Method, String>> methodMapper = new HashMap<>();
+
     private static WebMvcConfig webMvcConfig;
 
     /* 요청 Mapping 정보에 따라 호출되는 메소드를 매핑 */
@@ -36,16 +36,14 @@ public class HandlerMapping {
         webMvcConfig = new WebMvcConfig();
         webMvcConfig.initHandlerMethodArgumentResolvers();
 
+        methodMapper.put(GetMapping.class, (method) -> method.getAnnotation(GetMapping.class).value());
+        methodMapper.put(PostMapping.class, (method) -> method.getAnnotation(PostMapping.class).value());
+
         Reflections reflections = new Reflections("webserver");
         /* setting.MainController 어노테이션 붙어있는 클래스만 확인! */
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class);
         for (Class<?> clazz : classes) {
-            /* Get, Post Method 만 등록!
-                    --> [개선점] 상속관계 --> Custom Annotation 상속불가
-            */
-            registerGetMethod(clazz, obtainMethodStream(clazz, "GetMapping"));
-            registerPostMethod(clazz, obtainMethodStream(clazz, "PostMapping"));
-
+            registerMethod(clazz);
         }
     }
 
@@ -58,29 +56,14 @@ public class HandlerMapping {
                 .filter(m -> hasAnnotation(m.getDeclaredAnnotations(), name).isPresent());
     }
 
-    /*
-       @param  @Annotation PostMapping 을 가진 메소드의 스트림
-       @return Void 메소드 등록!
-    */
-    public static void registerPostMethod(Class clazz, Stream<Method> stream) {
-        List<Method> postMethods = stream.collect(Collectors.toList());
-        for (Method postMethod : postMethods) {
-            PostMapping postMapping = postMethod.getAnnotation(PostMapping.class);
-            handlerMapper.put(new Mapping(postMapping.value(), MethodType.obtainMethodType("POST"))
-                    , (body, jSessionId) -> invokeMethod(createAllParameters(body, postMethod, jSessionId), clazz, postMethod));
-        }
-    }
-
-    /*
-       @param  @Annotation PostMapping 을 가진 메소드의 스트림
-       @return Void 메소드 등록!
-    */
-    public static void registerGetMethod(Class clazz, Stream<Method> stream) {
-        List<Method> getMethods = stream.collect(Collectors.toList());
-        for (Method getMethod : getMethods) {
-            GetMapping getMapping = getMethod.getAnnotation(GetMapping.class);
-            handlerMapper.put(new Mapping(getMapping.value(), MethodType.obtainMethodType("GET"))
-                    , (body, jSessionId) -> invokeMethod(createAllParameters(body, getMethod, jSessionId), clazz, getMethod));
+    public static void registerMethod(Class clazz) {
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            Class methodClazz = MethodType.obtainMethodClass(method);
+            if(methodClazz != null) {
+                handlerMapper.put(new Mapping(methodMapper.get(methodClazz).apply(method), MethodType.obtainMethodTypeByClass(methodClazz))
+                        , (body, jSessionId) -> invokeMethod(createAllParameters(body, method, jSessionId), clazz, method));
+            }
         }
     }
 
@@ -99,9 +82,13 @@ public class HandlerMapping {
         Parameter[] parameters = method.getParameters();
         List<Object> args = new ArrayList<>();
         for (Parameter parameter : parameters) {
-            Class clazz = parameter.getType();
-            Object object = webMvcConfig.obtainHandlerMethodArgumentResolver(clazz).resolveArgument(clazz, jSessionId, body);
-            args.add(object);
+            try {
+                Class clazz = parameter.getType();
+                Object object = webMvcConfig.obtainHandlerMethodArgumentResolver(clazz).resolveArgument(clazz, jSessionId, body);
+                args.add(object);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         return args;
     }
@@ -117,7 +104,7 @@ public class HandlerMapping {
     public static String processHandler(Mapping mapping, Map<String, String> body, String jSessionId) {
         if(mapping.isResource()) {
             body.put("filePath", mapping.getPath());
-            return handlerMapper.get(new Mapping("/css", MethodType.obtainMethodType("GET"))).apply(body, jSessionId);
+            return handlerMapper.get(new Mapping("/css", MethodType.obtainMethodTypeByName("GET"))).apply(body, jSessionId);
         }
         return handlerMapper.get(mapping).apply(body, jSessionId);
     }
