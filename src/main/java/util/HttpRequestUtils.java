@@ -1,5 +1,7 @@
 package util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,6 +54,24 @@ public class HttpRequestUtils {
     public static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
     }
+
+    public static int readHeader(BufferedReader br, String headerFirstLine) throws IOException {
+        int contentLength = 0;
+        while(!headerFirstLine.equals("") && headerFirstLine != null) {
+            headerFirstLine = br.readLine();
+            contentLength = findContentLength(headerFirstLine, contentLength);
+        }
+        return contentLength;
+    }
+
+    private static int findContentLength(String headerFirstLine, int contentLength) {
+        if(headerFirstLine.startsWith("Content-Length")) {
+            String[] parts = headerFirstLine.split(" ");
+            contentLength = Integer.parseInt(parts[1]);
+        }
+        return contentLength;
+    }
+
 
     public static class Pair {
         String key;
