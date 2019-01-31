@@ -1,7 +1,7 @@
-package Controller;
+package controller;
 
 import db.DataBase;
-import model.ResponseMessage;
+import dto.ResponseMessage;
 import model.User;
 import util.HttpRequestUtils;
 import util.IOUtils;

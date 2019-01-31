@@ -3,7 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
-import model.ResponseMessage;
+import dto.ResponseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

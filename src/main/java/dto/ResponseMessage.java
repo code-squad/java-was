@@ -1,4 +1,4 @@
-package model;
+package dto;
 
 import org.slf4j.Logger;
 import util.ResponseHeaderUtils;

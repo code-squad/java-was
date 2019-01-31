@@ -1,8 +1,8 @@
 package webserver;
 
-import Controller.MainController;
-import Controller.UserController;
-import model.ResponseMessage;
+import controller.MainController;
+import controller.UserController;
+import dto.ResponseMessage;
 import org.slf4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;

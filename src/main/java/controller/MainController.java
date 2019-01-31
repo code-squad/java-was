@@ -1,6 +1,6 @@
-package Controller;
+package controller;
 
-import model.ResponseMessage;
+import dto.ResponseMessage;
 
 import java.io.File;
 import java.io.IOException;
