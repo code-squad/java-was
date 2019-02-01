@@ -25,6 +25,16 @@ public class HttpResponseHeaderUtils {
         return sb.toString();
     }
 
+    public static String generate200CssHeader(int lengthOfBodyContent) {
+        StringBuilder sb = new StringBuilder()
+                .append("HTTP/1.1 200 OK")
+                .append(NEW_LINE)
+                .append(generateCssContentType())
+                .append(generateContentLength(lengthOfBodyContent))
+                .append(NEW_LINE);
+        return sb.toString();
+    }
+
     public static String generate302CookieHeader(String path, boolean bool) {
         StringBuilder sb = new StringBuilder()
                 .append("HTTP/1.1 302 Found")
@@ -41,6 +51,13 @@ public class HttpResponseHeaderUtils {
     private static String generateHtmlContentType() {
         StringBuilder sb = new StringBuilder()
                 .append("Content-Type: text/html;charset=utf-8")
+                .append(NEW_LINE);
+        return sb.toString();
+    }
+
+    private static String generateCssContentType() {
+        StringBuilder sb = new StringBuilder()
+                .append("Content-Type: text/css;charset=utf-8")
                 .append(NEW_LINE);
         return sb.toString();
     }

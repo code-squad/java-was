@@ -14,6 +14,8 @@ public class Dispatcher {
 
     private static final String GET_METHOD = "GET";
     private static final String SUFFIX_HTML = "html";
+    private static final String SUFFIX_CSS = "css";
+
     private static final String POST_METHOD = "POST";
     public static final String USER_CREATE = "/user/create";
     private static final String USER_LOGIN = "/user/login";
@@ -45,7 +47,15 @@ public class Dispatcher {
         if(tokens[0].equals(GET_METHOD) && tokens[1].equals(USER_LIST)) {
             return UserController.list(br, headerFirstLine);
         }
+
+        // case 5 : css
+        if(tokens[0].equals(GET_METHOD) && tokens[1].endsWith(SUFFIX_CSS)) {
+            return MainController.showCss(tokens[1]);
+        }
+
         return MainController.showDefaultMessage();
+
+
     }
 
 

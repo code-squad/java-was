@@ -1,6 +1,7 @@
 package controller;
 
 import dto.ResponseMessage;
+import util.HttpResponseHeaderUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,4 +17,8 @@ public class MainController {
         return ResponseMessage.ofDefault();
     }
 
+    public static ResponseMessage showCss(String path) throws IOException {
+        byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
+        return ResponseMessage.ofMessage(HttpResponseHeaderUtils.generate200CssHeader(body.length), body);
+    }
 }
