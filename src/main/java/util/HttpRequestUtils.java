@@ -62,41 +62,22 @@ public class HttpRequestUtils {
     }
 
     public static Map<String, String> readHeader(BufferedReader br, String headerFirstLine) throws IOException {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> header = new HashMap<>();
         while(!headerFirstLine.equals("") && headerFirstLine != null) {
             headerFirstLine = br.readLine();
             String[] tokens = headerFirstLine.split(": ");
             if(tokens.length == 2) {
-                map.put(tokens[0], tokens[1]);
+                header.put(tokens[0], tokens[1]);
             }
         }
-        log.debug("header map : {}", map);
-        return map;
+        log.debug("header map : {}", header);
+        return header;
     }
 
-    public static Map<String, String> readRequestBody(BufferedReader br, String headerFirstLine) throws IOException {
-        int contentLength = Integer.parseInt(readHeader(br, headerFirstLine).get("Content-Length"));
+    public static Map<String, String> readRequestBody(BufferedReader br, int contentLength) throws IOException {
         String requestBody = IOUtils.readData(br, contentLength);
         return parseQueryString(requestBody);
     }
-
-    private static int findContentLength(String headerFirstLine, int contentLength) {
-        if(headerFirstLine.startsWith("Content-Length")) {
-            String[] parts = headerFirstLine.split(" ");
-            contentLength = Integer.parseInt(parts[1]);
-        }
-        return contentLength;
-    }
-
-    private static boolean findCookie(String headerFirstLine, boolean loginCookie) {
-        if(headerFirstLine.startsWith("Cookie")) {
-            String[] parts = headerFirstLine.split(" ");
-            loginCookie = Boolean.parseBoolean(parts[1].split("=")[1]);
-        }
-        return loginCookie;
-    }
-
-
 
     public static class Pair {
         String key;

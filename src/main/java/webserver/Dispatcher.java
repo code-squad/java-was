@@ -17,6 +17,7 @@ public class Dispatcher {
     private static final String POST_METHOD = "POST";
     public static final String USER_CREATE = "/user/create";
     private static final String USER_LOGIN = "/user/login";
+    public static final String USER_LIST = "/user/list";
 
     public static ResponseMessage dispatch(BufferedReader br) throws IOException {
         String headerFirstLine = br.readLine();
@@ -35,10 +36,15 @@ public class Dispatcher {
             return UserController.create(br, headerFirstLine);
         }
 
+        // case 3 : post login
         if(tokens[0].equals(POST_METHOD) && tokens[1].equals(USER_LOGIN)) {
             return UserController.login(br, headerFirstLine);
         }
 
+        // case 4 : get user list
+        if(tokens[0].equals(GET_METHOD) && tokens[1].equals(USER_LIST)) {
+            return UserController.list(br, headerFirstLine);
+        }
         return MainController.showDefaultMessage();
     }
 

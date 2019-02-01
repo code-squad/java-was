@@ -7,7 +7,7 @@ public class HttpResponseHeaderUtils {
         StringBuilder sb = new StringBuilder()
                 .append("HTTP/1.1 200 OK")
                 .append(NEW_LINE)
-                .append(generateContentType())
+                .append(generateHtmlContentType())
                 .append(generateContentLength(lengthOfBodyContent))
                 .append(NEW_LINE);
         return sb.toString();
@@ -20,7 +20,7 @@ public class HttpResponseHeaderUtils {
                 .append("Location: ")
                 .append(path)
                 .append(NEW_LINE)
-                .append(generateContentType())
+                .append(generateHtmlContentType())
                 .append(NEW_LINE);
         return sb.toString();
     }
@@ -32,13 +32,13 @@ public class HttpResponseHeaderUtils {
                 .append("Location: ")
                 .append(path)
                 .append(NEW_LINE)
-                .append(generateContentType())
+                .append(generateHtmlContentType())
                 .append(generateCookie(bool))
                 .append(NEW_LINE);
         return sb.toString();
     }
 
-    private static String generateContentType() {
+    private static String generateHtmlContentType() {
         StringBuilder sb = new StringBuilder()
                 .append("Content-Type: text/html;charset=utf-8")
                 .append(NEW_LINE);
