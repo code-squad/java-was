@@ -25,6 +25,14 @@ public class ResponseHeaderUtils {
         return sb.toString();
     }
 
+    public static String generate200CookieHeader(int lengthOfBodyContent, boolean bool) {
+        StringBuilder sb = new StringBuilder()
+                .append(generate200Header(lengthOfBodyContent))
+                .append(generateCookie(bool))
+                .append(NEW_LINE);
+        return sb.toString();
+    }
+
     private static String generateContentType() {
         StringBuilder sb = new StringBuilder()
                 .append("Content-Type: text/html;charset=utf-8")
@@ -36,6 +44,15 @@ public class ResponseHeaderUtils {
         StringBuilder sb = new StringBuilder()
                 .append("Content-Length: ")
                 .append(lengthOfBodyContent)
+                .append(NEW_LINE);
+        return sb.toString();
+    }
+
+    private static String generateCookie(boolean bool) {
+        StringBuilder sb = new StringBuilder()
+                .append("Cookie: logined=")
+                .append(bool)
+                .append("; Path=/")
                 .append(NEW_LINE);
         return sb.toString();
     }

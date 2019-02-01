@@ -64,6 +64,12 @@ public class HttpRequestUtils {
         return contentLength;
     }
 
+    public static Map<String, String> readRequestBody(BufferedReader br, String headerFirstLine) throws IOException {
+        int contentLength = readHeader(br, headerFirstLine);
+        String requestBody = IOUtils.readData(br, contentLength);
+        return parseQueryString(requestBody);
+    }
+
     private static int findContentLength(String headerFirstLine, int contentLength) {
         if(headerFirstLine.startsWith("Content-Length")) {
             String[] parts = headerFirstLine.split(" ");
