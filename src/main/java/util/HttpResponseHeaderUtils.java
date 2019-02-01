@@ -1,6 +1,6 @@
 package util;
 
-public class ResponseHeaderUtils {
+public class HttpResponseHeaderUtils {
     public static final String NEW_LINE = System.lineSeparator();
 
     public static String generate200Header(int lengthOfBodyContent) {
@@ -25,9 +25,14 @@ public class ResponseHeaderUtils {
         return sb.toString();
     }
 
-    public static String generate200CookieHeader(int lengthOfBodyContent, boolean bool) {
+    public static String generate302CookieHeader(String path, boolean bool) {
         StringBuilder sb = new StringBuilder()
-                .append(generate200Header(lengthOfBodyContent))
+                .append("HTTP/1.1 302 Found")
+                .append(NEW_LINE)
+                .append("Location: ")
+                .append(path)
+                .append(NEW_LINE)
+                .append(generateContentType())
                 .append(generateCookie(bool))
                 .append(NEW_LINE);
         return sb.toString();
@@ -50,7 +55,7 @@ public class ResponseHeaderUtils {
 
     private static String generateCookie(boolean bool) {
         StringBuilder sb = new StringBuilder()
-                .append("Cookie: logined=")
+                .append("Set-Cookie: logined=")
                 .append(bool)
                 .append("; Path=/")
                 .append(NEW_LINE);

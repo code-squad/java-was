@@ -1,7 +1,7 @@
 package dto;
 
 import org.slf4j.Logger;
-import util.ResponseHeaderUtils;
+import util.HttpResponseHeaderUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class ResponseMessage {
     }
 
     public static ResponseMessage ofBody(byte[] body) {
-        return new ResponseMessage(ResponseHeaderUtils.generate200Header(body.length), body);
+        return new ResponseMessage(HttpResponseHeaderUtils.generate200Header(body.length), body);
     }
 
     public static ResponseMessage ofMessage(String header, byte[] body) {

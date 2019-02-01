@@ -3,13 +3,19 @@ package util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class HttpRequestUtils {
+    private static final Logger log = getLogger(HttpRequestUtils.class);
+
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
@@ -55,17 +61,21 @@ public class HttpRequestUtils {
         return getKeyValue(header, ": ");
     }
 
-    public static int readHeader(BufferedReader br, String headerFirstLine) throws IOException {
-        int contentLength = 0;
+    public static Map<String, String> readHeader(BufferedReader br, String headerFirstLine) throws IOException {
+        Map<String, String> map = new HashMap<>();
         while(!headerFirstLine.equals("") && headerFirstLine != null) {
             headerFirstLine = br.readLine();
-            contentLength = findContentLength(headerFirstLine, contentLength);
+            String[] tokens = headerFirstLine.split(": ");
+            if(tokens.length == 2) {
+                map.put(tokens[0], tokens[1]);
+            }
         }
-        return contentLength;
+        log.debug("header map : {}", map);
+        return map;
     }
 
     public static Map<String, String> readRequestBody(BufferedReader br, String headerFirstLine) throws IOException {
-        int contentLength = readHeader(br, headerFirstLine);
+        int contentLength = Integer.parseInt(readHeader(br, headerFirstLine).get("Content-Length"));
         String requestBody = IOUtils.readData(br, contentLength);
         return parseQueryString(requestBody);
     }
@@ -77,6 +87,15 @@ public class HttpRequestUtils {
         }
         return contentLength;
     }
+
+    private static boolean findCookie(String headerFirstLine, boolean loginCookie) {
+        if(headerFirstLine.startsWith("Cookie")) {
+            String[] parts = headerFirstLine.split(" ");
+            loginCookie = Boolean.parseBoolean(parts[1].split("=")[1]);
+        }
+        return loginCookie;
+    }
+
 
 
     public static class Pair {
