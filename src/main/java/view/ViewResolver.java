@@ -41,27 +41,15 @@ public class ViewResolver {
         return stringBuilder.toString().getBytes();
     }
 
+    private static boolean isMustached(String line) {
+        return line.contains("{{") && line.contains("}}");
+    }
+
     private static String extractAttributeName(String line) {
         return line
                 .replace("{{", "")
                 .replace("}}", "")
                 .replace(" ", "");
-    }
-
-    private static boolean isMustached(String line) {
-        return line.contains("{{") && line.contains("}}");
-    }
-
-    private static String convert(List<List<String>> target, StringBuilder convertingArticleBuilder) {
-        StringBuilder convertedChunk = new StringBuilder();
-        for (List<String> strings : target) {
-            String convertingArticle = convertingArticleBuilder.toString();
-            for (int i = 0; i < strings.size(); i++) {
-                convertingArticle = convertingArticle.replace("{{" + i + "}}", strings.get(i));
-            }
-            convertedChunk.append(convertingArticle);
-        }
-        return convertedChunk.toString();
     }
 
     private static StringBuilder getConvertingArticleBuilder(BufferedReader br, String key)
@@ -74,5 +62,17 @@ public class ViewResolver {
             iterativeLine = br.readLine();
         }
         return sb;
+    }
+
+    private static String convert(List<List<String>> items, StringBuilder convertingArticleBuilder) {
+        StringBuilder convertedChunk = new StringBuilder();
+        for (List<String> item : items) {
+            String convertingArticle = convertingArticleBuilder.toString();
+            for (int i = 0; i < item.size(); i++) {
+                convertingArticle = convertingArticle.replace("{{" + i + "}}", item.get(i));
+            }
+            convertedChunk.append(convertingArticle);
+        }
+        return convertedChunk.toString();
     }
 }

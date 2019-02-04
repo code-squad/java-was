@@ -14,21 +14,25 @@ import java.util.stream.Collectors;
 public class UserList implements Controller {
     @Override
     public String service(HttpRequest request, HttpResponse response, Model model) {
-        String dbg = request.header("Cookie");
-        if (request.header("Cookie").contains("true")) {
+        if (request.isTrueCookie("logined")) {
             Collection<User> savedUsers = DataBase.findAll();
-            List<List<String>> values = savedUsers.stream().map((u)->{
-                ArrayList<String> list = new ArrayList<>();
-                list.add(u.getName());
-                list.add(u.getUserId());
-                list.add(u.getPassword());
-                return list;
-            }).collect(Collectors.toList());
-            model.setAttribute("user", values);
+            model.setAttribute("user", AdaptToModel(savedUsers));
             response.forward();
             return "/user/list.html";
         }
         response.redirect("/index.html");
         return "redirect";
+    }
+
+    private List<List<String>> AdaptToModel(Collection<User> savedUsers) {
+        return savedUsers.stream()
+                        .map((u) -> {
+                            ArrayList<String> list = new ArrayList<>();
+                            list.add(u.getName());
+                            list.add(u.getUserId());
+                            list.add(u.getPassword());
+                            return list;
+                        })
+                        .collect(Collectors.toList());
     }
 }

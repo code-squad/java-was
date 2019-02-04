@@ -3,18 +3,18 @@ package view;
 import dao.Model;
 import org.junit.Test;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ViewResolverTest {
 
     @Test
-    public void viewResolveTEst() throws Exception{
-//        byte[] body = Files.readAllBytes(new File("./webapp/view_test.html").toPath());
-//
-//        System.out.println(new String(body));
+    public void viewResolveTEst() throws Exception {
+        byte[] ret = ViewResolver.resolve("./view_test.html", makeModel());
+        System.out.println(new String(ret));
+    }
+
+    private Model makeModel() {
         Model model = new Model();
         List<List<String>> lists = new ArrayList<>();
 
@@ -37,13 +37,10 @@ public class ViewResolverTest {
 
         values = new ArrayList<>();
         values.add("title 1");
-        values.add("contets 2");
+        values.add("contents 2");
         lists.add(values);
 
         model.setAttribute("table", lists);
-
-
-        byte[] ret = ViewResolver.resolve("./view_test.html", model);
-        System.out.println(new String(ret));
+        return model;
     }
 }

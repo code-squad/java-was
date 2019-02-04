@@ -12,9 +12,7 @@ public enum HttpCode {
     private int code;
     private String explain;
 
-
     public String getStartLine() {
         return code + " " + explain;
     }
-
 }

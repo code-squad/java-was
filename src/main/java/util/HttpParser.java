@@ -28,16 +28,12 @@ public class HttpParser {
         return new HttpRequest(startLines, headers, queries);
     }
 
-    static private Map<String, String> parseQueryString(BufferedReader br, String[] startLines, Map<String, String> headers) throws IOException {
-        if (startLines[0].equals("GET") && startLines[1].contains("?")) {
-            String[] url = startLines[1].split("\\?");
-            startLines[1] = url[0];
-            return HttpRequestUtils.parseQueryString(url[1]);
-        } else if (startLines[0].equals("POST") && headers.containsKey("Content-Length")) {
-            String queryString = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-            return HttpRequestUtils.parseQueryString(queryString);
+    static private String[] parseStartLine(BufferedReader br) throws IOException {
+        String startLine = br.readLine();
+        if (startLine == null) {
+            throw new HttpParseException("빈 HTTP");
         }
-        return new HashMap<>();
+        return startLine.split(" ");
     }
 
     static private Map<String, String> parseHeader(BufferedReader br) throws IOException {
@@ -49,11 +45,15 @@ public class HttpParser {
         return HttpRequestUtils.parseHeader(lines);
     }
 
-    static private String[] parseStartLine(BufferedReader br) throws IOException {
-        String startLine = br.readLine();
-        if (startLine == null) {
-            throw new HttpParseException("빈 HTTP");
+    static private Map<String, String> parseQueryString(BufferedReader br, String[] startLines, Map<String, String> headers) throws IOException {
+        if (startLines[0].equals("GET") && startLines[1].contains("?")) {
+            String[] url = startLines[1].split("\\?");
+            startLines[1] = url[0];
+            return HttpRequestUtils.parseQueryString(url[1]);
+        } else if (startLines[0].equals("POST") && headers.containsKey("Content-Length")) {
+            String queryString = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+            return HttpRequestUtils.parseQueryString(queryString);
         }
-        return startLine.split(" ");
+        return new HashMap<>();
     }
 }

@@ -10,5 +10,4 @@ public class Forward implements Controller {
         response.forward();
         return request.url();
     }
-
 }
