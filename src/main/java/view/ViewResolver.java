@@ -11,9 +11,9 @@ import java.util.List;
 
 public class ViewResolver {
 
-    public static final String ROOT_PATH = "./webapp/";
+    private static final String ROOT_PATH = "./webapp/";
 
-    public static byte[] resolve(String viewName, Model model) throws Exception {
+    public static byte[] resolve(String viewName, Model model) throws IOException {
         if (model.isEmptyModel()) {
             return Files.readAllBytes(new File(ROOT_PATH + viewName).toPath());
         }
@@ -24,6 +24,7 @@ public class ViewResolver {
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader br = new BufferedReader(new FileReader(ROOT_PATH + viewName));
         String line;
+
         while ((line = br.readLine()) != null) {
             if (isMustached(line)) {
                 String key = extractAttributeName(line);
@@ -33,6 +34,7 @@ public class ViewResolver {
             stringBuilder.append(line);
             stringBuilder.append(System.lineSeparator());
         }
+
         return stringBuilder.toString().getBytes();
     }
 
