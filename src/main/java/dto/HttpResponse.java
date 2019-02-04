@@ -63,4 +63,9 @@ public class HttpResponse {
         sb.append("\r\n");
         return sb;
     }
+
+    public void redirect(String redirectUrl) {
+        this.code = HttpCode.FOUND;
+        headers.put("Location", redirectUrl);
+    }
 }

@@ -14,6 +14,9 @@ public class ViewResolver {
     private static final String ROOT_PATH = "./webapp/";
 
     public static byte[] resolve(String viewName, Model model) throws IOException {
+        if (viewName.equals("redirect")) {
+            return "".getBytes();
+        }
         if (model.isEmptyModel()) {
             return Files.readAllBytes(new File(ROOT_PATH + viewName).toPath());
         }
@@ -39,7 +42,10 @@ public class ViewResolver {
     }
 
     private static String extractAttributeName(String line) {
-        return line.replace("{{", "").replace("}}", "");
+        return line
+                .replace("{{", "")
+                .replace("}}", "")
+                .replace(" ", "");
     }
 
     private static boolean isMustached(String line) {
@@ -62,7 +68,7 @@ public class ViewResolver {
             throws IOException {
         StringBuilder sb = new StringBuilder();
         String iterativeLine = br.readLine();
-        while (!iterativeLine.equals("{{/" + key + "}}")) {
+        while (!iterativeLine.contains("{{/" + key + "}}")) {
             sb.append(iterativeLine);
             sb.append(System.lineSeparator());
             iterativeLine = br.readLine();

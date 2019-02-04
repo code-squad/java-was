@@ -2,6 +2,8 @@ package dto;
 
 import exception.HttpParseException;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 public class HttpRequest {
@@ -39,7 +41,11 @@ public class HttpRequest {
 
     public String query(String key) {
         if (this.queries.containsKey(key)) {
-            return this.queries.get(key);
+            try {
+                return URLDecoder.decode(this.queries.get(key), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
         return "";
     }

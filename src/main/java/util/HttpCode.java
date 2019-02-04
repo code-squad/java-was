@@ -2,7 +2,7 @@ package util;
 
 public enum HttpCode {
     OK(200,"OK"),
-    FOUND(303, "FOUND");
+    FOUND(302, "FOUND");
 
     HttpCode(int code, String explain) {
         this.code = code;

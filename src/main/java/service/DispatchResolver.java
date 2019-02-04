@@ -1,8 +1,6 @@
 package service;
 
-import controller.Controller;
-import controller.Home;
-import controller.StaticControl;
+import controller.*;
 import dto.HttpRequest;
 
 import java.util.HashMap;
@@ -14,7 +12,12 @@ public class DispatchResolver {
 
     static {
         resolver.put(hashCode("static", "GET"), new StaticControl());
-        resolver.put(hashCode("/index.html", "GET"), new Home());
+        resolver.put(hashCode("/index.html", "GET"), new Forward());
+        resolver.put(hashCode("/user/form.html", "GET"), new Forward());
+        resolver.put(hashCode("/user/login.html", "GET"), new Forward());
+        resolver.put(hashCode("/user/create", "POST"), new UserCreate());
+        resolver.put(hashCode("/user/login", "POST"), new UserLogin());
+        resolver.put(hashCode("/user/list.html", "GET"), new UserList());
 
     }
 
@@ -23,7 +26,7 @@ public class DispatchResolver {
     }
 
     public static Controller get(HttpRequest request) {
-        if (isaStyle(request.url())){
+        if (isaStyle(request.url())) {
             return resolver.get(hashCode("static", "GET"));
         }
         return resolver.get(hashCode(request.url(), request.method()));
