@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 public class HttpRequestUtilsTest {
     @Test
-    public void test() {
+    public void parseHeaderTest() {
         String headers =
                 "Host: localhost:8080\n\r" +
                         "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\n\r" +
@@ -24,9 +24,6 @@ public class HttpRequestUtilsTest {
         assertThat(ret.get("Host"), is("localhost:8080"));
         assertThat(ret.get("Accept"), is("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"));
         assertThat(ret.get("Referer"), is("http://localhost:8080/user/form.html"));
-
-
-
     }
 
 

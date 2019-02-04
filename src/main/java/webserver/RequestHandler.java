@@ -1,11 +1,18 @@
 package webserver;
 
+import controller.Controller;
+import dao.Model;
 import db.DataBase;
+import dto.HttpRequest;
+import dto.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.DispatchResolver;
+import util.HttpParser;
 import util.HttpRequestUtils;
 import util.IOUtils;
+import view.ViewResolver;
 
 import java.io.*;
 import java.net.Socket;
@@ -30,6 +37,17 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+
+            HttpRequest req = HttpParser.parse(in);
+            HttpResponse res = new HttpResponse();
+            Model model = new Model();
+            Controller controller = DispatchResolver.get(req);
+            String viewName = controller.service(req, res, model);
+
+//            byte[] view = ViewResolver.resolve(viewName, model);
+//            res.setBody(view);
+
+
 
             List<String> request = new ArrayList<>();
 
