@@ -28,7 +28,9 @@ public class RequestHandler extends Thread {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line = br.readLine();
             log.debug("request line : {}", line);
-            String url = RequestLineUtils.getPath(line);
+
+            String url = RequestLineUtils.processRequestHeader(line);
+
             while(!line.equals("")) {
                 line = br.readLine();
                 log.debug("header : {}", line);
@@ -64,4 +66,6 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         }
     }
+
+
 }
