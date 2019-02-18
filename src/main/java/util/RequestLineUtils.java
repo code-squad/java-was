@@ -23,6 +23,7 @@ public class RequestLineUtils {
         }
 
 
+        /*
         //GET /user/create?userId=11&password=1122&name=33&email=1%401 HTTP/1.1
         if (strings[1].startsWith(URL_USER_CREATE)) {
             String[] queryString = strings[1].split("\\?");
@@ -36,6 +37,7 @@ public class RequestLineUtils {
 
             logger.debug("## processRequestHeader : {}",  user.toString());;
         }
+        */
         return null;
     }
 

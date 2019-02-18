@@ -6,6 +6,7 @@ import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.IOUtils;
 import util.RequestLineUtils;
 
 public class RequestHandler extends Thread {
@@ -31,10 +32,26 @@ public class RequestHandler extends Thread {
 
             String url = RequestLineUtils.processRequestHeader(line);
 
+            boolean isPost = false;
+            int length = 0;
             while(!line.equals("")) {
                 line = br.readLine();
                 log.debug("header : {}", line);
+
+                isPost = line.contains("Content-Length");
+
+                if (isPost) {
+                    length = Integer.parseInt(line.substring(16));
+
+                }
+
             }
+
+            String data = IOUtils.readData(br, length);
+            System.out.println("data " + data);
+
+
+
 
             DataOutputStream dos = new DataOutputStream(out);
 
