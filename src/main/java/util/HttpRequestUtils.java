@@ -3,6 +3,7 @@ package util;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,8 +39,9 @@ public class HttpRequestUtils {
     }
 
     private static Map<String, String> parse(Stream<String> stream, String separator) {
-        return stream.map(t -> getKeyValue(t, separator)).filter(p -> p != null)
-                .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+        return stream.map(t -> getKeyValue(t, separator))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
 
     static Pair getKeyValue(String keyValue, String regex) {
@@ -55,11 +57,12 @@ public class HttpRequestUtils {
         return new Pair(tokens[0], tokens[1]);
     }
 
-    public static Pair parseHeader(String header) {
+    static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
     }
 
-    public static Map<String, String> parseHeader(List<String> headers) {
+
+    static Map<String, String> parseHeader(List<String> headers) {
         return parse(headers.stream(), ": ");
     }
 
@@ -72,11 +75,11 @@ public class HttpRequestUtils {
             this.value = value.trim();
         }
 
-        public String getKey() {
+        String getKey() {
             return key;
         }
 
-        public String getValue() {
+        String getValue() {
             return value;
         }
 
