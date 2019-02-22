@@ -14,7 +14,7 @@ public class RequestLineUtils {
 
 
 
-    public static String processRequestHeader(String input) {
+    public static String getUrl(String input) {
         String[] strings = input.split(" ");
 
         //GET /index.html HTTP/1.1
@@ -35,11 +35,15 @@ public class RequestLineUtils {
             user.setPassword(map.get("password"));
             user.setEmail(map.get("email"));
 
-            logger.debug("## processRequestHeader : {}",  user.toString());;
+            logger.debug("## getUrl : {}",  user.toString());;
         }
         */
-        return null;
+        return strings[1];
     }
 
 
+    public static String getHttpMethod(String requestLine) {
+        String[] requestLines = requestLine.split(" ");
+        return requestLines[0];
+    }
 }
