@@ -3,10 +3,13 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import db.DataBase;
 import model.User;
+import org.omg.CORBA.DATA_CONVERSION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
@@ -18,6 +21,7 @@ public class RequestHandler extends Thread {
     private static final String baseUrl = "./webapp";
     private static final String URL_CREATE = "/user/create";
     private static final String URL_LOGIN = "/user/login";
+    private static final String URL_USER_LIST = "/user/list";
 
     private Socket connection;
 
@@ -98,6 +102,23 @@ public class RequestHandler extends Thread {
         while(!line.equals("")) {
             line = br.readLine();
             log.debug("header : {}", line);
+
+            if (url.equals(URL_USER_LIST)) {
+                if (line.contains("Cookie")) {
+                    String[] str = line.split(" ");
+                    if (str[1].equals("logined=false")) {
+                        url = "/user/login.html";
+                    } else {
+                        StringBuilder sb = new StringBuilder();
+                        Collection<User> list = DataBase.findAll();
+                        for (User user : list) {
+                            sb.append(user.getUserId());
+                            sb.append(user.getName());
+                            sb.append(user.getEmail());
+                        }
+                    }
+                }
+            }
         }
         return Files.readAllBytes(new File(baseUrl + url).toPath());
     }
