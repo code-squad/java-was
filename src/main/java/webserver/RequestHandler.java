@@ -48,7 +48,18 @@ public class RequestHandler extends Thread {
             if (httpMethod.equals("GET")) {
                 body = requestMethodGet(line, br);
 
-                header = response200Header(body.length);
+
+                String[] str = line.split(" ");
+                if (!str[1].endsWith("html")) {
+                    header = response200HeaderCSS(body.length);
+                } else {
+
+                    header = response200Header(body.length);
+                }
+
+
+
+
             } else if (httpMethod.equals("POST")) {
                 header = requestMethodPost(line, br);
 
@@ -73,6 +84,15 @@ public class RequestHandler extends Thread {
         StringBuilder sb = new StringBuilder();
         sb.append("HTTP/1.1 200 OK \r\n");
         sb.append("Content-Type: text/html;charset=utf-8\r\n");
+        sb.append("Content-Length: " + lengthOfBodyContent + "\r\n");
+        sb.append("\r\n");
+        return sb.toString();
+    }
+
+    private String response200HeaderCSS(int lengthOfBodyContent) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("HTTP/1.1 200 OK \r\n");
+        sb.append("Content-Type: text/css;charset=utf-8\r\n");
         sb.append("Content-Length: " + lengthOfBodyContent + "\r\n");
         sb.append("\r\n");
         return sb.toString();
