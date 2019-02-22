@@ -48,22 +48,15 @@ public class RequestHandler extends Thread {
             if (httpMethod.equals("GET")) {
                 body = requestMethodGet(line, br);
 
-
-                String[] str = line.split(" ");
-                if (!str[1].endsWith("html")) {
-                    header = response200HeaderCSS(body.length);
+                String url = RequestLineUtils.getUrl(line);
+                if (url.endsWith("html")) {
+                    response200Header("text/html", body.length);
                 } else {
-
-                    header = response200Header(body.length);
+                    response200Header("text/css", body.length);
                 }
-
-
-
 
             } else if (httpMethod.equals("POST")) {
                 header = requestMethodPost(line, br);
-
-
             }
 
 //            byte[] body = "Hello World".getBytes();
@@ -80,19 +73,10 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private String response200Header(int lengthOfBodyContent) {
+    private String response200Header(String contentType, int lengthOfBodyContent) {
         StringBuilder sb = new StringBuilder();
         sb.append("HTTP/1.1 200 OK \r\n");
-        sb.append("Content-Type: text/html;charset=utf-8\r\n");
-        sb.append("Content-Length: " + lengthOfBodyContent + "\r\n");
-        sb.append("\r\n");
-        return sb.toString();
-    }
-
-    private String response200HeaderCSS(int lengthOfBodyContent) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("HTTP/1.1 200 OK \r\n");
-        sb.append("Content-Type: text/css;charset=utf-8\r\n");
+        sb.append("Content-Type: " + contentType + ";charset=utf-8\r\n");
         sb.append("Content-Length: " + lengthOfBodyContent + "\r\n");
         sb.append("\r\n");
         return sb.toString();
@@ -161,8 +145,6 @@ public class RequestHandler extends Thread {
             }
         }
 
-        System.out.println("url + " + url);
-
         if (url.equals(URL_CREATE)) {
             String data = IOUtils.readData(br, length);
             Map<String, String> map = HttpRequestUtils.parseQueryString(data);
@@ -177,7 +159,7 @@ public class RequestHandler extends Thread {
             log.debug("log : {}" , user.toString());
 
             header = response302Header("/index.html", false);
-            System.out.println(header);
+
         } else if (url.equals(URL_LOGIN)) {
             String data = IOUtils.readData(br, length);
             Map<String, String> map = HttpRequestUtils.parseQueryString(data);
@@ -189,14 +171,12 @@ public class RequestHandler extends Thread {
 
             if (user.matchPassword(password)) {
                 header =  response302Header("/index.html", true);
-                System.out.println(header);
             } else {
                 header =  response302Header("/user/login_failed.html", false);
-                System.out.println(header);
             }
         }
 
-        log.debug("===== header : {} =====", header);
+        log.debug("===== header : {} =====\n", header);
 
         return header;
     }
