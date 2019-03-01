@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import model.HttpMethod;
 
 public class HttpRequestUtils {
     /**
@@ -51,6 +52,21 @@ public class HttpRequestUtils {
 
     public static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
+    }
+
+    public static HttpMethod getHttpMethod(String requestLine) {
+        String[] lines = requestLine.split(" ");
+        for (HttpMethod value : HttpMethod.values()) {
+            if (lines[0].equals(value.toString())) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    public static String getPath(String requestLine) {
+        String[] lines = requestLine.split(" ");
+        return lines[1];
     }
 
     public static class Pair {

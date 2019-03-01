@@ -42,8 +42,5 @@ public class RequestLineUtils {
     }
 
 
-    public static String getHttpMethod(String requestLine) {
-        String[] requestLines = requestLine.split(" ");
-        return requestLines[0];
-    }
+
 }

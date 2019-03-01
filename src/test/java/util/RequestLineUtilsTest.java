@@ -27,19 +27,19 @@ public class RequestLineUtilsTest {
 
     }
 
-    @Test
-    public void HttpMethod_가져오기_GET() {
-        String input = "GET /index.html HTTP/1.1";
-        String result = RequestLineUtils.getHttpMethod(input);
-        assertThat(result).isEqualTo("GET");
-    }
-
-    @Test
-    public void HttpMethod_가져오기_POST() {
-        String input = "POST /user/create HTTP/1.1";
-        String result = RequestLineUtils.getHttpMethod(input);
-        assertThat(result).isEqualTo("POST");
-    }
+//    @Test
+//    public void HttpMethod_가져오기_GET() {
+//        String input = "GET /index.html HTTP/1.1";
+//        String result = RequestLineUtils.getHttpMethod(input);
+//        assertThat(result).isEqualTo("GET");
+//    }
+//
+//    @Test
+//    public void HttpMethod_가져오기_POST() {
+//        String input = "POST /user/create HTTP/1.1";
+//        String result = RequestLineUtils.getHttpMethod(input);
+//        assertThat(result).isEqualTo("POST");
+//    }
 
 
 }

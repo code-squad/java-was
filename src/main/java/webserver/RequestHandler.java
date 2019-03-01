@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import db.DataBase;
+import model.HttpMethod;
 import model.User;
 import org.omg.CORBA.DATA_CONVERSION;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ public class RequestHandler extends Thread {
     private static final String URL_USER_LIST = "/user/list";
 
     private Socket connection;
+    private HttpRequest request;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -40,22 +42,23 @@ public class RequestHandler extends Thread {
             String line = br.readLine();
             log.debug("request line : {}", line);
 
-            String httpMethod = RequestLineUtils.getHttpMethod(line);
-
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = "".getBytes();
             String header = null;
-            if (httpMethod.equals("GET")) {
+
+            request = new HttpRequest(line);
+            log.debug("########## run : {}",  request);
+
+            if (request.getHttpMethod().equals(HttpMethod.GET)) {
                 body = requestMethodGet(line, br);
 
-                String url = RequestLineUtils.getUrl(line);
-                if (url.endsWith("html")) {
-                    response200Header("text/html", body.length);
+                if (request.getPath().endsWith("html")) {
+                    header = response200Header("text/html", body.length);
                 } else {
-                    response200Header("text/css", body.length);
+                    header = response200Header("text/css", body.length);
                 }
 
-            } else if (httpMethod.equals("POST")) {
+            } else if (request.getHttpMethod().equals(HttpMethod.POST)) {
                 header = requestMethodPost(line, br);
             }
 
@@ -105,6 +108,17 @@ public class RequestHandler extends Thread {
         String url = RequestLineUtils.getUrl(line);
         while(!line.equals("")) {
             line = br.readLine();
+
+
+
+            request.getHeader(line);
+            log.debug("########## run : {}",  request);
+
+
+
+
+
+
             log.debug("header : {}", line);
 
             if (url.equals(URL_USER_LIST)) {
@@ -137,6 +151,10 @@ public class RequestHandler extends Thread {
         while(!line.equals("")) {
             line = br.readLine();
             log.debug("header : {}", line);
+
+
+            request.getHeader(line);
+            log.debug("########## run : {}",  request);
 
             isPost = line.contains("Content-Length");
 
