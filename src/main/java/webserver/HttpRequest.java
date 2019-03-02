@@ -1,48 +1,66 @@
 package webserver;
-
 import model.HttpMethod;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpRequest {
-    private List<HttpRequestUtils.Pair> httpHeader = new ArrayList<>();
-    private HttpMethod httpMethod;
+    private HttpMethod method;
     private String path;
+    private Map<String, String> httpRequest = new HashMap<>();
 
-    public HttpRequest(String requestLine) {
-        httpMethod = HttpRequestUtils.getHttpMethod(requestLine);
-        path = HttpRequestUtils.getPath(requestLine);
+    public HttpRequest(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        String line = br.readLine();
+        method = HttpRequestUtils.getHttpMethod(line);
+        path = HttpRequestUtils.getPath(line);
+
+        if (path.contains("?")) {
+            String[] paths = path.split("\\?");
+            path = paths[0];
+            Map<String, String> map = HttpRequestUtils.parseQueryString(paths[1]);
+            httpRequest.putAll(map);
+        }
+
+        while (!line.equals(""))  {
+            line = br.readLine();
+
+            if (line.trim().equals("")) {
+                break;
+            }
+            HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+            httpRequest.put(pair.getKey(), pair.getValue());
+        }
+
+        if (httpRequest.get("Content-Length") != (null)) {
+            int contentLength = Integer.parseInt(httpRequest.get("Content-Length"));
+            String body = IOUtils.readData(br, contentLength);
+
+            Map<String, String> map = HttpRequestUtils.parseQueryString(body);
+            httpRequest.putAll(map);
+        }
     }
 
-    public HttpMethod getHttpMethod() {
-        return httpMethod;
-    }
-
-    public void setHttpMethod(HttpMethod httpMethod) {
-        this.httpMethod = httpMethod;
-    }
-
-    public void getHeader(String header) {
-
-        httpHeader.add(HttpRequestUtils.parseHeader(header));
-
+    public HttpMethod getMethod() {
+        return this.method;
     }
 
     public String getPath() {
-        return path;
+        return this.path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public String getHeader(String header) {
+        return httpRequest.get(header);
     }
 
-    @Override
-    public String toString() {
-        return "HttpRequest{" +
-                "httpHeader=" + httpHeader +
-                ", httpMethod=" + httpMethod +
-                '}';
+    public String getParameter(String header) {
+        return httpRequest.get(header);
     }
+
 }

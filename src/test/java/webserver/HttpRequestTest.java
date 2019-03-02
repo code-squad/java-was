@@ -1,32 +1,37 @@
 package webserver;
 
 import model.HttpMethod;
-import org.junit.Before;
 import org.junit.Test;
-import util.HttpRequestUtils;
+
+import javax.annotation.concurrent.ThreadSafe;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 public class HttpRequestTest {
-    String requestLine;
+    private String testDirectory = "./src/test/resources/";
 
-    @Before
-    public void setUp() throws Exception {
-        requestLine = "GET /index.html HTTP/1.1";
+    @Test
+    public void request_GET() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "HTTP_GET.txt"));
+        HttpRequest request = new HttpRequest(in);
+
+        assertThat(HttpMethod.GET).isEqualTo(request.getMethod());
+        assertThat("/user/create").isEqualTo(request.getPath());
+        assertThat("keep-alive").isEqualTo(request.getHeader("Connection"));
+        assertThat("javajigi").isEqualTo(request.getParameter("userId"));
     }
 
     @Test
-    public void getHttpMethod() {
-        HttpRequest request = new HttpRequest(requestLine);
-        HttpMethod method = request.getHttpMethod();
-       // assertThat(method).isEqualTo(new HttpMethod("GET"));
-       // assertThat(method).isNotEqualTo(new HttpMethod("POST"));
-    }
+    public void request_POST() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "HTTP_POST.txt"));
+        HttpRequest request = new HttpRequest(in);
 
-    @Test
-    public void getHeader() {
-        String requestString = "Content-Length: 59";
-        HttpRequest request =  new HttpRequest(requestLine);
+        assertThat(request.getMethod()).isEqualTo(HttpMethod.POST);
+        assertThat(request.getPath()).isEqualTo("/user/create");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
     }
 }

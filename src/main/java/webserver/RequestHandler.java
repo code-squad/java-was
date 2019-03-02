@@ -4,18 +4,15 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import db.DataBase;
 import model.HttpMethod;
 import model.User;
-import org.omg.CORBA.DATA_CONVERSION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import util.IOUtils;
-import util.RequestLineUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -46,10 +43,10 @@ public class RequestHandler extends Thread {
             byte[] body = "".getBytes();
             String header = null;
 
-            request = new HttpRequest(line);
+          //  request = new HttpRequest(line);
             log.debug("########## run : {}",  request);
 
-            if (request.getHttpMethod().equals(HttpMethod.GET)) {
+            if (request.getMethod().equals(HttpMethod.GET)) {
                 body = requestMethodGet(line, br);
 
                 if (request.getPath().endsWith("html")) {
@@ -58,7 +55,7 @@ public class RequestHandler extends Thread {
                     header = response200Header("text/css", body.length);
                 }
 
-            } else if (request.getHttpMethod().equals(HttpMethod.POST)) {
+            } else if (request.getMethod().equals(HttpMethod.POST)) {
                 header = requestMethodPost(line, br);
             }
 
@@ -105,7 +102,7 @@ public class RequestHandler extends Thread {
     }
 
     private byte[] requestMethodGet(String line, BufferedReader br) throws IOException {
-        String url = RequestLineUtils.getUrl(line);
+        String url = HttpRequestUtils.getPath(line);
         while(!line.equals("")) {
             line = br.readLine();
 
@@ -146,7 +143,7 @@ public class RequestHandler extends Thread {
         int length = 0;
         String header = null;
 
-        String url = RequestLineUtils.getUrl(line);
+        String url = HttpRequestUtils.getPath(line);
 
         while(!line.equals("")) {
             line = br.readLine();
@@ -193,9 +190,7 @@ public class RequestHandler extends Thread {
                 header =  response302Header("/user/login_failed.html", false);
             }
         }
-
         log.debug("===== header : {} =====\n", header);
-
         return header;
     }
 }

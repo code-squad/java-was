@@ -54,6 +54,7 @@ public class HttpRequestUtils {
         return getKeyValue(header, ": ");
     }
 
+
     public static HttpMethod getHttpMethod(String requestLine) {
         String[] lines = requestLine.split(" ");
         for (HttpMethod value : HttpMethod.values()) {
