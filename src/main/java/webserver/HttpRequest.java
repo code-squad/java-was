@@ -1,5 +1,8 @@
 package webserver;
+import db.DataBase;
 import model.HttpMethod;
+import model.User;
+import org.slf4j.Logger;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
@@ -10,9 +13,17 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class HttpRequest {
+    private static final Logger logger = getLogger(HttpRequest.class);
+
+    private static final String URL_CREATE = "/user/create";
+    private static final String URL_LOGIN = "/user/login";
+
     private HttpMethod method;
     private String path;
+    private boolean login = false;
     private Map<String, String> httpRequest = new HashMap<>();
 
     public HttpRequest(InputStream in) throws IOException {
@@ -34,6 +45,7 @@ public class HttpRequest {
             if (line.trim().equals("")) {
                 break;
             }
+            logger.debug("### {}", line);
             HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
             httpRequest.put(pair.getKey(), pair.getValue());
         }
@@ -44,6 +56,27 @@ public class HttpRequest {
 
             Map<String, String> map = HttpRequestUtils.parseQueryString(body);
             httpRequest.putAll(map);
+
+            if (this.getPath().equals(URL_CREATE)) {
+                User user = new User();
+                user.setUserId(map.get("userId"));
+                user.setName(map.get("name"));
+                user.setPassword(map.get("password"));
+                user.setEmail(map.get("email"));
+
+                DataBase.addUser(user);
+
+
+            } else if (this.getPath().equals(URL_LOGIN)) {
+                String userId = map.get("userId");
+                String password = map.get("password");
+
+                User user = DataBase.findUserById(userId);
+
+                if (user.matchPassword(password)) {
+                    login = true;
+                }
+            }
         }
     }
 
@@ -63,4 +96,12 @@ public class HttpRequest {
         return httpRequest.get(header);
     }
 
+    public boolean isLogin() {
+        return login;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }
