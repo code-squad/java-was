@@ -2,22 +2,11 @@ package webserver;
 
 import org.slf4j.Logger;
 
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import static org.slf4j.LoggerFactory.getLogger;
-
-/**
- * HTTP/1.1 200 OK
- * Content-Type: text/html
- * Set-Cookie: logined=true; Path=/
- */
-
-//sb.append("Content-Type: " + contentType + ";charset=utf-8\r\n");
-
-//Content-Type: text/css
 
 public class HttpResponse {
     private static final Logger logger = getLogger(HttpResponse.class);
@@ -40,7 +29,6 @@ public class HttpResponse {
         }
         sb.append("charset=utf-8\r\n");
 
-        //dos.writeBytes(sb.toString());
     }
 
     public void forwardBody(String string) {

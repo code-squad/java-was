@@ -39,7 +39,6 @@ public class ListUserController extends AbstractController {
     }
 
     public boolean isLogin(String cookie) {
-        System.out.println(cookie);
         if (cookie.equals("logined=false")) {
             return false;
         }

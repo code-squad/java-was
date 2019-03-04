@@ -5,15 +5,7 @@ import webserver.HttpRequest;
 import webserver.HttpResponse;
 import webserver.RequestMapping;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class AbstractController implements Controller{
-
-
-    public AbstractController() {
-
-    }
 
     @Override
     public void service(HttpRequest request, HttpResponse response) {

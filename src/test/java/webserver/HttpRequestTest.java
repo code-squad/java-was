@@ -3,7 +3,6 @@ package webserver;
 import model.HttpMethod;
 import org.junit.Test;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
