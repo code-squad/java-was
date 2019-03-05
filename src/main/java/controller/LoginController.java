@@ -5,7 +5,7 @@ import webserver.HttpResponse;
 
 import java.io.IOException;
 
-public class LoginController extends AbstractController{
+public class LoginController extends AbstractController {
     @Override
     void doPost(HttpRequest request, HttpResponse response) {
         try {
@@ -15,7 +15,6 @@ public class LoginController extends AbstractController{
             if (request.isLogin()) {
                 path = "/index.html";
             }
-
             response.sendRedirect(path, request.isLogin());
             response.forward(request.getPath());
             response.responseBody(body);

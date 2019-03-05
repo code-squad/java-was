@@ -1,4 +1,5 @@
 package webserver;
+
 import db.DataBase;
 import model.HttpMethod;
 import model.User;
@@ -6,10 +7,7 @@ import org.slf4j.Logger;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +37,7 @@ public class HttpRequest {
             httpRequest.putAll(map);
         }
 
-        while (!line.equals(""))  {
+        while (!line.equals("")) {
             line = br.readLine();
 
             if (line.trim().equals("")) {
@@ -49,8 +47,11 @@ public class HttpRequest {
             HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
             httpRequest.put(pair.getKey(), pair.getValue());
         }
+        processBody(br);
+    }
 
-        if (httpRequest.get("Content-Length") != (null)) {
+    public void processBody(BufferedReader br) throws IOException {
+        if (isContent()) {
             int contentLength = Integer.parseInt(httpRequest.get("Content-Length"));
             String body = IOUtils.readData(br, contentLength);
 
@@ -72,9 +73,10 @@ public class HttpRequest {
                 String password = map.get("password");
 
                 User user = DataBase.findUserById(userId);
-
-                if (user.matchPassword(password)) {
-                    login = true;
+                if (user != null) {
+                    if (user.matchPassword(password)) {
+                        login = true;
+                    }
                 }
             }
         }
@@ -98,6 +100,18 @@ public class HttpRequest {
 
     public boolean isLogin() {
         return login;
+    }
+
+    public boolean isGet() {
+        return this.method == HttpMethod.GET;
+    }
+
+    public boolean isPost() {
+        return this.method == HttpMethod.POST;
+    }
+
+    public boolean isContent() {
+        return httpRequest.get("Content-Length") != (null);
     }
 
     @Override

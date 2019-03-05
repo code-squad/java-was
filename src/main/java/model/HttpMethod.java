@@ -1,5 +1,5 @@
 package model;
 
 public enum  HttpMethod {
-    GET, HEAD, POST, PUT, TRACE, OPTIONS, DELETE;
+    GET, HEAD, POST, PUT, TRACE, OPTIONS, DELETE
 }
