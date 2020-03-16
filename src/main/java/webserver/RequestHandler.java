@@ -21,9 +21,15 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String requestHeader = br.readLine();
+            String[] tokens = requestHeader.split(" ");
+            String url = tokens[1];
+            log.debug("url : {}", url);
             while (true) {
                 String line = br.readLine();
-                if ("".equals(line)) break;
+                if ("".equals(line)) {
+                    break;
+                }
                 log.debug(line);
             }
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
