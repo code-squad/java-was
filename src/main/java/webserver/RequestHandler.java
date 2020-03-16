@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,13 @@ public class RequestHandler extends Thread {
                 if (line == null)
                     return;
             }
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            byte[] body = null;
+            if (path != null && path.equals("/index.html")) {
+                body = Files.readAllBytes(new File("./webapp" + path).toPath());
+                response200Header(dos, body.length);
+                log.debug("body : {}", body.length);
+                responseBody(dos, body);
+            }
         } catch (IOException e) {
             log.error(e.getMessage());
         }
