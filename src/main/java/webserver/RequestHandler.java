@@ -2,6 +2,8 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,9 @@ public class RequestHandler extends Thread {
             String[] tokens = requestHeader.split(" ");
             String url = tokens[1];
             log.debug("url : {}", url);
+            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+
+            log.debug("body : {}", new String(body, "UTF-8"));
             while (true) {
                 String line = br.readLine();
                 if ("".equals(line)) {
@@ -34,7 +39,7 @@ public class RequestHandler extends Thread {
             }
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+//            byte[] body = "Hello World".getBytes();
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
