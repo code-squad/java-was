@@ -12,7 +12,7 @@
 
 -------------
 
-##Ground Rule
+## Ground Rule
 * 컴퓨터 사용은 50분 단위로 교체하기로 한다.
     * 작업한 것을 커밋한다. (master)
 * 최소 각자 2번은 진행한다.
@@ -21,7 +21,7 @@
 * daily scrum 
     * 끝나고 1시간 진행하기로 한다.
 
-##Repository 관리
+## Repository 관리
 * 하나의 repo를 공유한다.
     * https://github.com/Hamill210/java-was
 * 해야할 일들을 issue에 기록한다.
