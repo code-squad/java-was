@@ -2,11 +2,16 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Map;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.IOUtils;
+import util.HttpRequestUtils;
+
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,21 +29,28 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String line = br.readLine();
             if (line == null)
                 return;
 
-            String path = IOUtils.parsePath(line);
+            String path = HttpRequestUtils.getURL(line);
+            String queryString = HttpRequestUtils.getQueryString(path);
+            queryString = URLDecoder.decode(queryString, StandardCharsets.UTF_8.toString());
+            Map<String, String> map = HttpRequestUtils.parseQueryString(queryString);
             log.debug("path : {} ", path);
-            while (!"".equals(line)) {
+            User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
+            log.debug("User : {}", user);
+            log.debug("userId : {} , password : {}, name : {}, email : {} ", map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
+
+/*            while (!"".equals(line)) {
                 log.debug("br : {} ", line);
                 line = br.readLine();
                 if (line == null)
                     return;
-            }
+            }*/
             byte[] body = null;
-            if (path != null && path.equals("/index.html")) {
+            if (path != null) {
                 body = Files.readAllBytes(new File("./webapp" + path).toPath());
                 response200Header(dos, body.length);
                 log.debug("body : {}", body.length);
