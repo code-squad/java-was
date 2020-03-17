@@ -76,12 +76,13 @@ public class RequestHandler extends Thread {
     private void loginRequestHandler(OutputStream out, Map<String, String> parameterMap) {
         User loginUser = DataBase.findUserById(parameterMap.get("userId")).orElse(null);
         String inputPassword = parameterMap.get("password");
-        String setCookie = "logined=false;";
+        boolean setCookie = false;
         if (loginUser != null && loginUser.getPassword().equals(inputPassword)) {
-            setCookie = "logined=true;";
+            setCookie = true;
         }
         DataOutputStream dos = new DataOutputStream(out);
-        response200Header(dos, setCookie);
+        String redirectUrl = "/index.html";
+        response302Header(dos, redirectUrl, setCookie);
     }
 
     private void userCreateRequestHandler(OutputStream out, Map<String, String> parameterMap) {
@@ -111,20 +112,22 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         }
     }
-    private void response200Header(DataOutputStream dos, String setCookie) {
+
+    private void response302Header(DataOutputStream dos, String url) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Set-Cookie: " + setCookie + " Path=/\r\n");
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + url + " \r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
-    private void response302Header(DataOutputStream dos, String url) {
+
+    private void response302Header(DataOutputStream dos, String url, boolean setCookie) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: " + url + " \r\n");
+            dos.writeBytes("Set-Cookie: logined=" + setCookie + "; Path=/\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
