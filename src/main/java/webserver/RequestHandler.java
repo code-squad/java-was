@@ -5,12 +5,14 @@ import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
 
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 
 public class RequestHandler extends Thread {
@@ -33,37 +35,34 @@ public class RequestHandler extends Thread {
 
             String line = br.readLine();
 
-//            if (line == null)
-//                return;
+            String url = HttpRequestUtils.getURL(line); // index.html ? /users/create
 
-            String path = HttpRequestUtils.getURL(line); // index.html ? /users/create?query
-
-/*            while (!"".equals(line)) {
-                log.debug("br : {} ", line);
-                line = br.readLine();
-                if (line == null)
-                    return;
-            }*/
+            Map<String, String> headers = new HashMap<>();
             byte[] body = null;
-            if (path.equals("/")) path = "/index.html";
 
-            if (path.contains(".html")) {
-                body = Files.readAllBytes(new File("./webapp" + path).toPath());
-                response200Header(dos, body.length);
-                log.debug("body : {}", body.length);
-                responseBody(dos, body);
+            if (url.equals("/")) url = "/index.html";
 
-            } else {
-                String queryString = HttpRequestUtils.getQueryString(path);
-                queryString = URLDecoder.decode(queryString, StandardCharsets.UTF_8.toString());
-                Map<String, String> map = HttpRequestUtils.parseQueryString(queryString);
+            if (url.equals("/user/create")) {
+                while (!(line = br.readLine()).equals("")) {
+                    log.debug("br : {} ", line);
+                    String[] tokens = line.split(": ");
+                    headers.put(tokens[0], tokens[1]);
+                }
+                log.debug("content-Length : {}", headers.get("Content-Length"));
 
-                log.debug("path : {} ", path);
+                String bodyString = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+                log.debug("Body : {}", bodyString);
+                bodyString = URLDecoder.decode(bodyString, StandardCharsets.UTF_8.toString());
+                Map<String, String> map = HttpRequestUtils.parseQueryString(bodyString);
 
                 User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
 
                 log.debug("User : {}", user);
             }
+            body = Files.readAllBytes(new File("./webapp" + url).toPath());
+            response200Header(dos, body.length);
+            responseBody(dos, body);
+
         } catch (IOException e) {
             log.error(e.getMessage());
         }
