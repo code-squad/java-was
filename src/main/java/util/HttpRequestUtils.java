@@ -1,6 +1,9 @@
 package util;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,13 +20,12 @@ public class HttpRequestUtils {
         return line.split(" ")[INDEX_PATH];
     }
 
-    public static String getQueryString(String url) {
-        return url.split("\\?")[1];
+    public static String decode(String line) throws UnsupportedEncodingException {
+        return URLDecoder.decode(line, StandardCharsets.UTF_8.toString());
     }
 
     /**
-     * @param queryString은
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
     public static Map<String, String> parseQueryString(String queryString) {
@@ -31,8 +33,7 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param 쿠키
-     *            값은 name1=value1; name2=value2 형식임
+     * @param 쿠키 값은 name1=value1; name2=value2 형식임
      * @return
      */
     public static Map<String, String> parseCookies(String cookies) {
