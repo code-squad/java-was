@@ -3,13 +3,17 @@ package webserver;
 import Controller.PageController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
 import util.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import static util.HttpRequestUtils.Pair;
 
 public class RequestHandler extends Thread {
 
@@ -30,32 +34,26 @@ public class RequestHandler extends Thread {
 
       DataOutputStream dos = new DataOutputStream(out);
       BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-      String[] tokens = new String[3];
-      String line = null;
 
-      //      while (!"".equals(line = br.readLine()) || line == null) {
-      //        if (line.startsWith("GET")) {
-      //          tokens = line.split(" ");
-      //        }
-      //      }
+      Map<String, Pair> requestLine = requestLine(br);
+      log.debug("### requestLine : {}", requestLine);
+      Map<String, Pair> requestHeader = requestHeader(br);
+      log.debug("### requestHeader : {}", requestHeader);
 
-      List<String> requestHeaders = requestHeader(br);
-      log.debug("### requestHeader : {}", requestHeaders);
-      //      log.debug("### readLine : {}", ((line = br.readLine()) == null) ? "null" : line);
-      //      log.debug("### readLine : {}", br.readLine());
-      //      log.debug("### readLine : {}", br.readLine());
-      //      log.debug("### readLine : {}", br.readLine());
-      List<String> requestBodys = requestBody(br);
-      log.debug("### requestBody : {}", requestBodys);
+      String requestBody = "";
+      if (requestHeader.containsKey("Content-Length")) {
+        log.debug("### Content-Length : {}", requestHeader.get("Content-Length").getValue());
+        requestBody = requestBody(br
+            , Integer.parseInt(requestHeader.get("Content-Length").getValue()));
+        log.debug("### requestBody : {}", requestBody);
+      }
 
-      //
-      PageController wc = new PageController();
-      String redirectUrl = wc.doWork(requestHeaders.get(0));
-      //
-      //      File uriFile = new File(WEBAPP_PATH + tokens[1]);
+      PageController pc = new PageController();
+      String redirectUrl = pc.doWork(requestLine, requestBody);
+
       File uriFile = new File(WEBAPP_PATH + redirectUrl);
       byte[] body = Files.readAllBytes(uriFile.toPath());
-      //
+
       response200Header(dos, body.length);
       responseBody(dos, body);
     } catch (IOException ie) {
@@ -63,6 +61,41 @@ public class RequestHandler extends Thread {
     } catch (Exception e) {
       log.error(e.getMessage());
     }
+  }
+
+  /**
+   * @param br
+   * @return
+   * @throws Exception
+   */
+
+  private Map<String, Pair> requestLine(BufferedReader br) throws Exception {
+    if (!br.ready()) return new HashMap<>();
+
+    Map<String, Pair> requestLine = new HashMap<>();
+    Pair[] parsedRequestLine = HttpRequestUtils.parseRequestLine(br.readLine());
+    Arrays.stream(parsedRequestLine).forEach(token -> requestLine.put(token.getKey(), token));
+
+    return requestLine;
+  }
+
+  private Map<String, Pair> requestHeader(BufferedReader br) throws Exception {
+    if (!br.ready()) return new HashMap<>();
+
+    String line;
+    Map<String, Pair> requestHeader = new HashMap<>();
+    while (br.ready()) {
+      if ("".equals(line = br.readLine())) break;
+
+      Pair token = HttpRequestUtils.parseHeader(line);
+      requestHeader.put(token.getKey(), token);
+    }
+
+    return requestHeader;
+  }
+
+  private String requestBody(BufferedReader br, int contentLength) throws Exception {
+    return (br.ready()) ? IOUtils.readData(br, contentLength) : null;
   }
 
   private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
@@ -76,34 +109,6 @@ public class RequestHandler extends Thread {
     } catch (IOException e) {
       log.error(e.getMessage());
     }
-  }
-
-  private List<String> requestHeader(BufferedReader br) throws Exception {
-    String line = null;
-    List<String> requestHeaders = new ArrayList<>();
-
-    log.debug("### requestheader before : {}", br.ready());
-    while (!"".equals(line = br.readLine()) || line == null) {
-      requestHeaders.add(line);
-    }
-    log.debug("### requestheader after : {}", br.ready());
-
-    return requestHeaders;
-  }
-
-  private List<String> requestBody(BufferedReader br) throws Exception {
-    String line = null;
-    List<String> requestBody = new ArrayList<>();
-
-    log.debug("### requestBody before {}", br.ready());
-
-    if (br.ready()) {
-      log.debug("### : " + IOUtils.readData(br, 57));
-    }
-
-    log.debug("### requestBody after {}", br.ready());
-
-    return requestBody;
   }
 
   private void responseBody(DataOutputStream dos, byte[] body) {
