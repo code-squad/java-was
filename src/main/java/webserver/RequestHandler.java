@@ -1,5 +1,6 @@
 package webserver;
 
+import Controller.WelcomeController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +34,10 @@ public class RequestHandler extends Thread {
         if (line.startsWith("GET")) {
           tokens = line.split(" ");
         }
-        log.debug("{}", line);
       }
+
+      WelcomeController wc = new WelcomeController();
+      wc.doWork(tokens);
 
       File uriFile = new File(WEBAPP_PATH + tokens[1]);
       byte[] body = Files.readAllBytes(uriFile.toPath());
