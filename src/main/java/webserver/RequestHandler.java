@@ -30,18 +30,13 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            String line = br.readLine();
-            if (line == null)
-                return;
 
-            String path = HttpRequestUtils.getURL(line);
-            String queryString = HttpRequestUtils.getQueryString(path);
-            queryString = URLDecoder.decode(queryString, StandardCharsets.UTF_8.toString());
-            Map<String, String> map = HttpRequestUtils.parseQueryString(queryString);
-            log.debug("path : {} ", path);
-            User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
-            log.debug("User : {}", user);
-            log.debug("userId : {} , password : {}, name : {}, email : {} ", map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
+            String line = br.readLine();
+
+//            if (line == null)
+//                return;
+
+            String path = HttpRequestUtils.getURL(line); // index.html ? /users/create?query
 
 /*            while (!"".equals(line)) {
                 log.debug("br : {} ", line);
@@ -50,11 +45,24 @@ public class RequestHandler extends Thread {
                     return;
             }*/
             byte[] body = null;
-            if (path != null) {
+            if (path.equals("/")) path = "/index.html";
+
+            if (path.contains(".html")) {
                 body = Files.readAllBytes(new File("./webapp" + path).toPath());
                 response200Header(dos, body.length);
                 log.debug("body : {}", body.length);
                 responseBody(dos, body);
+
+            } else {
+                String queryString = HttpRequestUtils.getQueryString(path);
+                queryString = URLDecoder.decode(queryString, StandardCharsets.UTF_8.toString());
+                Map<String, String> map = HttpRequestUtils.parseQueryString(queryString);
+
+                log.debug("path : {} ", path);
+
+                User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
+
+                log.debug("User : {}", user);
             }
         } catch (IOException e) {
             log.error(e.getMessage());
