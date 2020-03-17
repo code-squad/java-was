@@ -2,6 +2,7 @@ package webserver;
 
 import constants.HttpMethod;
 import db.DataBase;
+import model.HttpRequest;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,20 +28,15 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String requestHeader = br.readLine();
-            String[] tokens = requestHeader.split(" ");
-            HttpMethod httpMethod = HttpMethod.valueOf(tokens[0]);
-            log.debug("httpMethod : {}", httpMethod);
-            String url = tokens[1];
-            log.debug("url : {}", url);
-
+            HttpRequest httpRequest = new HttpRequest(in);
+            HttpMethod httpMethod = HttpMethod.valueOf(httpRequest.getMethod());
+            String url = httpRequest.getPath();
             switch (httpMethod) {
                 case GET:
                     httpGetRequestHandler(out, url);
                     break;
                 case POST:
-                    httpPostRequestHandler(out, br, url);
+                    httpPostRequestHandler(out, in, url);
                     break;
                 case PUT:
                     break;
@@ -52,7 +48,8 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void httpPostRequestHandler(OutputStream out, BufferedReader br, String url) throws IOException {
+    private void httpPostRequestHandler(OutputStream out, InputStream in, String url) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
         int contentLength = 0;
 
         while (true) {
