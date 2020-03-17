@@ -2,6 +2,7 @@ package util;
 
 import org.junit.Test;
 import util.HttpRequestUtils.Pair;
+import webserver.RequestHandler;
 
 import java.util.Map;
 

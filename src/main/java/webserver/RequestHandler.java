@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RequestHandler extends Thread {
 
@@ -30,21 +32,29 @@ public class RequestHandler extends Thread {
       String[] tokens = new String[3];
       String line = null;
 
-      while (!"".equals(line = br.readLine()) || line == null) {
-        if (line.startsWith("GET")) {
-          tokens = line.split(" ");
-        }
-      }
+//      while (!"".equals(line = br.readLine()) || line == null) {
+//        if (line.startsWith("GET")) {
+//          tokens = line.split(" ");
+//        }
+//      }
 
-      WelcomeController wc = new WelcomeController();
-      wc.doWork(tokens);
+      List<String> requestHeaders = requestHeader(br);
+      log.debug("### requestHeader : {}", requestHeaders);
+      List<String> requestBodys = requestBody(br);
+      log.debug("### requestBody : {}", requestBodys);
 
-      File uriFile = new File(WEBAPP_PATH + tokens[1]);
-      byte[] body = Files.readAllBytes(uriFile.toPath());
-
-      response200Header(dos, body.length);
-      responseBody(dos, body);
-    } catch (IOException e) {
+//
+//      WelcomeController wc = new WelcomeController();
+//      wc.doWork(tokens);
+//
+//      File uriFile = new File(WEBAPP_PATH + tokens[1]);
+//      byte[] body = Files.readAllBytes(uriFile.toPath());
+//
+//      response200Header(dos, body.length);
+//      responseBody(dos, body);
+    } catch (IOException ie) {
+      log.error(ie.getMessage());
+    } catch (Exception e) {
       log.error(e.getMessage());
     }
   }
@@ -60,6 +70,28 @@ public class RequestHandler extends Thread {
     } catch (IOException e) {
       log.error(e.getMessage());
     }
+  }
+
+  private List<String> requestHeader(BufferedReader br) throws Exception {
+    String line = null;
+    List<String> requestHeaders = new ArrayList<>();
+
+    while (!"".equals(line = br.readLine()) || line == null) {
+      requestHeaders.add(line);
+    }
+
+    return requestHeaders;
+  }
+
+  private List<String> requestBody(BufferedReader br) throws Exception {
+    String line = null;
+    List<String> requestBody = new ArrayList<>();
+
+    while (!"".equals(line = br.readLine()) || line == null) {
+      requestBody.add(line);
+    }
+
+    return requestBody;
   }
 
   private void responseBody(DataOutputStream dos, byte[] body) {
