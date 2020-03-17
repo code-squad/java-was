@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,34 +36,40 @@ public class RequestHandler extends Thread {
 
             String line = br.readLine();
 
-            String url = HttpRequestUtils.getURL(line); // index.html ? /users/create
+            String url = HttpRequestUtils.getURL(line);
 
             Map<String, String> headers = new HashMap<>();
-            byte[] body = null;
+
 
             if (url.equals("/")) url = "/index.html";
 
             if (url.equals("/user/create")) {
                 while (!(line = br.readLine()).equals("")) {
-                    log.debug("br : {} ", line);
-                    String[] tokens = line.split(": ");
-                    headers.put(tokens[0], tokens[1]);
+                    HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+                    headers.put(pair.getKey(), pair.getValue());
                 }
                 log.debug("content-Length : {}", headers.get("Content-Length"));
 
-                String bodyString = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-                log.debug("Body : {}", bodyString);
-                bodyString = URLDecoder.decode(bodyString, StandardCharsets.UTF_8.toString());
-                Map<String, String> map = HttpRequestUtils.parseQueryString(bodyString);
+                String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
 
-                User user = new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email"));
+                body = HttpRequestUtils.decode(body);
 
+                Map<String, String> userMap = HttpRequestUtils.parseQueryString(body);
+
+                User user = new User(userMap.get("userId"), userMap.get("password"), userMap.get("name"), userMap.get("email"));
                 log.debug("User : {}", user);
-                response302Header(dos);
 
+                response302Header(dos);
             } else {
-                body = Files.readAllBytes(new File("./webapp" + url).toPath());
-                response200Header(dos, body.length);
+                byte[] body;
+
+                if (Files.exists(Paths.get(new File("./webapp") + url))) {
+                    body = Files.readAllBytes(new File("./webapp" + url).toPath());
+                    response200Header(dos, body.length);
+                } else {
+                    body = "요청하신 페이지가 없습니다".getBytes();
+                    response404Header(dos, body.length);
+                }
                 responseBody(dos, body);
             }
         } catch (IOException e) {
@@ -90,6 +97,18 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         }
     }
+
+    private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
 
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
