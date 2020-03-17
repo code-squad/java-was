@@ -28,10 +28,12 @@ public class RequestHandler extends Thread {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String requestHeader = br.readLine();
             String[] tokens = requestHeader.split(" ");
+            String httpMethod = tokens[0];
+            log.debug("httpMethod : {}", httpMethod);
             String url = tokens[1];
             log.debug("url : {}", url);
 
-            if (!url.equals("/user/create")) {
+            if (httpMethod.equals("GET")) {
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
                 log.debug("body : {}", new String(body, "UTF-8"));
                 DataOutputStream dos = new DataOutputStream(out);
