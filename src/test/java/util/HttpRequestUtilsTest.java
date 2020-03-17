@@ -4,12 +4,25 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
 import util.HttpRequestUtils.Pair;
 
 public class HttpRequestUtilsTest {
+
+    @Test
+    public void parseUriString() {
+        String uriString = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
+        Map<String, String> parameters = HttpRequestUtils.parseUriString(uriString);
+
+        assertEquals("javajigi", parameters.get("userId"));
+        assertEquals("password", parameters.get("password"));
+        assertEquals("%EB%B0%95%EC%9E%AC%EC%84%B1", parameters.get("name"));
+        assertEquals("javajigi%40slipp.net", parameters.get("email"));
+    }
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";

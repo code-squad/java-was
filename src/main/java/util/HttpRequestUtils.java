@@ -17,6 +17,10 @@ public class HttpRequestUtils {
         return parseValues(queryString, "&");
     }
 
+    public static Map<String, String> parseUriString(String uriString) {
+        return parseValues(uriString, "&");
+    }
+
     /**
      * @param 쿠키
      *            값은 name1=value1; name2=value2 형식임
