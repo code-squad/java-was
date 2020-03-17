@@ -1,5 +1,6 @@
 package util;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,6 +9,18 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
+
+    private static final int INDEX_PATH = 1;
+
+    public static String getURL(String line) throws IOException {
+        if (line == null) throw new IOException("잘못된 Request Start Line");
+        return line.split(" ")[INDEX_PATH];
+    }
+
+    public static String getQueryString(String url) {
+        return url.split("\\?")[1];
+    }
+
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
