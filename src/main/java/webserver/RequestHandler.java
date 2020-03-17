@@ -10,6 +10,7 @@ import java.nio.file.Files;
 public class RequestHandler extends Thread {
 
   private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+  private final String WEBAPP_PATH = System.getProperty("user.dir") + "/webapp";
   private Socket connection;
 
   public RequestHandler(Socket connectionSocket) {
@@ -35,10 +36,8 @@ public class RequestHandler extends Thread {
         log.debug("{}", line);
       }
 
-
-      byte[] body = Files.readAllBytes(new File("./webapp" + tokens[1]).toPath());
-
-      log.debug("### : end of request");
+      File uriFile = new File(WEBAPP_PATH + tokens[1]);
+      byte[] body = Files.readAllBytes(uriFile.toPath());
 
       response200Header(dos, body.length);
       responseBody(dos, body);
