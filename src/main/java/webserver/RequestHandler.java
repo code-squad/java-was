@@ -1,8 +1,9 @@
 package webserver;
 
-import Controller.WelcomeController;
+import Controller.PageController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -32,26 +33,31 @@ public class RequestHandler extends Thread {
       String[] tokens = new String[3];
       String line = null;
 
-//      while (!"".equals(line = br.readLine()) || line == null) {
-//        if (line.startsWith("GET")) {
-//          tokens = line.split(" ");
-//        }
-//      }
+      //      while (!"".equals(line = br.readLine()) || line == null) {
+      //        if (line.startsWith("GET")) {
+      //          tokens = line.split(" ");
+      //        }
+      //      }
 
       List<String> requestHeaders = requestHeader(br);
       log.debug("### requestHeader : {}", requestHeaders);
+      //      log.debug("### readLine : {}", ((line = br.readLine()) == null) ? "null" : line);
+      //      log.debug("### readLine : {}", br.readLine());
+      //      log.debug("### readLine : {}", br.readLine());
+      //      log.debug("### readLine : {}", br.readLine());
       List<String> requestBodys = requestBody(br);
       log.debug("### requestBody : {}", requestBodys);
 
-//
-//      WelcomeController wc = new WelcomeController();
-//      wc.doWork(tokens);
-//
-//      File uriFile = new File(WEBAPP_PATH + tokens[1]);
-//      byte[] body = Files.readAllBytes(uriFile.toPath());
-//
-//      response200Header(dos, body.length);
-//      responseBody(dos, body);
+      //
+      PageController wc = new PageController();
+      String redirectUrl = wc.doWork(requestHeaders.get(0));
+      //
+      //      File uriFile = new File(WEBAPP_PATH + tokens[1]);
+      File uriFile = new File(WEBAPP_PATH + redirectUrl);
+      byte[] body = Files.readAllBytes(uriFile.toPath());
+      //
+      response200Header(dos, body.length);
+      responseBody(dos, body);
     } catch (IOException ie) {
       log.error(ie.getMessage());
     } catch (Exception e) {
@@ -76,9 +82,11 @@ public class RequestHandler extends Thread {
     String line = null;
     List<String> requestHeaders = new ArrayList<>();
 
+    log.debug("### requestheader before : {}", br.ready());
     while (!"".equals(line = br.readLine()) || line == null) {
       requestHeaders.add(line);
     }
+    log.debug("### requestheader after : {}", br.ready());
 
     return requestHeaders;
   }
@@ -87,9 +95,13 @@ public class RequestHandler extends Thread {
     String line = null;
     List<String> requestBody = new ArrayList<>();
 
-    while (!"".equals(line = br.readLine()) || line == null) {
-      requestBody.add(line);
+    log.debug("### requestBody before {}", br.ready());
+
+    if (br.ready()) {
+      log.debug("### : " + IOUtils.readData(br, 57));
     }
+
+    log.debug("### requestBody after {}", br.ready());
 
     return requestBody;
   }
