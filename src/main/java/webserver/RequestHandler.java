@@ -35,7 +35,7 @@ public class RequestHandler extends Thread {
 
             if (httpMethod.equals("GET")) {
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-                log.debug("body : {}", new String(body, "UTF-8"));
+                log.trace("body : {}", new String(body, "UTF-8"));
                 DataOutputStream dos = new DataOutputStream(out);
                 response200Header(dos, body.length);
                 responseBody(dos, body);
@@ -51,13 +51,15 @@ public class RequestHandler extends Thread {
                 if(line.contains("Content-Length")) {
                     contentLength = Integer.parseInt(line.split(": ")[1]);
                 }
-                log.debug(line);
             }
             String userParameter = IOUtils.readData(br, contentLength);
             Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(userParameter);
             User newUser = new User(parameterMap);
             log.debug("user : {}", newUser);
-//            byte[] body = "Hello World".getBytes();
+
+            DataOutputStream dos = new DataOutputStream(out);
+            String redirectUrl = "/index.html";
+            response302Header(dos, redirectUrl);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -68,6 +70,15 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+    private void response302Header(DataOutputStream dos, String url) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + url + " \r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
