@@ -4,6 +4,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -29,25 +30,32 @@ public class RequestHandler extends Thread {
             String[] tokens = requestHeader.split(" ");
             String url = tokens[1];
             log.debug("url : {}", url);
-            String queryString = url.substring(url.indexOf('?') + 1);
-            log.debug("queryString : {}", queryString);
-            Map<String, String> parmeterMap = HttpRequestUtils.parseQueryString(queryString);
-            User newUser = new User(parmeterMap);
-            log.debug("user : {}", newUser);
-            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
 
-            log.debug("body : {}", new String(body, "UTF-8"));
+            if (!url.equals("/user/create")) {
+                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+                log.debug("body : {}", new String(body, "UTF-8"));
+                DataOutputStream dos = new DataOutputStream(out);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+
+            int contentLength = 0;
+
             while (true) {
                 String line = br.readLine();
                 if ("".equals(line)) {
                     break;
                 }
+                if(line.contains("Content-Length")) {
+                    contentLength = Integer.parseInt(line.split(": ")[1]);
+                }
                 log.debug(line);
             }
-            DataOutputStream dos = new DataOutputStream(out);
+            String userParameter = IOUtils.readData(br, contentLength);
+            Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(userParameter);
+            User newUser = new User(parameterMap);
+            log.debug("user : {}", newUser);
 //            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
