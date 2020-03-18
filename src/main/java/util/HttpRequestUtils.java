@@ -32,6 +32,9 @@ public class HttpRequestUtils {
   public static Map<String, String> parseCookies(String cookies) {
     return parseValues(cookies, ";");
   }
+  public static Map<String, String> parseRequestBody(String requestBody) {
+    return parseValues(requestBody, "&");
+  }
 
   private static Map<String, String> parseValues(String values, String separator) {
     if (Strings.isNullOrEmpty(values)) {

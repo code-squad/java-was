@@ -1,6 +1,7 @@
 package Controller;
 
 import db.DataBase;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
@@ -60,7 +61,14 @@ public class PageController {
         }
         if (requestUrl.equals("/user/login")) {
           log.debug("### requestBody : {}", requestBody);
-          //
+          Map<String, String> parsedRequestBody = HttpRequestUtils.parseRequestBody(requestBody);
+          log.debug("### parsedRequestBody : {}", parsedRequestBody);
+          User loginUser = new User(parsedRequestBody.get("userId"), parsedRequestBody.get("password"), "", "");
+          User findUser = DataBase.findUserById(parsedRequestBody.get("userId"));
+          log.debug("### loginUser : {}", loginUser.equals(findUser));
+
+
+
           //          UserController.create(requestBody);
           //          //        log.debug("### userDB : {}", WebServer.userDB);
           //          responseBodyUrl = "/index.html";
