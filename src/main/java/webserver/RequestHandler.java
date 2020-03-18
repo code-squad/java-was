@@ -84,6 +84,10 @@ public class RequestHandler extends Thread {
     }
 
     private void httpGetRequestHandler(OutputStream out, BufferedReader br, String url) throws IOException {
+        if (url.contains("/user/list")) {
+            showUserList(out, br, url);
+            return;
+        }
         while (true) {
             String line = br.readLine();
 
@@ -94,6 +98,21 @@ public class RequestHandler extends Thread {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         log.trace("body : {}", new String(body, "UTF-8"));
         DataOutputStream dos = new DataOutputStream(out);
+        response200Header(dos, body.length);
+        responseBody(dos, body);
+    }
+
+    private void showUserList(OutputStream out, BufferedReader br, String url) throws IOException {
+        boolean isLogined;
+        Map<String, String> requestHeaders = readRequestHeader(br);
+        Map<String, String> cookies = HttpRequestUtils.parseCookies(requestHeaders.getOrDefault("Cookie", ""));
+        isLogined = Boolean.parseBoolean(cookies.get("logined"));
+        DataOutputStream dos = new DataOutputStream(out);
+        if (!isLogined) {
+            response302Header(dos, "/index.html", isLogined);
+            return;
+        }
+        byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         response200Header(dos, body.length);
         responseBody(dos, body);
     }
