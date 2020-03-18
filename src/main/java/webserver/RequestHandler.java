@@ -33,9 +33,8 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             HttpRequest httpRequest = new HttpRequest(br);
-            HttpMethod httpMethod = HttpMethod.valueOf(httpRequest.getMethod());
             String url = httpRequest.getPath();
-            switch (httpMethod) {
+            switch (httpRequest.getHttpMethod()) {
                 case GET:
                     httpGetRequestHandler(out, br, url);
                     break;
@@ -46,6 +45,8 @@ public class RequestHandler extends Thread {
                     break;
                 case DELETE:
                     break;
+                default:
+                    log.error("405 Method Not Allowed");
             }
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -89,13 +90,6 @@ public class RequestHandler extends Thread {
         if (url.contains("/user/list")) {
             showUserList(out, br, url);
             return;
-        }
-        while (true) {
-            String line = br.readLine();
-
-            if ("".equals(line)) {
-                break;
-            }
         }
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         log.trace("body : {}", new String(body, "UTF-8"));
