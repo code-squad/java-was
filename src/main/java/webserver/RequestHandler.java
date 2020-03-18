@@ -65,8 +65,8 @@ public class RequestHandler extends Thread {
                 User user = new User(userMap.get("userId"), userMap.get("password"), userMap.get("name"), userMap.get("email"));
                 DataBase.addUser(user);
                 log.debug("Database User : {}", DataBase.findUserById(userMap.get("userId")));
-
                 response302Header(dos);
+                
             } else if (url.equals("/user/login")) {
 
                 while (!(line = br.readLine()).equals("")) {
@@ -87,8 +87,12 @@ public class RequestHandler extends Thread {
 
                 if (dbUser.isSameUser(loginUser)) {
                     log.debug("logined Success");
+                    response302Header(dos);
                 } else {
                     log.debug("logined Fail");
+                    byte[] failedBody = Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
+                    response401Header(dos, failedBody.length);
+                    responseBody(dos, failedBody);
                 }
 
             } else {
@@ -128,6 +132,18 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         }
     }
+
+    private void response401Header(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 401 Unauthorized \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
 
     private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
