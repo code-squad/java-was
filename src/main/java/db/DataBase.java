@@ -10,6 +10,10 @@ import model.User;
 public class DataBase {
     private static Map<String, User> users = Maps.newHashMap();
 
+    public static int getSizeOfUsers() {
+        return users.size();
+    }
+
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
     }

@@ -2,13 +2,15 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,10 @@ public class RequestHandler extends Thread {
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
+            if (DataBase.getSizeOfUsers() == 0) {
+                DataBase.addUser(new User("jay", "1234", "김자윤", "jay@gmail.com"));
+            }
+
             String line = br.readLine();
 
             String url = HttpRequestUtils.getURL(line);
@@ -57,9 +63,34 @@ public class RequestHandler extends Thread {
                 Map<String, String> userMap = HttpRequestUtils.parseQueryString(body);
 
                 User user = new User(userMap.get("userId"), userMap.get("password"), userMap.get("name"), userMap.get("email"));
-                log.debug("User : {}", user);
+                DataBase.addUser(user);
+                log.debug("Database User : {}", DataBase.findUserById(userMap.get("userId")));
 
                 response302Header(dos);
+            } else if (url.equals("/user/login")) {
+
+                while (!(line = br.readLine()).equals("")) {
+                    HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+                    headers.put(pair.getKey(), pair.getValue());
+                }
+                log.debug("content-Length : {}", headers.get("Content-Length"));
+
+                String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+
+                body = HttpRequestUtils.decode(body);
+
+                Map<String, String> userMap = HttpRequestUtils.parseQueryString(body);
+                User loginUser = new User(userMap.get("userId"), userMap.get("password"));
+                User dbUser = Optional.ofNullable(DataBase.findUserById(userMap.get("userId")))
+                        .orElseThrow(() -> new NoSuchElementException("로그인을 시도한 유저가 존재하지 않습니다"));
+                log.debug("Database User : {}", dbUser);
+
+                if (dbUser.isSameUser(loginUser)) {
+                    log.debug("logined Success");
+                } else {
+                    log.debug("logined Fail");
+                }
+
             } else {
                 byte[] body;
 
@@ -72,7 +103,7 @@ public class RequestHandler extends Thread {
                 }
                 responseBody(dos, body);
             }
-        } catch (IOException e) {
+        } catch (IOException | NoSuchElementException e) {
             log.error(e.getMessage());
         }
     }

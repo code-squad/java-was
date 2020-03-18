@@ -13,6 +13,11 @@ public class User {
         this.email = email;
     }
 
+    public User(String userId, String password) {
+        this.userId = userId;
+        this.password = password;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -27,6 +32,10 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public boolean isSameUser(User loginedUser) {
+        return this.password.equals(loginedUser.password);
     }
 
     @Override
