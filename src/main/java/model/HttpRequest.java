@@ -14,10 +14,8 @@ public class HttpRequest {
     private String method;
     private String path;
 
-    public HttpRequest(InputStream in) {
+    public HttpRequest(BufferedReader br) {
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
             String requestHeader = br.readLine();
             if (requestHeader == null) {
                 return;

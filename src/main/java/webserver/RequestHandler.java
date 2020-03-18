@@ -12,6 +12,7 @@ import util.IOUtils;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RequestHandler extends Thread {
@@ -28,15 +29,16 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = new HttpRequest(in);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            HttpRequest httpRequest = new HttpRequest(br);
             HttpMethod httpMethod = HttpMethod.valueOf(httpRequest.getMethod());
             String url = httpRequest.getPath();
             switch (httpMethod) {
                 case GET:
-                    httpGetRequestHandler(out, url);
+                    httpGetRequestHandler(out, br, url);
                     break;
                 case POST:
-                    httpPostRequestHandler(out, in, url);
+                    httpPostRequestHandler(out, br, url);
                     break;
                 case PUT:
                     break;
@@ -48,19 +50,9 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void httpPostRequestHandler(OutputStream out, InputStream in, String url) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        int contentLength = 0;
-
-        while (true) {
-            String line = br.readLine();
-            if ("".equals(line)) {
-                break;
-            }
-            if(line.contains("Content-Length")) {
-                contentLength = Integer.parseInt(line.split(": ")[1]);
-            }
-        }
+    private void httpPostRequestHandler(OutputStream out, BufferedReader br, String url) throws IOException {
+        Map<String, String> headers = readRequestHeader(br);
+        int contentLength = Integer.parseInt(headers.getOrDefault("Content-Length", "0"));
         String userParameter = IOUtils.readData(br, contentLength);
         Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(userParameter);
         if (url.contains("create")) {
@@ -91,12 +83,35 @@ public class RequestHandler extends Thread {
         response302Header(dos, redirectUrl);
     }
 
-    private void httpGetRequestHandler(OutputStream out, String url) throws IOException {
+    private void httpGetRequestHandler(OutputStream out, BufferedReader br, String url) throws IOException {
+        while (true) {
+            String line = br.readLine();
+
+            if ("".equals(line)) {
+                break;
+            }
+        }
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         log.trace("body : {}", new String(body, "UTF-8"));
         DataOutputStream dos = new DataOutputStream(out);
         response200Header(dos, body.length);
         responseBody(dos, body);
+    }
+
+    private Map<String, String> readRequestHeader(BufferedReader br) throws IOException {
+        Map<String, String> requestHeaders = new HashMap<>();
+
+        while (true) {
+            String line = br.readLine();
+
+            if ("".equals(line)) {
+                break;
+            }
+            String[] header = line.split(": ");
+            requestHeaders.put(header[0], header[1]);
+        }
+
+        return requestHeaders;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
