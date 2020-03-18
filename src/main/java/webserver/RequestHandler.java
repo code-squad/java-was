@@ -43,11 +43,14 @@ public class RequestHandler extends Thread {
       }
 
       PageController pc = new PageController();
-      String responseBodyURL = pc.doWork(requestLine, requestBody);
+      Map<String, String> response = pc.doWork(requestLine, requestHeader, requestBody);
 
-      String statusLine = statusLine(200);
-      byte[] body = responseBody(responseBodyURL);
-      String responseHeader = responseHeader(body.length);
+
+      String statusLine = statusLine(response.get("statusCode"), response.get("message"));
+      log.debug("### statusLine: {}", statusLine);
+      byte[] body = responseBody(response.get("responseBodyUrl"));
+      String responseHeader = responseHeader(body.length, response.get("location"));
+      log.debug("### responseHeader : {}", responseHeader);
 
       sendResponse(dos, statusLine, responseHeader, body);
     } catch (IOException ie) {
@@ -106,9 +109,9 @@ public class RequestHandler extends Thread {
    * Desc :
    * Return : String
    */
-  private String statusLine(int statusCode) {
+  private String statusLine(String statusCode, String message) {
     log.debug("### statusLine");
-    return "HTTP/1.1" + statusCode + " OK \r\n";
+    return "HTTP/1.1 " + statusCode + " " + message + "\r\n";
   }
 
   /**
@@ -116,10 +119,12 @@ public class RequestHandler extends Thread {
    * Desc :
    * Return : String
    */
-  private String responseHeader(int lengthOfBodyContent) {
+  private String responseHeader(int lengthOfBodyContent, String location) {
     log.debug("### responseHeader, {}", lengthOfBodyContent);
 
     StringBuilder sb = new StringBuilder();
+
+    sb.append("location: ").append(location).append("\r\n");
     sb.append("Content-Type: text/html;charset=utf-8\r\n");
     sb.append("Content-Length: ").append(lengthOfBodyContent).append("\r\n");
     sb.append("\r\n");
@@ -144,6 +149,7 @@ public class RequestHandler extends Thread {
    */
   private void sendResponse(DataOutputStream dos, String statusLine, String header, byte[] body) throws Exception {
     log.debug("### DataOutputStream");
+    log.debug("### statusLine : {}", statusLine);
     dos.writeBytes(statusLine);
     dos.writeBytes(header);
     dos.write(body, 0, body.length);
