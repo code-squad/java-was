@@ -42,6 +42,10 @@ public class PageController {
           responseBodyUrl = "/user/login.html";
           statusCode = "200";
           message = "OK";
+        } else if (requestUrl.equals("/user/login_failed.html")) {
+          responseBodyUrl = "/user/login_failed.html";
+          statusCode = "200";
+          message = "OK";
         }
         break;
       case "POST":
