@@ -1,5 +1,7 @@
 package model;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 public class User {
@@ -15,11 +17,11 @@ public class User {
         this.email = email;
     }
 
-    public User(Map<String, String> parameterMap) {
-        this.userId = parameterMap.get("userId");
-        this.password = parameterMap.get("password");
-        this.name = parameterMap.get("name");
-        this.email = parameterMap.get("email");
+    public User(Map<String, String> parameterMap) throws UnsupportedEncodingException {
+        this.userId = URLDecoder.decode(parameterMap.get("userId"), "UTF-8");
+        this.password = URLDecoder.decode(parameterMap.get("password"), "UTF-8");
+        this.name = URLDecoder.decode(parameterMap.get("name"), "UTF-8");
+        this.email = URLDecoder.decode(parameterMap.get("email"), "UTF-8");
     }
 
     public String getUserId() {
