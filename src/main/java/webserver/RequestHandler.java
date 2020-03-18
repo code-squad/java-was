@@ -2,10 +2,12 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import db.DataBase;
 import db.SessionDataBase;
@@ -110,13 +112,42 @@ public class RequestHandler extends Thread {
 
                 if (SessionDataBase.isSessionIdExist(sessionId)) {
                     log.debug("로그인된 유저입니다");
-                    byte[] userList = Files.readAllBytes(new File("./webapp" + url+".html").toPath());
-                    response200Header(dos, userList.length);
-                    responseBody(dos, userList);
+                    List<User> users = new ArrayList<>(DataBase.findAll());
+                    byte[] listHtml = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
+                    StringBuilder list = new StringBuilder(new String(listHtml));
+                    int index = list.indexOf("<table class=\"table table-hover\">");
+//                    log.debug("table table-hover Index : {}", index);
+                    String temp = "<table class=\"table table-hover\">";
+//                    log.debug("index Length : {}", index + temp.length());
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("<thead>");
+                    sb.append("<tr>");
+                    sb.append("<th>#</th> <th>사용자 아이디</th> <th>이름</th> <th>이메일</th><th></th>");
+                    sb.append("</tr>");
+                    sb.append("</thead>");
+                    sb.append("<tbody>");
+
+                    for (int i = 0; i < users.size(); i++) {
+                        sb.append("<tr>");
+                        sb.append("<th scope=\"row\">").append(i + 1).append("</th>");
+                        sb.append("<td>").append(users.get(i).getUserId()).append("</td>");
+                        sb.append("<td>").append(users.get(i).getName()).append("</td>");
+                        sb.append("<td>").append(users.get(i).getEmail()).append("</td>");
+                        sb.append("<td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>");
+                        sb.append("</tr>");
+                    }
+                    sb.append("</tbody>");
+
+                    list.insert(index + temp.length(), sb);
+                    String html = list.toString();
+                    log.debug("html : {} ", html);
+
+                    response200Header(dos, html.length());
+                    responseBody(dos, html.getBytes());
 
                 } else {
                     log.debug("해당 세션을 찾을 수 없다.");
-                    response302Header(dos,"/user/login.html");
+                    response302Header(dos, "/user/login.html");
                 }
 
             } else {
@@ -150,7 +181,7 @@ public class RequestHandler extends Thread {
     private void response302Header(DataOutputStream dos, String path) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: "+path+"\r\n");
+            dos.writeBytes("Location: " + path + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
