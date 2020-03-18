@@ -5,10 +5,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import db.DataBase;
 import model.User;
@@ -66,7 +63,7 @@ public class RequestHandler extends Thread {
                 DataBase.addUser(user);
                 log.debug("Database User : {}", DataBase.findUserById(userMap.get("userId")));
                 response302Header(dos);
-                
+
             } else if (url.equals("/user/login")) {
 
                 while (!(line = br.readLine()).equals("")) {
@@ -87,7 +84,8 @@ public class RequestHandler extends Thread {
 
                 if (dbUser.isSameUser(loginUser)) {
                     log.debug("logined Success");
-                    response302Header(dos);
+                    String sessionId = UUID.randomUUID().toString().replace("-", "");
+                    response302HeaderWithCookie(dos, sessionId);
                 } else {
                     log.debug("logined Fail");
                     byte[] failedBody = Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
@@ -127,6 +125,17 @@ public class RequestHandler extends Thread {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: /\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302HeaderWithCookie(DataOutputStream dos, String sessionId) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: /\r\n");
+            dos.writeBytes("Set-Cookie: JSESSIONID=" + sessionId + "; Path=/" + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
