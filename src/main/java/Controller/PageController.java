@@ -1,10 +1,10 @@
 package Controller;
 
+import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import webserver.RequestHandler;
-import webserver.WebServer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,9 @@ import java.util.Map;
 public class PageController {
   private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
-  public Map<String, String> doWork(Map<String, HttpRequestUtils.Pair> requestLine, Map<String, HttpRequestUtils.Pair> requestHeader, String requestBody) {
+  public Map<String, String> doWork(Map<String, HttpRequestUtils.Pair> requestLine,
+                                    Map<String, HttpRequestUtils.Pair> requestHeader, String requestBody)
+  {
     Map<String, String> response = new HashMap<>();
     log.debug("### dowork");
 
@@ -32,16 +34,35 @@ public class PageController {
           responseBodyUrl = "/user/form.html";
           statusCode = "200";
           message = "OK";
+        } else if (requestUrl.equals("/index.html")) {
+          responseBodyUrl = "/index.html";
+          statusCode = "200";
+          message = "OK";
+        } else if (requestUrl.equals("/user/login.html")) {
+          responseBodyUrl = "/user/login.html";
+          statusCode = "200";
+          message = "OK";
         }
         break;
       case "POST":
         if (requestUrl.equals("/user/create")) {
           UserController.create(requestBody);
-          log.debug("### userDB : {}", WebServer.userDB);
+          log.debug("### DataBase : {}", DataBase.findAll());
+          log.debug("### requestBody : {}", requestBody);
           responseBodyUrl = "/index.html";
           statusCode = "302";
           location = "http://localhost:8080/index.html";
           message = "Found";
+        }
+        if (requestUrl.equals("/user/login")) {
+          log.debug("### requestBody : {}", requestBody);
+          //
+          //          UserController.create(requestBody);
+          //          //        log.debug("### userDB : {}", WebServer.userDB);
+          //          responseBodyUrl = "/index.html";
+          //          statusCode = "302";
+          //          location = "http://localhost:8080/index.html";
+          //          message = "Found";
         }
         break;
       default:

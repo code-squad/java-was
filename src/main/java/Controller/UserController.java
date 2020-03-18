@@ -1,11 +1,11 @@
 package Controller;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import webserver.RequestHandler;
-import webserver.WebServer;
 
 import java.util.Map;
 
@@ -16,8 +16,8 @@ public class UserController {
     Map<String, String> parameters = HttpRequestUtils.parseUriString(uriString);
     log.debug("### parameters : {}", parameters);
     User user = new User(parameters);
-    WebServer.userDB.put(WebServer.userDB.size() + 1, user);
+    DataBase.addUser(user);
 
-    return user;
+    return DataBase.findUserById(user.getUserId());
   }
 }

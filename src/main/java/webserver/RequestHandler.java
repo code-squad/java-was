@@ -45,7 +45,6 @@ public class RequestHandler extends Thread {
       PageController pc = new PageController();
       Map<String, String> response = pc.doWork(requestLine, requestHeader, requestBody);
 
-
       String statusLine = statusLine(response.get("statusCode"), response.get("message"));
       log.debug("### statusLine: {}", statusLine);
       byte[] body = responseBody(response.get("responseBodyUrl"));
