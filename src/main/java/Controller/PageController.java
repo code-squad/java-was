@@ -60,21 +60,25 @@ public class PageController {
           message = "Found";
         }
         if (requestUrl.equals("/user/login")) {
-          log.debug("### requestBody : {}", requestBody);
           Map<String, String> parsedRequestBody = HttpRequestUtils.parseRequestBody(requestBody);
-          log.debug("### parsedRequestBody : {}", parsedRequestBody);
-          User loginUser = new User(parsedRequestBody.get("userId"), parsedRequestBody.get("password"), "", "");
+          User loginUser =
+              new User(parsedRequestBody.get("userId"), parsedRequestBody.get("password"), "", "");
           User findUser = DataBase.findUserById(parsedRequestBody.get("userId"));
-          log.debug("### loginUser : {}", loginUser.equals(findUser));
+          log.debug("### login check : {}", loginUser.getPassword().equals(findUser.getPassword()));
 
-
-
-          //          UserController.create(requestBody);
-          //          //        log.debug("### userDB : {}", WebServer.userDB);
-          //          responseBodyUrl = "/index.html";
-          //          statusCode = "302";
-          //          location = "http://localhost:8080/index.html";
-          //          message = "Found";
+          if (loginUser.getPassword().equals(findUser.getPassword())) {
+            responseBodyUrl = "/index.html";
+            statusCode = "302";
+            location = "http://localhost:8080/index.html";
+            message = "Found";
+            response.put("Set-Cookie", "logined=true; Path=/");
+          } else {
+            responseBodyUrl = "/user/login_failed.html";
+            statusCode = "302";
+            location = "http://localhost:8080/user/login_failed.html";
+            message = "Found";
+            response.put("Set-Cookie", "logined=false; Path=/");
+          }
         }
         break;
       default:

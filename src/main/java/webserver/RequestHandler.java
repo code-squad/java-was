@@ -48,7 +48,7 @@ public class RequestHandler extends Thread {
       String statusLine = statusLine(response.get("statusCode"), response.get("message"));
       log.debug("### statusLine: {}", statusLine);
       byte[] body = responseBody(response.get("responseBodyUrl"));
-      String responseHeader = responseHeader(body.length, response.get("location"));
+      String responseHeader = responseHeader(body.length, response);
       log.debug("### responseHeader : {}", responseHeader);
 
       sendResponse(dos, statusLine, responseHeader, body);
@@ -118,12 +118,13 @@ public class RequestHandler extends Thread {
    * Desc :
    * Return : String
    */
-  private String responseHeader(int lengthOfBodyContent, String location) {
+  private String responseHeader(int lengthOfBodyContent, Map<String, String> response) {
     log.debug("### responseHeader, {}", lengthOfBodyContent);
 
     StringBuilder sb = new StringBuilder();
 
-    sb.append("location: ").append(location).append("\r\n");
+    sb.append("location: ").append(response.get("location")).append("\r\n");
+    sb.append("Set-Cookie: ").append(response.get("Set-Cookie")).append("\r\n");
     sb.append("Content-Type: text/html;charset=utf-8\r\n");
     sb.append("Content-Length: ").append(lengthOfBodyContent).append("\r\n");
     sb.append("\r\n");
