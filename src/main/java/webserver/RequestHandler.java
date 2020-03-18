@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import db.DataBase;
+import db.SessionDataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ public class RequestHandler extends Thread {
                 User user = new User(userMap.get("userId"), userMap.get("password"), userMap.get("name"), userMap.get("email"));
                 DataBase.addUser(user);
                 log.debug("Database User : {}", DataBase.findUserById(userMap.get("userId")));
-                response302Header(dos);
+                response302Header(dos, "/");
 
             } else if (url.equals("/user/login")) {
 
@@ -85,12 +86,37 @@ public class RequestHandler extends Thread {
                 if (dbUser.isSameUser(loginUser)) {
                     log.debug("logined Success");
                     String sessionId = UUID.randomUUID().toString().replace("-", "");
+                    SessionDataBase.addSession(sessionId, dbUser);
+
+                    log.debug("Session : {} ", SessionDataBase.getSessionedUser(sessionId));
                     response302HeaderWithCookie(dos, sessionId);
                 } else {
                     log.debug("logined Fail");
                     byte[] failedBody = Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
                     response401Header(dos, failedBody.length);
                     responseBody(dos, failedBody);
+                }
+
+            } else if (url.equals("/user/list")) {
+                while (!(line = br.readLine()).equals("")) {
+                    HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+                    headers.put(pair.getKey(), pair.getValue());
+                }
+
+                String cookie = headers.get("Cookie");
+//                log.debug("Cookie : {}", cookie);
+                String sessionId = cookie.split("=")[1];
+//                log.debug("SessionId : {}", sessionId);
+
+                if (SessionDataBase.isSessionIdExist(sessionId)) {
+                    log.debug("로그인된 유저입니다");
+                    byte[] userList = Files.readAllBytes(new File("./webapp" + url+".html").toPath());
+                    response200Header(dos, userList.length);
+                    responseBody(dos, userList);
+
+                } else {
+                    log.debug("해당 세션을 찾을 수 없다.");
+                    response302Header(dos,"/user/login.html");
                 }
 
             } else {
@@ -121,10 +147,10 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void response302Header(DataOutputStream dos) {
+    private void response302Header(DataOutputStream dos, String path) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: /\r\n");
+            dos.writeBytes("Location: "+path+"\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
