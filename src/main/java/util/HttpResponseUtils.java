@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class HttpResponseUtils {
@@ -69,6 +70,19 @@ public class HttpResponseUtils {
         responseBody(dos, body);
     }
 
+    public static void readStaticFile(DataOutputStream dos, String url) throws IOException {
+        byte[] body;
+        if (Files.exists(Paths.get(new File("./webapp") + url))) {
+            body = Files.readAllBytes(new File("./webapp" + url).toPath());
+            response200Header(dos, body.length);
+            responseBody(dos, body);
+            return;
+        }
+        body = "요청하신 페이지가 없습니다".getBytes();
+        response404Header(dos, body.length);
+        responseBody(dos, body);
+    }
+
     private static void responseCssHeader(DataOutputStream dos, int lengthOfBodyContent) throws IOException {
         dos.writeBytes("HTTP/1.1 200 OK \r\n");
         dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
@@ -96,4 +110,10 @@ public class HttpResponseUtils {
         dos.flush();
     }
 
+    private static void response404Header(DataOutputStream dos, int lengthOfBodyContent) throws IOException {
+        dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+        dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+        dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+        dos.writeBytes("\r\n");
+    }
 }

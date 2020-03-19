@@ -102,62 +102,9 @@ public class RequestHandler extends Thread {
             } else if (url.contains(".css")) {
                 HttpResponseUtils.readCss(dos, url);
             } else {
-                byte[] body;
-
-                if (Files.exists(Paths.get(new File("./webapp") + url))) {
-                    body = Files.readAllBytes(new File("./webapp" + url).toPath());
-                    response200Header(dos, body.length);
-                } else {
-                    body = "요청하신 페이지가 없습니다".getBytes();
-                    response404Header(dos, body.length);
-                }
-                responseBody(dos, body);
+                HttpResponseUtils.readStaticFile(dos, url);
             }
         } catch (IOException | NoSuchElementException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response200CssHeader(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-
-    private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
