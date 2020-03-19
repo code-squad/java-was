@@ -2,12 +2,10 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import db.DataBase;
 import db.SessionDataBase;
@@ -15,7 +13,9 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.HttpResponseUtils;
 import util.IOUtils;
+import util.SessionUtils;
 
 
 public class RequestHandler extends Thread {
@@ -36,27 +36,25 @@ public class RequestHandler extends Thread {
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
+            // For.Test
             if (DataBase.getSizeOfUsers() == 0) {
                 DataBase.addUser(new User("jay", "1234", "김자윤", "jay@gmail.com"));
             }
 
-            String line = br.readLine();
+            String requestLine = br.readLine();
 
-            String url = HttpRequestUtils.getURL(line);
+            String url = HttpRequestUtils.getURL(requestLine);
 
-            Map<String, String> headers = new HashMap<>();
-
+            Map<String, String> header;
 
             if (url.equals("/")) url = "/index.html";
 
             if (url.equals("/user/create")) {
-                while (!(line = br.readLine()).equals("")) {
-                    HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
-                    headers.put(pair.getKey(), pair.getValue());
-                }
-                log.debug("content-Length : {}", headers.get("Content-Length"));
+                header = parseHeader(br);
 
-                String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+//                log.debug("content-Length : {}", header.get("Content-Length"));
+
+                String body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")));
 
                 body = HttpRequestUtils.decode(body);
 
@@ -64,91 +62,43 @@ public class RequestHandler extends Thread {
 
                 User user = new User(userMap.get("userId"), userMap.get("password"), userMap.get("name"), userMap.get("email"));
                 DataBase.addUser(user);
+
                 log.debug("Database User : {}", DataBase.findUserById(userMap.get("userId")));
                 response302Header(dos, "/");
 
             } else if (url.equals("/user/login")) {
-
-                while (!(line = br.readLine()).equals("")) {
-                    HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
-                    headers.put(pair.getKey(), pair.getValue());
-                }
-                log.debug("content-Length : {}", headers.get("Content-Length"));
-
-                String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-
+                header = parseHeader(br);
+                String body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")));
                 body = HttpRequestUtils.decode(body);
-
                 Map<String, String> userMap = HttpRequestUtils.parseQueryString(body);
                 User loginUser = new User(userMap.get("userId"), userMap.get("password"));
                 User dbUser = Optional.ofNullable(DataBase.findUserById(userMap.get("userId")))
                         .orElseThrow(() -> new NoSuchElementException("로그인을 시도한 유저가 존재하지 않습니다"));
-                log.debug("Database User : {}", dbUser);
 
                 if (dbUser.isSameUser(loginUser)) {
-                    log.debug("logined Success");
-                    String sessionId = UUID.randomUUID().toString().replace("-", "");
+                    log.debug("로그인 성송");
+                    String sessionId = SessionUtils.createSessionId();
                     SessionDataBase.addSession(sessionId, dbUser);
-
-                    log.debug("Session : {} ", SessionDataBase.getSessionedUser(sessionId));
                     response302HeaderWithCookie(dos, sessionId);
-                } else {
-                    log.debug("logined Fail");
-                    byte[] failedBody = Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
-                    response401Header(dos, failedBody.length);
-                    responseBody(dos, failedBody);
+                    return;
                 }
+                log.debug("로그인 실패");
+                HttpResponseUtils.readLoginFailed(dos);
 
             } else if (url.contains("list.html")) {
-                while (!(line = br.readLine()).equals("")) {
-                    HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
-                    headers.put(pair.getKey(), pair.getValue());
-                }
-
-                String cookie = headers.get("Cookie");
-//                log.debug("Cookie : {}", cookie);
+                header = parseHeader(br);
+                String cookie = header.get("Cookie");
                 String sessionId = cookie.split("=")[1];
-//                log.debug("SessionId : {}", sessionId);
 
                 if (SessionDataBase.isSessionIdExist(sessionId)) {
                     log.debug("로그인된 유저입니다");
                     List<User> users = new ArrayList<>(DataBase.findAll());
-                    byte[] listHtml = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
-                    StringBuilder list = new StringBuilder(new String(listHtml));
-                    int index = list.indexOf("<table class=\"table table-hover\">");
-//                    log.debug("table table-hover Index : {}", index);
-                    String temp = "<table class=\"table table-hover\">";
-//                    log.debug("index Length : {}", index + temp.length());
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("<thead>");
-                    sb.append("<tr>");
-                    sb.append("<th>#</th> <th>사용자 아이디</th> <th>이름</th> <th>이메일</th><th></th>");
-                    sb.append("</tr>");
-                    sb.append("</thead>");
-                    sb.append("<tbody>");
-
-                    for (int i = 0; i < users.size(); i++) {
-                        sb.append("<tr>");
-                        sb.append("<th scope=\"row\">").append(i + 1).append("</th>");
-                        sb.append("<td>").append(users.get(i).getUserId()).append("</td>");
-                        sb.append("<td>").append(users.get(i).getName()).append("</td>");
-                        sb.append("<td>").append(users.get(i).getEmail()).append("</td>");
-                        sb.append("<td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>");
-                        sb.append("</tr>");
-                    }
-                    sb.append("</tbody>");
-
-                    list.insert(index + temp.length(), sb);
-                    String html = list.toString();
-                    log.debug("html : {} ", html);
-
-                    response200Header(dos, html.length());
-                    responseBody(dos, html.getBytes());
-
-                } else {
-                    log.debug("해당 세션을 찾을 수 없다.");
-                    response302Header(dos, "/user/login.html");
+                    HttpResponseUtils.readUserList(dos, users);
+                    return;
                 }
+                log.debug("해당 세션을 찾을 수 없다.");
+                HttpResponseUtils.responseRedirect(dos, "/user/login.html");
+//                response302Header(dos, "/user/login.html");
 
             } else if (url.contains(".css")) {
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
@@ -216,17 +166,6 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void response401Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 401 Unauthorized \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
 
     private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
@@ -247,5 +186,16 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private Map<String, String> parseHeader(BufferedReader br) throws IOException {
+        Map<String, String> header = new HashMap<>();
+        String requestLine;
+
+        while (!(requestLine = br.readLine()).equals("")) {
+            HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(requestLine);
+            header.put(pair.getKey(), pair.getValue());
+        }
+        return header;
     }
 }
