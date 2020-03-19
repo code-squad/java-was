@@ -33,6 +33,10 @@ public class RequestHandler extends Thread {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             HttpRequest httpRequest = new HttpRequest(br);
             String url = httpRequest.getPath();
+            if (url == null) {
+                log.error("400 Bad Request");
+                return;
+            }
             switch (httpRequest.getHttpMethod()) {
                 case GET:
                     httpGetRequestHandler(out, br, url);
