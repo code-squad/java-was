@@ -4,6 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
 
+import static constants.CommonConstants.*;
+import static constants.CommonConstants.UTF_8;
+
 public class User {
     private String userId;
     private String password;
@@ -18,10 +21,10 @@ public class User {
     }
 
     public User(Map<String, String> parameterMap) throws UnsupportedEncodingException {
-        this.userId = URLDecoder.decode(parameterMap.get("userId"), "UTF-8");
-        this.password = URLDecoder.decode(parameterMap.get("password"), "UTF-8");
-        this.name = URLDecoder.decode(parameterMap.get("name"), "UTF-8");
-        this.email = URLDecoder.decode(parameterMap.get("email"), "UTF-8");
+        this.userId = URLDecoder.decode(parameterMap.get(USER_ID), UTF_8);
+        this.password = URLDecoder.decode(parameterMap.get(PASSWORD), UTF_8);
+        this.name = URLDecoder.decode(parameterMap.get("name"), UTF_8);
+        this.email = URLDecoder.decode(parameterMap.get("email"), UTF_8);
     }
 
     public String getUserId() {

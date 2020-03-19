@@ -16,6 +16,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static constants.CommonConstants.*;
+import static constants.ErrorConstants.METHOD_NOT_ALLOWED;
+import static constants.RequestHeaderConstants.CONTENT_LENGTH;
+
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
@@ -49,7 +53,7 @@ public class RequestHandler extends Thread {
                 case DELETE:
                     break;
                 default:
-                    log.error("405 Method Not Allowed");
+                    log.error(METHOD_NOT_ALLOWED);
             }
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -58,7 +62,7 @@ public class RequestHandler extends Thread {
 
     private void httpPostRequestHandler(OutputStream out, BufferedReader br, String url) throws IOException {
         Map<String, String> headers = readRequestHeader(br);
-        int contentLength = Integer.parseInt(headers.getOrDefault("Content-Length", "0"));
+        int contentLength = Integer.parseInt(headers.getOrDefault(CONTENT_LENGTH, ZERO_STRING));
         String userParameter = IOUtils.readData(br, contentLength);
         Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(userParameter);
         if (url.contains("create")) {
@@ -69,8 +73,8 @@ public class RequestHandler extends Thread {
     }
 
     private void loginRequestHandler(OutputStream out, Map<String, String> parameterMap) {
-        User loginUser = DataBase.findUserById(parameterMap.get("userId")).orElse(null);
-        String inputPassword = parameterMap.get("password");
+        User loginUser = DataBase.findUserById(parameterMap.get(USER_ID)).orElse(null);
+        String inputPassword = parameterMap.get(PASSWORD);
         boolean setCookie = false;
         if (loginUser != null && loginUser.getPassword().equals(inputPassword)) {
             setCookie = true;
