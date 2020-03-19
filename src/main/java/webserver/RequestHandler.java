@@ -1,6 +1,5 @@
 package webserver;
 
-import constants.HttpMethod;
 import db.DataBase;
 import model.HttpRequest;
 import model.User;
@@ -94,7 +93,7 @@ public class RequestHandler extends Thread {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         log.trace("body : {}", new String(body, "UTF-8"));
         DataOutputStream dos = new DataOutputStream(out);
-        if (url.contains(".css")) {
+        if (url.endsWith(".css")) {
             response200Header(dos, body.length, "text/css");
         } else {
             response200Header(dos, body.length);
