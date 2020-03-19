@@ -1,6 +1,12 @@
 package util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -8,9 +14,31 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
+
+    private static final int INDEX_PATH = 1;
+
+    public static Map<String, String> extractHeader(BufferedReader br) throws IOException {
+        Map<String, String> header = new HashMap<>();
+        String requestLine;
+
+        while (!(requestLine = br.readLine()).equals("")) {
+            Pair pair = parseHeader(requestLine);
+            header.put(pair.getKey(), pair.getValue());
+        }
+        return header;
+    }
+
+    public static String getURL(String line) throws IOException {
+        if (line == null) throw new IOException("잘못된 Request Start Line");
+        return line.split(" ")[INDEX_PATH];
+    }
+
+    public static String decode(String line) throws UnsupportedEncodingException {
+        return URLDecoder.decode(line, StandardCharsets.UTF_8.toString());
+    }
+
     /**
-     * @param queryString은
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
     public static Map<String, String> parseQueryString(String queryString) {
@@ -18,8 +46,7 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param 쿠키
-     *            값은 name1=value1; name2=value2 형식임
+     * @param 쿠키 값은 name1=value1; name2=value2 형식임
      * @return
      */
     public static Map<String, String> parseCookies(String cookies) {
@@ -49,7 +76,7 @@ public class HttpRequestUtils {
         return new Pair(tokens[0], tokens[1]);
     }
 
-    public static Pair parseHeader(String header) {
+    private static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
     }
 
