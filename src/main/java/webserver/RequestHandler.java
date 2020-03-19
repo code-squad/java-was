@@ -49,7 +49,7 @@ public class RequestHandler extends Thread {
       log.debug("### statusLine: {}", statusLine);
       byte[] body = responseBody(response.get("responseBodyUrl"));
       String responseHeader = responseHeader(body.length, response);
-      log.debug("### responseHeader : {}", responseHeader);
+      log.debug("### maked responseHeader : {}", responseHeader);
 
       sendResponse(dos, statusLine, responseHeader, body);
     } catch (IOException ie) {
@@ -125,7 +125,16 @@ public class RequestHandler extends Thread {
 
     sb.append("location: ").append(response.get("location")).append("\r\n");
     sb.append("Set-Cookie: ").append(response.get("Set-Cookie")).append("\r\n");
-    sb.append("Content-Type: text/html;charset=utf-8\r\n");
+
+    String contentType = response.get("contentType");
+    if (contentType.startsWith("text/html")) {
+      sb.append("Content-Type: text/html;charset=utf-8\r\n");
+    } else if (contentType.startsWith("text/css")) {
+      sb.append("Content-Type: text/css\r\n");
+    } else {
+      sb.append("Content-Type: text/html;charset=utf-8\r\n");
+    }
+
     sb.append("Content-Length: ").append(lengthOfBodyContent).append("\r\n");
     sb.append("\r\n");
 
@@ -138,7 +147,10 @@ public class RequestHandler extends Thread {
    * Return : byte[]
    */
   private byte[] responseBody(String responseBodyURL) throws Exception {
+    log.debug("### responseBody!!!");
+    log.debug("### {}, {} : ", WEBAPP_PATH, responseBodyURL);
     File uriFile = new File(WEBAPP_PATH + responseBodyURL);
+    log.debug("### {} : ", uriFile);
     return Files.readAllBytes(uriFile.toPath());
   }
 

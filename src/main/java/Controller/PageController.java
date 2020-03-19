@@ -28,6 +28,7 @@ public class PageController {
     String method = requestLine.get("method").getValue();
     String requestUrl = requestLine.get("requestUrl").getValue();
     String protocol = requestLine.get("protocol").getValue();
+    String contentType = requestHeader.get("Accept").getValue();
 
     switch (method) {
       case "GET":
@@ -52,10 +53,10 @@ public class PageController {
           boolean de = false;
           log.debug("### requestHeader : {}", requestHeader);
           log.debug("### requestHeader : {}", requestHeader.get("Cookie").getValue());
-//          ### requestHeader : null;logined=true;null
-          String cookie = requestHeader.get("Cookie").getValue().replaceAll(" ","");
-//          ### requestHeader : null;logined=true;null
+
+          String cookie = requestHeader.get("Cookie").getValue().replaceAll(" ", "");
           boolean delemeter = Arrays.stream(cookie.split(";")).anyMatch(token -> token.startsWith("logined=true"));
+
           if (delemeter) {
             responseBodyUrl = "/user/list.html";
             statusCode = "200";
@@ -66,6 +67,10 @@ public class PageController {
             location = "http://localhost:8080/user/login.html";
             message = "Found";
           }
+        } else {
+          responseBodyUrl = requestLine.get("requestUrl").getValue();
+          statusCode = "200";
+          message = "OK";
         }
         break;
       case "POST":
@@ -108,6 +113,7 @@ public class PageController {
     response.put("statusCode", statusCode);
     response.put("location", location);
     response.put("message", message);
+    response.put("contentType", contentType);
 
     return response;
   }
