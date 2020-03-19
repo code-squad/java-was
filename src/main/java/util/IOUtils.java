@@ -13,6 +13,6 @@ public class IOUtils {
     public static String readData(BufferedReader br, int contentLength) throws IOException {
         char[] body = new char[contentLength];
         br.read(body, 0, contentLength);
-        return String.copyValueOf(body);
+        return HttpRequestUtils.decode(String.copyValueOf(body));
     }
 }
