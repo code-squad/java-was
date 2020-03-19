@@ -1,10 +1,12 @@
 package util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -14,6 +16,17 @@ import com.google.common.collect.Maps;
 public class HttpRequestUtils {
 
     private static final int INDEX_PATH = 1;
+
+    public static Map<String, String> extractHeader(BufferedReader br) throws IOException {
+        Map<String, String> header = new HashMap<>();
+        String requestLine;
+
+        while (!(requestLine = br.readLine()).equals("")) {
+            Pair pair = parseHeader(requestLine);
+            header.put(pair.getKey(), pair.getValue());
+        }
+        return header;
+    }
 
     public static String getURL(String line) throws IOException {
         if (line == null) throw new IOException("잘못된 Request Start Line");
@@ -63,7 +76,7 @@ public class HttpRequestUtils {
         return new Pair(tokens[0], tokens[1]);
     }
 
-    public static Pair parseHeader(String header) {
+    private static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
     }
 
