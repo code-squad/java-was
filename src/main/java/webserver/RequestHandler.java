@@ -64,7 +64,7 @@ public class RequestHandler extends Thread {
                 DataBase.addUser(user);
 
                 log.debug("Database User : {}", DataBase.findUserById(userMap.get("userId")));
-                response302Header(dos, "/");
+                HttpResponseUtils.redirect(dos, "/");
 
             } else if (url.equals("/user/login")) {
                 header = parseHeader(br);
@@ -79,7 +79,7 @@ public class RequestHandler extends Thread {
                     log.debug("로그인 성송");
                     String sessionId = SessionUtils.createSessionId();
                     SessionDataBase.addSession(sessionId, dbUser);
-                    response302HeaderWithCookie(dos, sessionId);
+                    HttpResponseUtils.redirectWithCookie(dos, sessionId);
                     return;
                 }
                 log.debug("로그인 실패");
@@ -97,14 +97,10 @@ public class RequestHandler extends Thread {
                     return;
                 }
                 log.debug("해당 세션을 찾을 수 없다.");
-                HttpResponseUtils.responseRedirect(dos, "/user/login.html");
-//                response302Header(dos, "/user/login.html");
+                HttpResponseUtils.redirect(dos, "/user/login.html");
 
             } else if (url.contains(".css")) {
-                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-                response200CssHeader(dos, body.length);
-                responseBody(dos, body);
-
+                HttpResponseUtils.readCss(dos, url);
             } else {
                 byte[] body;
 
@@ -138,28 +134,6 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-
-    private void response302Header(DataOutputStream dos, String path) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + path + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response302HeaderWithCookie(DataOutputStream dos, String sessionId) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: /\r\n");
-            dos.writeBytes("Set-Cookie: JSESSIONID=" + sessionId + "; Path=/" + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
