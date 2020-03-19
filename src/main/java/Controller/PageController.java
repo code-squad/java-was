@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import webserver.RequestHandler;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +48,24 @@ public class PageController {
           responseBodyUrl = "/user/login_failed.html";
           statusCode = "200";
           message = "OK";
+        } else if (requestUrl.equals("/user/list")) {
+          boolean de = false;
+          log.debug("### requestHeader : {}", requestHeader);
+          log.debug("### requestHeader : {}", requestHeader.get("Cookie").getValue());
+//          ### requestHeader : null;logined=true;null
+          String cookie = requestHeader.get("Cookie").getValue().replaceAll(" ","");
+//          ### requestHeader : null;logined=true;null
+          boolean delemeter = Arrays.stream(cookie.split(";")).anyMatch(token -> token.startsWith("logined=true"));
+          if (delemeter) {
+            responseBodyUrl = "/user/list.html";
+            statusCode = "200";
+            message = "OK";
+          } else {
+            responseBodyUrl = "/user/list.html";
+            statusCode = "302";
+            location = "http://localhost:8080/user/login.html";
+            message = "Found";
+          }
         }
         break;
       case "POST":
