@@ -24,7 +24,6 @@ public class RequestHandler extends Thread {
 
     try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
       // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-      log.debug("### run");
 
       DataOutputStream dos = new DataOutputStream(out);
       BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -36,11 +35,17 @@ public class RequestHandler extends Thread {
           pc.doWork(httpRequest.getStartLine(), httpRequest.getHeader(), httpRequest.getBody());
 
       HttpResponse httpResponse = new HttpResponse(response);
-      //      sendResponse(dos, statusLine, responseHeader, body);
-    } catch (IOException ie) {
-      log.error(ie.getMessage());
+
+      sendResponse(dos, httpResponse.getStartLine(), httpResponse.getHeader(), httpResponse.getBody());
     } catch (Exception e) {
       log.error(e.getMessage());
     }
+  }
+
+  private void sendResponse(DataOutputStream dos, String statusLine, String header, byte[] body) throws Exception {
+    dos.writeBytes(statusLine);
+    dos.writeBytes(header);
+    dos.write(body, 0, body.length);
+    dos.flush();
   }
 }
