@@ -40,15 +40,25 @@ public class HttpRequest {
 
     private void parseRequest(BufferedReader br) {
         String requestLine;
+
         try {
             requestLine = br.readLine();
             httpMethod = HttpMethod.valueOf(HttpRequestUtils.getMethod(requestLine));
             path = HttpRequestUtils.getURL(requestLine);
+            changePathIfRoot();
             header = HttpRequestUtils.extractHeader(br);
-            String body = IOUtils.readData(br, Integer.parseInt(getHeader("Content-Length")));
-            parameter= HttpRequestUtils.parseQueryString(body);
+            if (httpMethod.equals(HttpMethod.POST)) {
+                String body = IOUtils.readData(br, Integer.parseInt(getHeader("Content-Length")));
+                parameter = HttpRequestUtils.parseQueryString(body);
+            }
         } catch (IOException e) {
             log.error("HttpRequest parse 과정 에러");
+        }
+    }
+
+    private void changePathIfRoot() {
+        if (this.path.equals("/")) {
+            path = "/index.html";
         }
     }
 }
