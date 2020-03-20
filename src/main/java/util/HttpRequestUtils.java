@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ public class HttpRequestUtils {
   public static Map<String, String> parseCookies(String cookies) {
     return parseValues(cookies, ";");
   }
+
   public static Map<String, String> parseRequestBody(String requestBody) {
     return parseValues(requestBody, "&");
   }
@@ -76,6 +78,27 @@ public class HttpRequestUtils {
 
   public static Pair parseHeader(String header) {
     return getKeyValue(header, ": ");
+  }
+
+  /**
+   * Feat : regex 를 기준으로 Map 을 리턴 합니다.
+   * Desc : Header 를 파싱하기 위해 사용합니다.
+   * Return : Map<String, String>
+   */
+  public static Map<String, String> getKeyValueMap(String keyValue, String regex) {
+    if (Strings.isNullOrEmpty(keyValue)) {
+      return new HashMap<>();
+    }
+
+    String[] tokens = keyValue.split(regex);
+    if (tokens.length != 2) {
+      return new HashMap<>();
+    }
+
+    Map<String, String> returnMap = new HashMap<>();
+    returnMap.put(tokens[0], tokens[1]);
+
+    return returnMap;
   }
 
   public static class Pair {

@@ -36,11 +36,11 @@ public class RequestHandler extends Thread {
       BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
       HttpRequest httpRequest = new HttpRequest(br);
-      log.debug("httpRequest.getMethod() : {}", httpRequest.getMethod());
-      log.debug("httpRequest.getPath() : {}", httpRequest.getPath());
+      log.debug("### httpRequest.getMethod() : {}", httpRequest.getMethod());
+      log.debug("### httpRequest.getPath() : {}", httpRequest.getPath());
 
-//      Map<String, Pair> requestLine = requestLine(br);
-//      Map<String, Pair> requestHeader = requestHeader(br);
+      log.debug("### httpRequest.getHeader() : {}", httpRequest.getHeader());
+
 //      String requestBody = "";
 //      if (requestHeader.containsKey("Content-Length")) {
 //        requestBody = requestBody(br, Integer.parseInt(requestHeader.get("Content-Length").getValue()));
