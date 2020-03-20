@@ -16,6 +16,8 @@ import com.google.common.collect.Maps;
 public class HttpRequestUtils {
 
     private static final int INDEX_PATH = 1;
+    private static final int INDEX_METHOD = 0;
+
 
     public static Map<String, String> extractHeader(BufferedReader br) throws IOException {
         Map<String, String> header = new HashMap<>();
@@ -32,6 +34,12 @@ public class HttpRequestUtils {
         if (line == null) throw new IOException("잘못된 Request Start Line");
         return line.split(" ")[INDEX_PATH];
     }
+
+    public static String getMethod(String line) throws IOException {
+        if (line == null) throw new IOException("잘못된 Request Start Line");
+        return line.split(" ")[INDEX_METHOD];
+    }
+
 
     public static String decode(String line) throws UnsupportedEncodingException {
         return URLDecoder.decode(line, StandardCharsets.UTF_8.toString());

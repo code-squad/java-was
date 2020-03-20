@@ -110,4 +110,8 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         }
     }
+
+    public void getDefaultPath(String url) {
+
+    }
 }
