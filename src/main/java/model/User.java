@@ -20,11 +20,11 @@ public class User {
         this.email = email;
     }
 
-    public User(Map<String, String> parameterMap) throws UnsupportedEncodingException {
-        this.userId = URLDecoder.decode(parameterMap.get(USER_ID), UTF_8);
-        this.password = URLDecoder.decode(parameterMap.get(PASSWORD), UTF_8);
-        this.name = URLDecoder.decode(parameterMap.get("name"), UTF_8);
-        this.email = URLDecoder.decode(parameterMap.get("email"), UTF_8);
+    public User(Map<String, String> params) throws UnsupportedEncodingException {
+        this.userId = URLDecoder.decode(params.get(USER_ID), UTF_8);
+        this.password = URLDecoder.decode(params.get(PASSWORD), UTF_8);
+        this.name = URLDecoder.decode(params.get("name"), UTF_8);
+        this.email = URLDecoder.decode(params.get("email"), UTF_8);
     }
 
     public String getUserId() {
