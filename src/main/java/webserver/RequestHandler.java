@@ -78,7 +78,7 @@ public class RequestHandler extends Thread {
                     }
 
                     log.debug("로그인 실패");
-                    httpResponse.readLoginFailed();
+                    httpResponse.forward(HttpResponseUtils.PAGE_LOGIN_FAILED);
                     break;
                 }
 

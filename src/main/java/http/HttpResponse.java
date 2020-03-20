@@ -2,12 +2,12 @@ package http;
 
 
 import model.User;
+import util.HttpResponseUtils;
 
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +32,13 @@ public class HttpResponse {
 
     public void forward(String path) throws IOException {
         byte[] body;
-        if (Files.exists(Paths.get(new File("./webapp") + path))) {
-            body = Files.readAllBytes(new File("./webapp" + path).toPath());
+        if (HttpResponseUtils.isFileExist(path)) {
+            body = HttpResponseUtils.readFile(path);
             response200Header(body.length);
             responseBody(body);
             return;
         }
-        body = "요청하신 페이지가 없습니다".getBytes();
+        body = HttpResponseUtils.notExistPage();
         response404Header(body.length);
         responseBody(body);
     }
@@ -67,40 +67,11 @@ public class HttpResponse {
         dos.writeBytes("\r\n");
     }
 
-    public void readLoginFailed() throws IOException {
-        byte[] body = Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
-        response401Header(body.length);
-        responseBody(body);
-    }
-
     public void readUserList(List<User> users) throws IOException {
-        byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
-        StringBuilder list = new StringBuilder(new String(body));
-        int index = list.indexOf("<table class=\"table table-hover\">");
-        String temp = "<table class=\"table table-hover\">";
-        StringBuilder sb = new StringBuilder();
-        sb.append("<thead>");
-        sb.append("<tr>");
-        sb.append("<th>#</th> <th>사용자 아이디</th> <th>이름</th> <th>이메일</th><th></th>");
-        sb.append("</tr>");
-        sb.append("</thead>");
-        sb.append("<tbody>");
-
-        for (int i = 0; i < users.size(); i++) {
-            sb.append("<tr>");
-            sb.append("<th scope=\"row\">").append(i + 1).append("</th>");
-            sb.append("<td>").append(users.get(i).getUserId()).append("</td>");
-            sb.append("<td>").append(users.get(i).getName()).append("</td>");
-            sb.append("<td>").append(users.get(i).getEmail()).append("</td>");
-            sb.append("<td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>");
-            sb.append("</tr>");
-        }
-        sb.append("</tbody>");
-
-        list.insert(index + temp.length(), sb);
-        String html = list.toString();
-        response200Header(html.length());
-        responseBody(html.getBytes());
+        byte[] body = HttpResponseUtils.readFile("/user/list.html");
+        String userListHtml = HttpResponseUtils.getUserListHTML(body, users);
+        response200Header(userListHtml.length());
+        responseBody(userListHtml.getBytes());
     }
 
     public void readCss(String path) throws IOException {
