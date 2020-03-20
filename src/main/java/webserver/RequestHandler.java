@@ -17,8 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static constants.CommonConstants.*;
+import static constants.ContentTypeConstants.TEXT_CSS;
 import static constants.ErrorConstants.METHOD_NOT_ALLOWED;
 import static constants.RequestHeaderConstants.CONTENT_LENGTH;
+import static constants.RequestHeaderConstants.COOKIE;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -99,10 +101,10 @@ public class RequestHandler extends Thread {
             return;
         }
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-        log.trace("body : {}", new String(body, "UTF-8"));
+        log.trace("body : {}", new String(body, UTF_8));
         DataOutputStream dos = new DataOutputStream(out);
         if (url.endsWith(".css")) {
-            response200Header(dos, body.length, "text/css");
+            response200Header(dos, body.length, TEXT_CSS);
         } else {
             response200Header(dos, body.length);
         }
@@ -112,8 +114,8 @@ public class RequestHandler extends Thread {
     private void showUserList(OutputStream out, BufferedReader br, String url) throws IOException {
         boolean isLogined;
         Map<String, String> requestHeaders = readRequestHeader(br);
-        Map<String, String> cookies = HttpRequestUtils.parseCookies(requestHeaders.getOrDefault("Cookie", ""));
-        isLogined = Boolean.parseBoolean(cookies.get("logined"));
+        Map<String, String> cookies = HttpRequestUtils.parseCookies(requestHeaders.getOrDefault(COOKIE, ""));
+        isLogined = Boolean.parseBoolean(cookies.get(LOGIN_COOKIE_ID));
         DataOutputStream dos = new DataOutputStream(out);
         if (!isLogined) {
             response302Header(dos, "/index.html", isLogined);
@@ -158,7 +160,7 @@ public class RequestHandler extends Thread {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes(CONTENT_LENGTH + ": " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -168,7 +170,7 @@ public class RequestHandler extends Thread {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: " + contentType + "\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes(CONTENT_LENGTH + ": " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -189,7 +191,7 @@ public class RequestHandler extends Thread {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: " + url + " \r\n");
-            dos.writeBytes("Set-Cookie: logined=" + setCookie + "; Path=/\r\n");
+            dos.writeBytes("Set-Cookie: " + LOGIN_COOKIE_ID + "=" + setCookie + "; Path=/\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());

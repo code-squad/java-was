@@ -5,4 +5,5 @@ public class CommonConstants {
     public static final String UTF_8 = "UTF-8";
     public static final String USER_ID = "userId";
     public static final String PASSWORD = "password";
+    public static final String LOGIN_COOKIE_ID = "logined";
 }
