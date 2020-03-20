@@ -1,6 +1,7 @@
 package model;
 
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 import java.io.BufferedReader;
 import java.util.HashMap;
@@ -12,6 +13,8 @@ public class HttpRequest extends HttpTemplate {
     this.br = br;
     this.startLine = requestLine();
     this.header = requestHeader();
+    this.body = requestBody();
+
     //      Map<String, HttpRequestUtils.Pair> requestLine = requestLine(br);
     //      Map<String, HttpRequestUtils.Pair> requestHeader = requestHeader(br);
     //      String requestBody = "";
@@ -57,6 +60,17 @@ public class HttpRequest extends HttpTemplate {
     return requestHeader;
   }
 
+  /**
+   * Feat : requestBody 를 만듭니다.
+   * Desc : contentLength 만큼 만듭니다.
+   * Return : String
+   */
+  private String requestBody() throws Exception {
+    return (br.ready() && header.containsKey("Content-Length"))
+        ? IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")))
+        : "";
+  }
+
   public String getMethod() {
     return this.startLine.get("method");
   }
@@ -67,6 +81,10 @@ public class HttpRequest extends HttpTemplate {
 
   public Map<String, String> getHeader() {
     return this.header;
+  }
+
+  public String getBody() {
+    return this.body;
   }
 
 }

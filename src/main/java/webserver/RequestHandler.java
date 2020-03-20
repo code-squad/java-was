@@ -38,8 +38,8 @@ public class RequestHandler extends Thread {
       HttpRequest httpRequest = new HttpRequest(br);
       log.debug("### httpRequest.getMethod() : {}", httpRequest.getMethod());
       log.debug("### httpRequest.getPath() : {}", httpRequest.getPath());
-
       log.debug("### httpRequest.getHeader() : {}", httpRequest.getHeader());
+      log.debug("### httpRequest.getBody() : {}", httpRequest.getBody());
 
 //      String requestBody = "";
 //      if (requestHeader.containsKey("Content-Length")) {
