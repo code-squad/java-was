@@ -1,6 +1,6 @@
 package webserver;
 
-import Controller.PageController;
+import model.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
@@ -35,23 +35,27 @@ public class RequestHandler extends Thread {
       DataOutputStream dos = new DataOutputStream(out);
       BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
-      Map<String, Pair> requestLine = requestLine(br);
-      Map<String, Pair> requestHeader = requestHeader(br);
-      String requestBody = "";
-      if (requestHeader.containsKey("Content-Length")) {
-        requestBody = requestBody(br, Integer.parseInt(requestHeader.get("Content-Length").getValue()));
-      }
+      HttpRequest httpRequest = new HttpRequest(br);
+      log.debug("httpRequest.getMethod() : {}", httpRequest.getMethod());
+      log.debug("httpRequest.getPath() : {}", httpRequest.getPath());
 
-      PageController pc = new PageController();
-      Map<String, String> response = pc.doWork(requestLine, requestHeader, requestBody);
-
-      String statusLine = statusLine(response.get("statusCode"), response.get("message"));
-      log.debug("### statusLine: {}", statusLine);
-      byte[] body = responseBody(response.get("responseBodyUrl"));
-      String responseHeader = responseHeader(body.length, response);
-      log.debug("### maked responseHeader : {}", responseHeader);
-
-      sendResponse(dos, statusLine, responseHeader, body);
+//      Map<String, Pair> requestLine = requestLine(br);
+//      Map<String, Pair> requestHeader = requestHeader(br);
+//      String requestBody = "";
+//      if (requestHeader.containsKey("Content-Length")) {
+//        requestBody = requestBody(br, Integer.parseInt(requestHeader.get("Content-Length").getValue()));
+//      }
+//
+//      PageController pc = new PageController();
+//      Map<String, String> response = pc.doWork(requestLine, requestHeader, requestBody);
+//
+//      String statusLine = statusLine(response.get("statusCode"), response.get("message"));
+//      log.debug("### statusLine: {}", statusLine);
+//      byte[] body = responseBody(response.get("responseBodyUrl"));
+//      String responseHeader = responseHeader(body.length, response);
+//      log.debug("### maked responseHeader : {}", responseHeader);
+//
+//      sendResponse(dos, statusLine, responseHeader, body);
     } catch (IOException ie) {
       log.error(ie.getMessage());
     } catch (Exception e) {
@@ -122,10 +126,9 @@ public class RequestHandler extends Thread {
     log.debug("### responseHeader, {}", lengthOfBodyContent);
 
     StringBuilder sb = new StringBuilder();
-
+    sb.append("responseBodyUrl").append(response.get("responseBodyUrl")).append("\r\n");
     sb.append("location: ").append(response.get("location")).append("\r\n");
     sb.append("Set-Cookie: ").append(response.get("Set-Cookie")).append("\r\n");
-
     String contentType = response.get("contentType");
     if (contentType.startsWith("text/html")) {
       sb.append("Content-Type: text/html;charset=utf-8\r\n");
