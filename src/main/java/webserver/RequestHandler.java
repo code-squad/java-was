@@ -116,6 +116,12 @@ public class RequestHandler extends Thread {
             response302Header(dos, "/index.html", isLogined);
             return;
         }
+        byte[] body = hardBar(url);
+        response200Header(dos, body.length);
+        responseBody(dos, body);
+    }
+
+    private byte[] hardBar(String url) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("<tbody>");
         Collection<User> users = DataBase.findAll();
@@ -131,8 +137,7 @@ public class RequestHandler extends Thread {
         sb.append("</tbody>");
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         body = new String(body, StandardCharsets.UTF_8).replaceAll("\\{\\{users}}", sb.toString()).getBytes();
-        response200Header(dos, body.length);
-        responseBody(dos, body);
+        return body;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
