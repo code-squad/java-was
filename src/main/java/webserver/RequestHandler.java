@@ -1,5 +1,6 @@
 package webserver;
 
+import Controller.PageController;
 import model.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,17 +42,13 @@ public class RequestHandler extends Thread {
       log.debug("### httpRequest.getHeader() : {}", httpRequest.getHeader());
       log.debug("### httpRequest.getBody() : {}", httpRequest.getBody());
 
-//      String requestBody = "";
-//      if (requestHeader.containsKey("Content-Length")) {
-//        requestBody = requestBody(br, Integer.parseInt(requestHeader.get("Content-Length").getValue()));
-//      }
-//
-//      PageController pc = new PageController();
-//      Map<String, String> response = pc.doWork(requestLine, requestHeader, requestBody);
-//
+      PageController pc = new PageController();
+      Map<String, String> response = pc.doWork(httpRequest.getStartLine(), httpRequest.getHeader(), httpRequest.getBody());
+      log.debug("### !!!!!!!!!!response : {}", response);
 //      String statusLine = statusLine(response.get("statusCode"), response.get("message"));
 //      log.debug("### statusLine: {}", statusLine);
 //      byte[] body = responseBody(response.get("responseBodyUrl"));
+//      log.debug("!!!!!body : {}", body);
 //      String responseHeader = responseHeader(body.length, response);
 //      log.debug("### maked responseHeader : {}", responseHeader);
 //

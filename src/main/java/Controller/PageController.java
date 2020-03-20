@@ -14,8 +14,8 @@ import java.util.Map;
 public class PageController {
   private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
-  public Map<String, String> doWork(Map<String, HttpRequestUtils.Pair> requestLine,
-                                    Map<String, HttpRequestUtils.Pair> requestHeader, String requestBody)
+  public Map<String, String> doWork(Map<String, String> requestLine,
+                                    Map<String, String> requestHeader, String requestBody)
   {
     Map<String, String> response = new HashMap<>();
     log.debug("### dowork");
@@ -25,10 +25,10 @@ public class PageController {
     String location = "";
     String message = "";
 
-    String method = requestLine.get("method").getValue();
-    String requestUrl = requestLine.get("requestUrl").getValue();
-    String protocol = requestLine.get("protocol").getValue();
-    String contentType = requestHeader.get("Accept").getValue();
+    String method = requestLine.get("method");
+    String requestUrl = requestLine.get("requestUrl");
+    String protocol = requestLine.get("protocol");
+    String contentType = requestHeader.get("Accept");
 
     switch (method) {
       case "GET":
@@ -52,9 +52,9 @@ public class PageController {
         } else if (requestUrl.equals("/user/list")) {
           boolean de = false;
           log.debug("### requestHeader : {}", requestHeader);
-          log.debug("### requestHeader : {}", requestHeader.get("Cookie").getValue());
+          log.debug("### requestHeader : {}", requestHeader.get("Cookie"));
 
-          String cookie = requestHeader.get("Cookie").getValue().replaceAll(" ", "");
+          String cookie = requestHeader.get("Cookie").replaceAll(" ", "");
           boolean delemeter = Arrays.stream(cookie.split(";")).anyMatch(token -> token.startsWith("logined=true"));
 
           if (delemeter) {
@@ -68,7 +68,7 @@ public class PageController {
             message = "Found";
           }
         } else {
-          responseBodyUrl = requestLine.get("requestUrl").getValue();
+          responseBodyUrl = requestLine.get("requestUrl");
           statusCode = "200";
           message = "OK";
         }

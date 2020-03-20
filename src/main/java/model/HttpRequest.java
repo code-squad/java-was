@@ -87,4 +87,8 @@ public class HttpRequest extends HttpTemplate {
     return this.body;
   }
 
+  public Map<String, String> getStartLine() {
+    return this.startLine;
+  }
+
 }
