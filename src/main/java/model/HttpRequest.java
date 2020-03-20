@@ -8,19 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest extends HttpTemplate {
+  private BufferedReader br;
 
   public HttpRequest(BufferedReader br) throws Exception {
     this.br = br;
     this.startLine = requestLine();
     this.header = requestHeader();
     this.body = requestBody();
-
-    //      Map<String, HttpRequestUtils.Pair> requestLine = requestLine(br);
-    //      Map<String, HttpRequestUtils.Pair> requestHeader = requestHeader(br);
-    //      String requestBody = "";
-    //      if (requestHeader.containsKey("Content-Length")) {
-    //        requestBody = requestBody(br, Integer.parseInt(requestHeader.get("Content-Length").getValue()));
-    //      }
   }
 
   /**
@@ -67,12 +61,16 @@ public class HttpRequest extends HttpTemplate {
    */
   private String requestBody() throws Exception {
     return (br.ready() && header.containsKey("Content-Length"))
-        ? IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")))
-        : "";
+           ? IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")))
+           : "";
   }
 
   public String getMethod() {
     return this.startLine.get("method");
+  }
+
+  public String getProtocol() {
+    return this.startLine.get("protocol");
   }
 
   public String getPath() {
@@ -90,5 +88,4 @@ public class HttpRequest extends HttpTemplate {
   public Map<String, String> getStartLine() {
     return this.startLine;
   }
-
 }

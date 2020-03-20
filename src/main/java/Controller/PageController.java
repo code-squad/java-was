@@ -113,6 +113,7 @@ public class PageController {
     response.put("statusCode", statusCode);
     response.put("location", location);
     response.put("message", message);
+    response.put("protocol", protocol);
     response.put("contentType", contentType);
 
     return response;
