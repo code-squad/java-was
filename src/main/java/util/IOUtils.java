@@ -1,5 +1,7 @@
 package util;
 
+import model.HttpRequest;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 
