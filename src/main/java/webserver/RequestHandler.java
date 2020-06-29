@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import db.DataBase;
 import model.User;
+import util.HttpMethod;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
@@ -43,20 +44,15 @@ public class RequestHandler extends Thread {
 			}
 
 			String[] tokens = line.split(" ");
-			String httpMethod = tokens[0];
+			HttpMethod httpMethod = HttpMethod.valueOf(tokens[0]);
 			String url = tokens[1];
 
-			if (httpMethod.equals("GET")) {
-				byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-				log.trace("body : {}", new String(body, StandardCharsets.UTF_8));
-				DataOutputStream dos = new DataOutputStream(out);
-				response200Header(dos, body.length);
-				responseBody(dos, body);
+			if (httpMethod.equals(HttpMethod.GET)) {
+				httpMethodGetHandler(out, br, url);
 			}
 
-			if (httpMethod.equals("POST")) {
-				userSignUpWithPostMethod(url, br, out);
-				userLoginWithPostMethod(url, br, out);
+			if (httpMethod.equals(HttpMethod.POST)) {
+				httpMethodPostHandler(out, br, url);
 			}
 
 		} catch (IOException e) {
@@ -64,11 +60,32 @@ public class RequestHandler extends Thread {
 		}
 	}
 
-	private void userSignUpWithPostMethod(String url, BufferedReader br, OutputStream out) throws IOException {
-		if (! url.contains("create")) {
-			return;
+	private void httpMethodGetHandler(OutputStream out, BufferedReader br, String url) throws IOException {
+		byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+		log.trace("body : {}", new String(body, StandardCharsets.UTF_8));
+		DataOutputStream dos = new DataOutputStream(out);
+		response200Header(dos, body.length);
+		responseBody(dos, body);
+	}
+
+	private void httpMethodPostHandler(OutputStream out, BufferedReader br, String url) throws IOException {
+		int contentLength = contentLengthParser(br);
+		String body = IOUtils.readData(br, contentLength);
+		log.debug("body: {}", body);
+
+		Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(body);
+		log.debug("parameterMap: {}", parameterMap);
+
+		if (url.contains("create")) {
+			userSignUpWithPostMethod(url, br, out);
 		}
 
+		if (url.contains("login")) {
+			userLoginWithPostMethod(url, br, out);
+		}
+	}
+
+	private void userSignUpWithPostMethod(String url, BufferedReader br, OutputStream out) throws IOException {
 		int contentLength = contentLengthParser(br);
 		String body = IOUtils.readData(br, contentLength);
 		log.debug("body: {}", body);
@@ -83,10 +100,6 @@ public class RequestHandler extends Thread {
 	}
 
 	private void userLoginWithPostMethod(String url, BufferedReader br, OutputStream out) throws IOException {
-		if (! url.contains("login")) {
-			return;
-		}
-
 		int contentLength = contentLengthParser(br);
 		String userParameter = IOUtils.readData(br, contentLength);
 		Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(userParameter);
@@ -95,10 +108,12 @@ public class RequestHandler extends Thread {
 		String inputPassword = parameterMap.get("password");
 		String setCookie = "loggedIn=false;";
 		String redirectUrl = "/user/login_failed.html";
+
 		if (loginUser != null && loginUser.getPassword().equals(inputPassword)) {
 			redirectUrl = "/index.html";
 			setCookie = "loggedIn=true;";
 		}
+
 		DataOutputStream dos = new DataOutputStream(out);
 		response302Header(dos, setCookie, redirectUrl);
 	}
