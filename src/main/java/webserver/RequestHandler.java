@@ -44,7 +44,9 @@ public class RequestHandler extends Thread {
             String[] tokens = line.split(" ");
 
             String url = tokens[1];
-            userSignUpWithPostMethod(url, br);
+            if (url.startsWith("/user/create")) {
+                userSignUpByHttpMethod(tokens, url, br);
+            }
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + tokens[1]).toPath());
@@ -55,8 +57,20 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private User userSignUpWithGetMethod(String url) {
+    private User userSignUpByHttpMethod(String[] tokens, String url, BufferedReader br) throws IOException {
+        String httpMethod = tokens[0];
+        if (httpMethod.equals("GET")) {
+            return userSignUpWithGetMethod(url);
+        }
+        if (httpMethod.equals("POST")) {
+            return userSignUpWithPostMethod(url, br);
+        }
+        return null;
+    }
+
+    private User userSignUpWithGetMethod(String url) throws IOException {
         final String questionMark = "?";
+        OutputStream out = connection.getOutputStream();
         if (url.startsWith("/user/create")) {
             int index = url.indexOf(questionMark);
             String queryString = url.substring(index + 1);
@@ -64,12 +78,18 @@ public class RequestHandler extends Thread {
             Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(queryString);
             User user = User.ofMap(parameterMap);
             log.debug("user: {}", user);
+
+            DataOutputStream dos = new DataOutputStream(out);
+            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+            response200Header(dos, body.length);
+            responseBody(dos, body);
             return user;
         }
         return null;
     }
 
     private User userSignUpWithPostMethod(String url, BufferedReader br) throws IOException {
+        OutputStream out = connection.getOutputStream();
         if (url.startsWith("/user/create")) {
             int contentLength = contentLengthParser(br);
             String body = IOUtils.readData(br, contentLength);
@@ -78,6 +98,8 @@ public class RequestHandler extends Thread {
             log.debug("parameterMap: {}", parameterMap);
             User user = User.ofMap(parameterMap);
             log.debug("user: {}", user);
+            DataOutputStream dos = new DataOutputStream(out);
+            response302Header(dos, "/index.html");
             return user;
         }
         return null;
@@ -116,6 +138,16 @@ public class RequestHandler extends Thread {
         try {
             dos.write(body, 0, body.length);
             dos.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String url) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Redirect \r\n");
+            dos.writeBytes("Location: " + url + " \r\n");
+            dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
