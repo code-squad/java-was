@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -61,10 +62,19 @@ public class RequestHandler extends Thread {
 	}
 
 	private void httpMethodGetHandler(OutputStream out, BufferedReader br, String url) throws IOException {
+		if (url.contains("/user/list")) {
+			userListResponseHandler(out, br, url);
+			return;
+		}
 		byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
 		log.trace("body : {}", new String(body, StandardCharsets.UTF_8));
 		DataOutputStream dos = new DataOutputStream(out);
-		response200Header(dos, body.length);
+		if (url.endsWith(".css")) {
+			response200Header(dos, body.length, "text/css");
+		}
+		if (! url.endsWith(".css")) {
+			response200Header(dos, body.length);
+		}
 		responseBody(dos, body);
 	}
 
@@ -101,34 +111,66 @@ public class RequestHandler extends Thread {
 
 	private void userLoginWithPostMethod(String url, BufferedReader br, OutputStream out) throws IOException {
 		int contentLength = contentLengthParser(br);
-		String userParameter = IOUtils.readData(br, contentLength);
-		Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(userParameter);
+		String body = IOUtils.readData(br, contentLength);
+		log.debug("body: {}", body);
+		Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(body);
 
 		User loginUser = DataBase.findUserById(parameterMap.get("userId"));
 		String inputPassword = parameterMap.get("password");
-		String setCookie = "loggedIn=false;";
+		boolean setCookie = false;
 		String redirectUrl = "/user/login_failed.html";
 
 		if (loginUser != null && loginUser.getPassword().equals(inputPassword)) {
 			redirectUrl = "/index.html";
-			setCookie = "loggedIn=true;";
+			setCookie = true;
 		}
 
 		DataOutputStream dos = new DataOutputStream(out);
 		response302Header(dos, setCookie, redirectUrl);
 	}
 
-	private int contentLengthParser(BufferedReader br) throws IOException {
-		int contentLength = 0;
+	private void userListResponseHandler(OutputStream out, BufferedReader br, String url) throws IOException {
+		Map<String, String> requestHeaders = readRequestHeader(br);
+		Map<String, String> cookies = HttpRequestUtils.parseCookies(requestHeaders.get("cookie"));
+		boolean isLoggedIn = Boolean.parseBoolean(cookies.get("loggedIn"));
+		DataOutputStream dos = new DataOutputStream(out);
+
+		if (! isLoggedIn) {
+			response302Header(dos, isLoggedIn, "/index.html");
+			return;
+		}
+		byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+		response200Header(dos, body.length);
+		responseBody(dos, body);
+	}
+
+	private Map<String, String> readRequestHeader(BufferedReader br) throws IOException {
+		Map<String, String> requestHeaders = new HashMap<>();
+
 		while (true) {
 			String line = br.readLine();
 			if ("".equals(line)) {
 				break;
 			}
+			String[] header = line.split(": ");
+			requestHeaders.put(header[0], header[1]);
+		}
+		return requestHeaders;
+	}
+
+	private int contentLengthParser(BufferedReader br) throws IOException {
+		int contentLength = 0;
+		String line;
+		do {
+			line = br.readLine();
+			if ("".equals(line)) {
+				break;
+			}
 			if (line.contains("Content-Length")) {
 				contentLength = Integer.parseInt(line.split(": ")[1]);
+				return contentLength;
 			}
-		}
+		} while (line.contains("Content-Length"));
 		return contentLength;
 	}
 
@@ -136,6 +178,17 @@ public class RequestHandler extends Thread {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
 			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+			dos.writeBytes("\r\n");
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
+		try {
+			dos.writeBytes("HTTP/1.1 200 OK \r\n");
+			dos.writeBytes("Content-Type: " + contentType + "\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
@@ -173,10 +226,10 @@ public class RequestHandler extends Thread {
 		}
 	}
 
-	private void response302Header(DataOutputStream dos, String setCookie, String url) {
+	private void response302Header(DataOutputStream dos, boolean setCookie, String url) {
 		try {
 			dos.writeBytes("HTTP/1.1 302 Redirect \r\n");
-			dos.writeBytes("Set-Cookie: " + setCookie + " Path=/\r\n");
+			dos.writeBytes("Set-Cookie: loggedIn:" + setCookie + " Path=/\r\n");
 			dos.writeBytes("Location: " + url + " \r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
