@@ -80,7 +80,8 @@ public class RequestHandler extends Thread {
 	}
 
 	private void httpMethodPostHandler(OutputStream out, BufferedReader br, String url) throws IOException {
-		int contentLength = contentLengthParser(br);
+		Map<String, String> headers = readRequestHeader(br);
+		int contentLength = Integer.parseInt(headers.getOrDefault("Content-Length", "0"));
 		String body = IOUtils.readData(br, contentLength);
 		log.debug("body: {}", body);
 
@@ -88,20 +89,15 @@ public class RequestHandler extends Thread {
 		log.debug("parameterMap: {}", parameterMap);
 
 		if (url.contains("create")) {
-			userSignUpWithPostMethod(url, br, out);
+			userSignUpWithPostMethod(parameterMap, out);
 		}
 
 		if (url.contains("login")) {
-			userLoginWithPostMethod(url, br, out);
+			userLoginWithPostMethod(parameterMap, out);
 		}
 	}
 
-	private void userSignUpWithPostMethod(String url, BufferedReader br, OutputStream out) throws IOException {
-		int contentLength = contentLengthParser(br);
-		String body = IOUtils.readData(br, contentLength);
-		log.debug("body: {}", body);
-
-		Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(body);
+	private void userSignUpWithPostMethod(Map<String, String> parameterMap, OutputStream out) throws IOException {
 		log.debug("parameterMap: {}", parameterMap);
 		User user = User.ofMap(parameterMap);
 		DataBase.addUser(user);
@@ -110,12 +106,7 @@ public class RequestHandler extends Thread {
 		response302Header(dos, "/index.html");
 	}
 
-	private void userLoginWithPostMethod(String url, BufferedReader br, OutputStream out) throws IOException {
-		int contentLength = contentLengthParser(br);
-		String body = IOUtils.readData(br, contentLength);
-		log.debug("body: {}", body);
-		Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(body);
-
+	private void userLoginWithPostMethod(Map<String, String> parameterMap, OutputStream out) throws IOException {
 		User loginUser = DataBase.findUserById(parameterMap.get("userId"));
 		String inputPassword = parameterMap.get("password");
 		boolean setCookie = false;
@@ -174,22 +165,6 @@ public class RequestHandler extends Thread {
 		return requestHeaders;
 	}
 
-	private int contentLengthParser(BufferedReader br) throws IOException {
-		int contentLength = 0;
-		String line;
-		do {
-			line = br.readLine();
-			if ("".equals(line)) {
-				break;
-			}
-			if (line.contains("Content-Length")) {
-				contentLength = Integer.parseInt(line.split(": ")[1]);
-				return contentLength;
-			}
-		} while (line.contains("Content-Length"));
-		return contentLength;
-	}
-
 	private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
@@ -206,17 +181,6 @@ public class RequestHandler extends Thread {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
 			dos.writeBytes("Content-Type: " + contentType + "\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-			dos.writeBytes("\r\n");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-	}
-
-	private void response200Header(DataOutputStream dos, String setCookie) {
-		try {
-			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-			dos.writeBytes("Set-Cookie: " + setCookie + " Path=/\r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
 			log.error(e.getMessage());
