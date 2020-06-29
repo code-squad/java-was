@@ -10,8 +10,10 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -123,7 +125,7 @@ public class RequestHandler extends Thread {
 
 	private void userListResponseHandler(OutputStream out, BufferedReader br, String url) throws IOException {
 		Map<String, String> requestHeaders = readRequestHeader(br);
-		Map<String, String> cookies = HttpRequestUtils.parseCookies(requestHeaders.get("cookie"));
+		Map<String, String> cookies = HttpRequestUtils.parseCookies(requestHeaders.get("Cookie"));
 		boolean isLoggedIn = Boolean.parseBoolean(cookies.get("loggedIn"));
 		DataOutputStream dos = new DataOutputStream(out);
 
@@ -135,9 +137,10 @@ public class RequestHandler extends Thread {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<tbody>");
 		Collection<User> users = DataBase.findAll();
+		List<User> userList = new ArrayList<>(users);
 
-		for (int index = 0; index < users.size(); index++) {
-			User user = (User) users.toArray()[index];
+		for (int index = 0; index < userList.size(); index++) {
+			User user = userList.get(index);
 			sb.append("<tr>").append("<th scope=\"row\">")
 				.append(index).append("</th> <td>").append(user.getUserId())
 				.append("</td> <td>").append(user.getName())
@@ -209,7 +212,7 @@ public class RequestHandler extends Thread {
 	private void response302Header(DataOutputStream dos, boolean setCookie, String url) {
 		try {
 			dos.writeBytes("HTTP/1.1 302 Redirect \r\n");
-			dos.writeBytes("Set-Cookie: loggedIn:" + setCookie + " Path=/\r\n");
+			dos.writeBytes("Cookie: loggedIn:" + setCookie + " Path=/\r\n");
 			dos.writeBytes("Location: " + url + " \r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
