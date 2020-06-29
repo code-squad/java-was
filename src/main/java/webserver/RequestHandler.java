@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import model.User;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -42,14 +43,8 @@ public class RequestHandler extends Thread {
 
             String[] tokens = line.split(" ");
 
-            while (! line.equals("")) {
-                line = br.readLine();
-                log.debug("header: {}", line);
-            }
-
-            //요구사항 2
             String url = tokens[1];
-            userSignUp(url);
+            userSignUpWithPostMethod(url, br);
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + tokens[1]).toPath());
@@ -60,7 +55,7 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private User userSignUp(String url) {
+    private User userSignUpWithGetMethod(String url) {
         final String questionMark = "?";
         if (url.startsWith("/user/create")) {
             int index = url.indexOf(questionMark);
@@ -72,6 +67,38 @@ public class RequestHandler extends Thread {
             return user;
         }
         return null;
+    }
+
+    private User userSignUpWithPostMethod(String url, BufferedReader br) throws IOException {
+        if (url.startsWith("/user/create")) {
+            int contentLength = contentLengthParser(br);
+            String body = IOUtils.readData(br, contentLength);
+            log.debug("body: {}", body);
+            Map<String, String> parameterMap = HttpRequestUtils.parseQueryString(body);
+            log.debug("parameterMap: {}", parameterMap);
+            User user = User.ofMap(parameterMap);
+            log.debug("user: {}", user);
+            return user;
+        }
+        return null;
+    }
+
+    private int contentLengthParser(BufferedReader br) throws IOException {
+        int contentLength = 0;
+        String line = " ";
+        //TODO br.readLine()의 작동방식 살펴보기
+        while (true) {
+            line = br.readLine();
+            log.debug("this is line: {}", line);
+            if (line.contains("Content-Length")) {
+                contentLength = Integer.parseInt(line.split(": ")[1]);
+                break;
+            }
+            if (line.equals("")) {
+                break;
+            }
+        }
+        return contentLength;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
