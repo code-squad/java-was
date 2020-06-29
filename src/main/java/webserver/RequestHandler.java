@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -139,7 +140,22 @@ public class RequestHandler extends Thread {
 			response302Header(dos, isLoggedIn, "/index.html");
 			return;
 		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<tbody>");
+		Collection<User> users = DataBase.findAll();
+
+		for (int index = 0; index < users.size(); index++) {
+			User user = (User) users.toArray()[index];
+			sb.append("<tr>").append("<th scope=\"row\">")
+				.append(index).append("</th> <td>").append(user.getUserId())
+				.append("</td> <td>").append(user.getName())
+				.append("</td> <td>").append(user.getEmail())
+				.append("</td><td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>").append("</tr>");
+		}
+		sb.append("</tbody>");
 		byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+		body = new String(body, StandardCharsets.UTF_8).replaceAll("\\{\\{users}}", sb.toString()).getBytes();
 		response200Header(dos, body.length);
 		responseBody(dos, body);
 	}
